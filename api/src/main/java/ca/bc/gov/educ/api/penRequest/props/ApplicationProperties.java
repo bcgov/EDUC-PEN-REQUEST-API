@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppliationProperties {
+public class ApplicationProperties {
 
     public static final String CLIENT_ID = "DIGITAL-ID-API";
 

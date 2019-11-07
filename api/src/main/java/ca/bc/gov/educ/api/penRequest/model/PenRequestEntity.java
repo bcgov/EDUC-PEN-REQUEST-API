@@ -46,7 +46,7 @@ public class PenRequestEntity {
     String createUser;
     @PastOrPresent
     Date createDate;
-    StringUpdateUser;
+    String updateUser;
     @PastOrPresent
     Date updateDate;
 }

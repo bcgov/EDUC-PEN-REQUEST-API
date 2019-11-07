@@ -36,7 +36,6 @@ public class CustomRemoteTokenService implements ResourceServerTokenServices {
     private AccessTokenConverter tokenConverter = new DefaultAccessTokenConverter();
 
 
-
     @Autowired
     public CustomRemoteTokenService() {
         restTemplate = new RestTemplate();
@@ -81,3 +80,4 @@ public class CustomRemoteTokenService implements ResourceServerTokenServices {
         }
         return null;
     }
+}

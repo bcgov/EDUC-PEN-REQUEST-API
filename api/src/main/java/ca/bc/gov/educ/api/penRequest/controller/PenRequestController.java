@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penRequest.controller;
 
 import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penRequest.service.PenRequestService.java;
+import ca.bc.gov.educ.api.penRequest.service.PenRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +19,7 @@ public class PenRequestController {
     }
 
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable String id) throws Exception {
+    public PenRequestEntity retrievePenRequest(@PathVariable Integer id) throws Exception {
         return service.retrievePenRequest(id);
     }
 
