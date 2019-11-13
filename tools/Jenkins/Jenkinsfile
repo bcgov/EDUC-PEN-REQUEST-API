@@ -8,7 +8,7 @@ pipeline{
       PROD = 'c2mvws-prod'
 
       REPO_NAME = 'educ-pen-request-api'
-      OWNER = 'bcgov'
+      OWNER = 'ndenny1'
       JOB_NAME = 'master'
       TAG = 'dev'
 

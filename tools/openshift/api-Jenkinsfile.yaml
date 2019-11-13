@@ -14,7 +14,7 @@ objects:
       source:
         git:
           ref: master
-          uri: "https://github.com/bcgov/EDUC-PEN-REQUEST-API"
+          uri: "https://github.com/ndenny1/EDUC-PEN-REQUEST-API"
       strategy:
         jenkinsPipelineStrategy:
           jenkinsfilePath: tools/Jenkins/Jenkinsfile
