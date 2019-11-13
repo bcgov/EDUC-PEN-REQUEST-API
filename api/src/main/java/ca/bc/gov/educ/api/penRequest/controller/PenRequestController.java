@@ -19,7 +19,7 @@ public class PenRequestController {
     }
 
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable Integer id) throws Exception {
+    public PenRequestEntity retrievePenRequest(@PathVariable String id) throws Exception {
         return service.retrievePenRequest(id);
     }
 

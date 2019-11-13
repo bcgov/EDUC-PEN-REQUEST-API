@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ca.bc.gov.educ.api.penRequest.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
@@ -19,8 +20,13 @@ public class PenRequestService {
     @Autowired
     private PenRequestRepository penRequestRepository;
 
-    public PenRequestEntity retrievePenRequest(Integer id) throws Exception{
+    public PenRequestEntity retrievePenRequest(String id) throws Exception{
         try{
+            Boolean res = penRequestRepository.existsById(id);
+            if(!res){
+                throw new EntityNotFoundException(PenRequestEntity.class);
+            }
+
             return penRequestRepository.findById(id).orElse(null);
         } catch(Exception e){
             throw new Exception("Error while retrieving PenRequest", e);
