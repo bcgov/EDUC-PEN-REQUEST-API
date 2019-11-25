@@ -24,64 +24,63 @@ pipeline{
       TEST_HOST_ROUTE = "${APP_NAME}-${TEST}.${APP_DOMAIN}"
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
-
-      stage('Build PEN Request API'){
-        steps{
-          script{
-            openshift.withCluster(){
-              openshift.withProject(){
-                def bcApi = openshift.process('-f', 'tools/openshift/api.bc.yaml')
-                openshift.apply(bcApi).narrow('bc').startBuild('-w').logs('-f')
-              }
+  stages{
+    stage('Build PEN Request API'){
+      steps{
+        script{
+          openshift.withCluster(){
+            openshift.withProject(){
+              def bcApi = openshift.process('-f', 'tools/openshift/api.bc.yaml')
+              openshift.apply(bcApi).narrow('bc').startBuild('-w').logs('-f')
             }
           }
         }
-        post {
-          success {
-              echo 'Cleanup BuildConfigs'
-              script {
-                  openshift.withCluster() {
-                    openshift.withProject(TOOLS) {
-                      def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
+      }
+      post {
+        success {
+            echo 'Cleanup BuildConfigs'
+            script {
+                openshift.withCluster() {
+                  openshift.withProject(TOOLS) {
+                    def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
 
-                      if(bcApi.exists()) {
-                          echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
-                          bcApi.delete()
-                      }
+                    if(bcApi.exists()) {
+                        echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
+                        bcApi.delete()
                     }
                   }
-              }
-          }
-          failure {
-              echo 'Build stage failed'
-          }
+                }
+            }
+        }
+        failure {
+            echo 'Build stage failed'
         }
       }
-      stage('Promote to DEV') {
-        steps {
-          script {
-            openshift.withCluster() {
-              openshift.withProject(DEV) {
-                echo "Tagging image"
-                openshift.tag("${TOOLS}/${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${TAG}")
-                def dcTemplate = openshift.process('-f',
-                  'tools/openshift/api.dc.yaml',
-                  "REPO_NAME=${REPO_NAME}",
-                  "JOB_NAME=${JOB_NAME}",
-                  "NAMESPACE=${DEV}",
-                  "APP_NAME=${APP_NAME}",
-                  "HOST_ROUTE=${DEV_HOST_ROUTE}",
-                  "TAG=${TAG}"
-                )
+    }
+    stage('Promote to DEV') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(DEV) {
+              echo "Tagging image"
+              openshift.tag("${TOOLS}/${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${TAG}")
+              def dcTemplate = openshift.process('-f',
+                'tools/openshift/api.dc.yaml',
+                "REPO_NAME=${REPO_NAME}",
+                "JOB_NAME=${JOB_NAME}",
+                "NAMESPACE=${DEV}",
+                "APP_NAME=${APP_NAME}",
+                "HOST_ROUTE=${DEV_HOST_ROUTE}",
+                "TAG=${TAG}"
+              )
 
-                echo "Applying Deployment ${REPO_NAME}"
-                def dc = openshift.apply(dcTemplate).narrow('dc')
+              echo "Applying Deployment ${REPO_NAME}"
+              def dc = openshift.apply(dcTemplate).narrow('dc')
 
-                echo "Waiting for deployment to roll out"
-                // Wait for deployments to roll out
-                timeout(10) {
-                  dc.rollout().status('--watch=true')
-                }
+              echo "Waiting for deployment to roll out"
+              // Wait for deployments to roll out
+              timeout(10) {
+                dc.rollout().status('--watch=true')
               }
             }
           }
@@ -89,3 +88,4 @@ pipeline{
       }
     }
   }
+}
