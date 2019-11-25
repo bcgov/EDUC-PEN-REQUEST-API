@@ -44,12 +44,12 @@ public class PenRequestService {
         
         validateParameters(penRequest);
         
-        Optional<PenRequestEntity> curPenRequest = PenRequestRepository.findById(penRequest.getPenRequestID());
+        Optional<PenRequestEntity> curPenRequest = penRequestRepository.findById(penRequest.getPenRequestID());
 
         if(curPenRequest.isPresent())
         {
             PenRequestEntity newPenRequest = curPenRequest.get();
-            newPenRequest.setpenRequestStatusCode(penRequest.getPenRequestStatusCode());
+            newPenRequest.setPenRequestStatusCode(penRequest.getPenRequestStatusCode());
             newPenRequest.setLegalFirstName(penRequest.getLegalFirstName());
             newPenRequest.setLegalLastName(penRequest.getLegalLastName());
             newPenRequest.setDob(penRequest.getDob());
@@ -62,12 +62,12 @@ public class PenRequestService {
             newPenRequest.setMaidenName(penRequest.getMaidenName());
             newPenRequest.setPastNames(penRequest.getPastNames());
             newPenRequest.setLastBCSchool(penRequest.getLastBCSchool());
-            newPenRequest.setLasBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
+            newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setReceiver(penRequest.getReceiver());
             newPenRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
             newPenRequest.setUpdateDate(new Date());
-            newPenRequest = PenRequestRepository.save(newPenRequest);
+            newPenRequest = penRequestRepository.save(newPenRequest);
 
             return newPenRequest;
         } else {
