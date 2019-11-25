@@ -1,16 +1,15 @@
 package ca.bc.gov.educ.api.penRequest.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
-
 import javax.persistence.Column;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
@@ -18,11 +17,14 @@ import java.util.Date;
 
 @Entity
 @Data
+@Getter
+@Setter
 @Table(name = "PEN_Retrieval_Request")
 public class PenRequestEntity {
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @NotNull(message="penRequestID cannot be null")
-    @Column(name = "PEN_Retrieval_Request_ID")
+    @Column(name = "PEN_Retrieval_Request_ID", unique = true, updatable = false)
     Integer penRequestID;
 
     @NotNull(message="digitalID cannot be null")
@@ -43,9 +45,6 @@ public class PenRequestEntity {
 
     @Column(name = "DOB")
     Date dob;
-
-    @Column(name = "Sex_Code")
-    String sexCode;
 
     @Column(name = "Gender_Code")
     String genderCode;

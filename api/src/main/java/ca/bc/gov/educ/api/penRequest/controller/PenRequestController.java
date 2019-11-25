@@ -24,7 +24,7 @@ public class PenRequestController {
 
     @PreAuthorize("#oauth2.hasScope('REQUEST_GET')")
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable String id) throws Exception {
+    public PenRequestEntity retrievePenRequest(@PathVariable Integer id) throws Exception {
         return service.retrievePenRequest(id);
     }
 
