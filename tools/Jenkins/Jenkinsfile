@@ -8,7 +8,7 @@ pipeline{
       PROD = 'c2mvws-prod'
 
       REPO_NAME = 'educ-pen-request-api'
-      OWNER = 'ndenny1'
+      OWNER = 'bcgov'
       JOB_NAME = 'master'
       TAG = 'dev'
 
@@ -25,35 +25,53 @@ pipeline{
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
   stages{
-    stage('Build PEN Request API'){
-      steps{
-        script{
-          openshift.withCluster(){
-            openshift.withProject(){
-              def bcApi = openshift.process('-f', 'tools/openshift/api.bc.yaml')
-              openshift.apply(bcApi).narrow('bc').startBuild('-w').logs('-f')
-            }
+    stage('Build App') {
+      steps {
+        sh "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"
+      }
+    }
+    stage('Create Image Builder') {
+      when {
+        expression {
+          openshift.withCluster() {
+            return !openshift.selector("bc", "educ-pen-request-api-master").exists();
+          }
+        }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.newBuild("--name=educ-pen-request-api-master", "--image-stream=redhat-openjdk18-openshift:1.1", "--binary")
+          }
+        }
+      }
+    }
+    stage('Build Image') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.selector("bc", "educ-pen-request-api-master").startBuild("--from-file=./api/target/penrequest-api-0.0.1.SNAPSHOT.jar", "--wait")
           }
         }
       }
       post {
         success {
-            echo 'Cleanup BuildConfigs'
-            script {
-                openshift.withCluster() {
-                  openshift.withProject(TOOLS) {
-                    def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
+          echo 'Cleanup BuildConfigs'
+          script {
+              openshift.withCluster() {
+                openshift.withProject(TOOLS) {
+                  def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
 
-                    if(bcApi.exists()) {
-                        echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
-                        bcApi.delete()
-                    }
+                  if(bcApi.exists()) {
+                      echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
+                      bcApi.delete()
                   }
                 }
+              }
             }
         }
         failure {
-            echo 'Build stage failed'
+          echo 'Build stage failed'
         }
       }
     }
