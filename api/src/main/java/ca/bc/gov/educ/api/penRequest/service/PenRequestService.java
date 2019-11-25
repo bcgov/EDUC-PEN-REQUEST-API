@@ -64,7 +64,7 @@ public class PenRequestService {
             newPenRequest.setLastBCSchool(penRequest.getLastBCSchool());
             newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
-            newPenRequest.setReceiver(penRequest.getReceiver());
+            newPenRequest.setReviewer(penRequest.getReviewer());
             newPenRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
             newPenRequest.setUpdateDate(new Date());
             newPenRequest = penRequestRepository.save(newPenRequest);
