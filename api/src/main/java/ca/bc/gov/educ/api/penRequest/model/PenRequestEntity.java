@@ -19,68 +19,68 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-@Table(name = "PEN_Retrieval_Request")
+@Table(name = "pen_retrieval_request")
 public class PenRequestEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @NotNull(message="penRequestID cannot be null")
-    @Column(name = "PEN_Retrieval_Request_ID", unique = true, updatable = false)
+    @Column(name = "pen_retrieval_request_id", unique = true, updatable = false)
     Integer penRequestID;
 
     @NotNull(message="digitalID cannot be null")
-    @Column(name = "Digital_Identity_ID")
+    @Column(name = "digital_identity_id")
     Integer digitalID;
 
-    @Column(name = "PEN_Retrieval_Request_Status_Code")
+    @Column(name = "pen_retrieval_request_status_code")
     String penRequestStatusCode;
 
-    @Column(name = "Legal_First_Name")
+    @Column(name = "legal_first_name")
     String legalFirstName;
 
-    @Column(name = "Legal_Middle_Names")
+    @Column(name = "legal_middle_names")
     String legalMiddleNames;
 
-    @Column(name = "Legal_Last_Name")
+    @Column(name = "legal_last_name")
     String legalLastName;
 
-    @Column(name = "DOB")
+    @Column(name = "dob")
     Date dob;
 
-    @Column(name = "Gender_Code")
+    @Column(name = "gender_code")
     String genderCode;
 
-    @Column(name = "Data_Source_Code")
+    @Column(name = "data_source_code")
     String dataSourceCode;
 
-    @Column(name = "Usual_First_Name")
+    @Column(name = "usual_first_name")
     String usualFirstName;
 
-    @Column(name = "Usual_Middle_Names")
+    @Column(name = "usual_middle_names")
     String usualMiddleName;
 
-    @Column(name = "Usual_Last_Name")
+    @Column(name = "usual_last_name")
     String usualLastName;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     String email;
 
-    @Column(name = "Maiden_Name")
+    @Column(name = "maiden_mame")
     String maidenName;
 
-    @Column(name = "Past_Names")
+    @Column(name = "past_names")
     String pastNames;
 
-    @Column(name = "Last_BC_School")
+    @Column(name = "last_bc_school")
     String lastBCSchool;
 
-    @Column(name = "Last_BC_School_Student_Number")
+    @Column(name = "last_bc_school_student_number")
     String lastBCSchoolStudentNumber;
 
-    @Column(name = "Current_School")
+    @Column(name = "current_school")
     String currentSchool;
 
-    @Column(name = "Reciever")
-    String receiver;
+    @Column(name = "reviewer")
+    String reviewer;
 
     @NotNull(message="createUser cannot be null")
     @Column(name = "create_user", updatable=false)
