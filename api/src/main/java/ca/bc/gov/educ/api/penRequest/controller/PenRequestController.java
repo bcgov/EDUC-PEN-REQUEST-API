@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.penRequest.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penRequest.service.PenRequestService;
 import org.springframework.beans.factory.annotation.Autowired;

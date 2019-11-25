@@ -20,7 +20,7 @@ public class PenRequestService {
     @Autowired
     private PenRequestRepository penRequestRepository;
 
-    public PenRequestEntity retrievePenRequest(String id) throws Exception{
+    public PenRequestEntity retrievePenRequest(String id) throws Exception, EntityNotFoundException{
         try{
             Boolean res = penRequestRepository.existsById(id);
             if(!res){

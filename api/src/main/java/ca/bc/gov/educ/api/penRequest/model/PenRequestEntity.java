@@ -80,27 +80,14 @@ public class PenRequestEntity {
     @Column(name = "Current_School")
     String currentSchool;
 
-    @Column(name = "Address_Line_1")
-    String addressLine1;
+    @Column(name = "Reciever")
+    String receiver;
 
-    @Column(name = "Address_Line_2")
-    String addressLine2;
-
-    @Column(name = "City")
-    String city;
-
-    @Column(name = "Province_Code")
-    String provinceCode;
-
-    @Column(name = "Country_Code")
-    String countryCode;
-
-    @Column(name = "Postal_Code")
-    String postalCode;
-
+    @NotNull(message="createUser cannot be null")
     @Column(name = "create_user", updatable=false)
     String createUser;
 
+    @NotNull(message="createDate cannot be null")
     @PastOrPresent
     @Column(name = "create_date", updatable=false)
     Date createDate;
