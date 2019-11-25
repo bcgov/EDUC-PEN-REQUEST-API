@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: 'educ-pren-request-template'
+  template: 'educ-pen-request-api-template'
 metadata:
-  name: 'educ-pen-request-template'
+  name: 'educ-pen-request-api-template'
 objects:
   - apiVersion: v1
     kind: BuildConfig
