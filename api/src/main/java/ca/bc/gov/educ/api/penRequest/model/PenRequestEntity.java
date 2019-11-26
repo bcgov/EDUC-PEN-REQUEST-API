@@ -23,7 +23,6 @@ import java.util.Date;
 public class PenRequestEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @NotNull(message="penRequestID cannot be null")
     @Column(name = "pen_retrieval_request_id", unique = true, updatable = false)
     Integer penRequestID;
 
