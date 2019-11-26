@@ -25,19 +25,19 @@ public class PenRequestController {
         this.service = penRequest;
     }
 
-    @PreAuthorize("#oauth2.hasScope('REQUEST_GET')")
+    @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/{id}")
     public PenRequestEntity retrievePenRequest(@PathVariable Integer id) throws Exception {
         return service.retrievePenRequest(id);
     }
 
-    @PreAuthorize("#oauth2.hasScope('REQUEST_POST')")
+    @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PostMapping()
     public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
         return service.createPenRequest(penRequest);
     }
 
-    @PreAuthorize("#oauth2.hasScope('REQUEST_PUT')")
+    @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PutMapping()
     public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
         return service.updatePenRequest(penRequest);
