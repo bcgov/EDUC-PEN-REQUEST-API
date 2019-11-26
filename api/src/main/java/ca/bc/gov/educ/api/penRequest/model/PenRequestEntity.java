@@ -63,7 +63,7 @@ public class PenRequestEntity {
     @Column(name = "email")
     String email;
 
-    @Column(name = "maiden_mame")
+    @Column(name = "maiden_name")
     String maidenName;
 
     @Column(name = "past_names")
