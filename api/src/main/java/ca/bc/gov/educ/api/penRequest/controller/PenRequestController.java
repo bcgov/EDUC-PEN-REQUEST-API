@@ -31,6 +31,12 @@ public class PenRequestController {
         return service.retrievePenRequest(id);
     }
 
+    @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+    @GetMapping("/all")
+    public Iterable<PenRequestEntity> retrieveAllRequests() throws Exception {
+        return service.retrieveAllRequests();
+    }
+
     @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PostMapping()
     public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
