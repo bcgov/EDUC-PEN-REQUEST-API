@@ -81,11 +81,9 @@ public class PenRequestEntity {
     @Column(name = "reviewer")
     String reviewer;
 
-    @NotNull(message="createUser cannot be null")
     @Column(name = "create_user", updatable=false)
     String createUser;
 
-    @NotNull(message="createDate cannot be null")
     @PastOrPresent
     @Column(name = "create_date", updatable=false)
     Date createDate;
