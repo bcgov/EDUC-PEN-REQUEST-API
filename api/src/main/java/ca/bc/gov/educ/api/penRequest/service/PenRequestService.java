@@ -40,6 +40,13 @@ public class PenRequestService {
         return penRequestRepository.save(penRequest);
     }
 
+    public Iterable<PenRequestEntity> retrieveAllRequests() throws EntityNotFoundException {
+        if(penRequestRepository.findAll() == null) {
+            throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", "any");
+        }
+        return penRequestRepository.findAll();
+    }
+
     public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) throws EntityNotFoundException, InvalidParameterException {
         
         validateParameters(penRequest);
