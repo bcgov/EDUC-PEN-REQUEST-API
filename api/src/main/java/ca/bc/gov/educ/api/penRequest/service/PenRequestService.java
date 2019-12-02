@@ -32,6 +32,7 @@ public class PenRequestService {
         if(penRequest.getPenRequestID()!=null){
             throw new InvalidParameterException("penRequest");
         }
+        penRequest.setPenRequestStatusCode("DRAFT");
         penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
         penRequest.setUpdateDate(new Date());
         penRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
