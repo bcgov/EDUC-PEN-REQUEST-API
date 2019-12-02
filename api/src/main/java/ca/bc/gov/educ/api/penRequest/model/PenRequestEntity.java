@@ -30,6 +30,7 @@ public class PenRequestEntity {
     @Column(name = "digital_identity_id")
     Integer digitalID;
 
+    @NotNull(message="penRequestStatusCode cannot be null")
     @Column(name = "pen_retrieval_request_status_code")
     String penRequestStatusCode;
 
@@ -39,6 +40,7 @@ public class PenRequestEntity {
     @Column(name = "legal_middle_names")
     String legalMiddleNames;
 
+    @NotNull(message="legalLastName cannot be null")
     @Column(name = "legal_last_name")
     String legalLastName;
 
