@@ -30,7 +30,6 @@ public class PenRequestEntity {
     @Column(name = "digital_identity_id")
     Integer digitalID;
 
-    @NotNull(message="penRequestStatusCode cannot be null")
     @Column(name = "pen_retrieval_request_status_code")
     String penRequestStatusCode;
 
