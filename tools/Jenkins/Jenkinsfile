@@ -27,9 +27,10 @@ pipeline{
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
   stages{
-    stage('Build App') {
+    stage('Build App and Report to SonarQube') {
       steps {
         sh "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"
+        sh "mvn sonar:sonar -Dsonar.host.url=https://sonarqube-c2mvws-tools.pathfinder.gov.bc.ca:9000 -Dsonar.login=dd9c4f7f4793fa8f285ce41f49977be331e93170"
       }
     }
     stage('Create Image Builder') {
