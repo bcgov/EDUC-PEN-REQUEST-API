@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("penrequest")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -27,7 +29,7 @@ public class PenRequestController {
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable Integer id) throws Exception {
+    public PenRequestEntity retrievePenRequest(@PathVariable UUID id) throws Exception {
         return service.retrievePenRequest(id);
     }
 
