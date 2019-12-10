@@ -3,17 +3,19 @@ package ca.bc.gov.educ.api.penRequest.model;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.GenerationType;
 import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -22,13 +24,23 @@ import java.util.Date;
 @Table(name = "pen_retrieval_request")
 public class PenRequestEntity {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name = "pen_retrieval_request_id", unique = true, updatable = false)
-    Integer penRequestID;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator",
+            parameters = {
+                    @Parameter(
+                            name = "uuid_gen_strategy_class",
+                            value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
+                    )
+            }
+    )
+    @Column(name = "pen_retrieval_request_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+    UUID penRequestID;
 
     @NotNull(message="digitalID cannot be null")
-    @Column(name = "digital_identity_id")
-    Integer digitalID;
+    @Column(name = "digital_identity_id", columnDefinition = "BINARY(16)")
+    UUID digitalID;
 
     @Column(name = "pen_retrieval_request_status_code")
     String penRequestStatusCode;

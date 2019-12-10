@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.penRequest.props.ApplicationProperties;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PenRequestService {
@@ -17,7 +18,7 @@ public class PenRequestService {
     @Autowired
     private PenRequestRepository penRequestRepository;
 
-    public PenRequestEntity retrievePenRequest(Integer id) throws EntityNotFoundException{
+    public PenRequestEntity retrievePenRequest(UUID id) throws EntityNotFoundException{
         Optional<PenRequestEntity> res = penRequestRepository.findById(id);
         if(res.isPresent()){
             return res.get();
