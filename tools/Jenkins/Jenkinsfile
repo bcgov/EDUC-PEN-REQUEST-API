@@ -36,7 +36,7 @@ pipeline{
         steps {
             script{
                 dir('api'){
-                    sh "mvn sonar:sonar -Dsonar.host.url=https://sonarqube-c2mvws-tools.pathfinder.gov.bc.ca:9000 -Dsonar.login=dd9c4f7f4793fa8f285ce41f49977be331e93170"
+                    sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube.c2mvws-tools.svc.cluster.local:9000 -Dsonar.login=dd9c4f7f4793fa8f285ce41f49977be331e93170"
                 }
             }
         }
