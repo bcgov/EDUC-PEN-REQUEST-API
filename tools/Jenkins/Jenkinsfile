@@ -32,6 +32,15 @@ pipeline{
         sh "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"
       }
     }
+    stage('Report to SonarQube') {
+        steps {
+            script{
+                dir('api'){
+                    sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube.c2mvws-tools.svc.cluster.local:9000 -Dsonar.login=dd9c4f7f4793fa8f285ce41f49977be331e93170"
+                }
+            }
+        }
+    }
     stage('Create Image Builder') {
       when {
         expression {
@@ -82,6 +91,36 @@ pipeline{
         script {
           openshift.withCluster() {
             openshift.withProject(DEV) {
+              echo "Tagging image"
+              openshift.tag("${TOOLS}/${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${TAG}")
+              def dcTemplate = openshift.process('-f',
+                'tools/openshift/api.dc.yaml',
+                "REPO_NAME=${REPO_NAME}",
+                "JOB_NAME=${JOB_NAME}",
+                "NAMESPACE=${DEV}",
+                "APP_NAME=${APP_NAME}",
+                "HOST_ROUTE=${DEV_HOST_ROUTE}",
+                "TAG=${TAG}"
+              )
+
+              echo "Applying Deployment ${REPO_NAME}"
+              def dc = openshift.apply(dcTemplate).narrow('dc')
+
+              echo "Waiting for deployment to roll out"
+              // Wait for deployments to roll out
+              timeout(10) {
+                dc.rollout().status('--watch=true')
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('Promote to TEST') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(TEST) {
               echo "Tagging image"
               openshift.tag("${TOOLS}/${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${TAG}")
               def dcTemplate = openshift.process('-f',
