@@ -50,4 +50,9 @@ public class PenRequestController {
     public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
         return service.updatePenRequest(penRequest);
     }
+
+    @GetMapping("/health")
+    public void health(){
+    }
+
 }
