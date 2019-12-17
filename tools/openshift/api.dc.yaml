@@ -95,6 +95,11 @@ objects:
                     configMapKeyRef:
                       key: ORACLE_PASS
                       name: pen-request-api-config
+                - name: PORT_NUMBER
+                  valueFrom: 
+                    configMapKeyRef:
+                      key: PORT_NUMBER
+                      name: pen-request-api-config
       test: false
       triggers:
         - type: ConfigChange
