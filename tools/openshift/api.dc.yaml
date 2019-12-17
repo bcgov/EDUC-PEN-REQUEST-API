@@ -33,7 +33,7 @@ objects:
                 exec:
                   command:
                     - cat
-                    - /api
+                    - /
                 initialDelaySeconds: 15
                 timeoutSeconds: 1
               name: "${APP_NAME}-${JOB_NAME}"
