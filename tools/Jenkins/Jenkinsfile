@@ -133,7 +133,7 @@ pipeline{
                 "JOB_NAME=${JOB_NAME}",
                 "NAMESPACE=${TEST}",
                 "APP_NAME=${APP_NAME}",
-                "HOST_ROUTE=${DEV_HOST_ROUTE}",
+                "HOST_ROUTE=${TEST_HOST_ROUTE}",
                 "TAG=${TAG}"
               )
 
