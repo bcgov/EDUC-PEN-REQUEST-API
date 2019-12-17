@@ -29,6 +29,13 @@ objects:
           containers:
             - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-${JOB_NAME}:${TAG}
               imagePullPolicy: IfNotPresent
+              livenessProbe:
+                exec:
+                  command:
+                    - cat
+                    - /api
+                initialDelaySeconds: 15
+                timeoutSeconds: 1
               name: "${APP_NAME}-${JOB_NAME}"
               ports:
                 - containerPort: ${{CONTAINER_PORT}}
