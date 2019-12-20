@@ -18,6 +18,7 @@ oc create -n {YOUR_OPENSHIFT_ENVIRONMENT} configmap pen-request-api-config
 --from-literal=KEYCLOAK_PUBLIC_KEY={PUBLIC KEY}
 --from-literal=ORACLE_PASS={ORACLE DB PASSWORD}
 --from-literal=ORACLE_USER={ORACLE DB USERNAME}
+--from-literal=PORT_NUMBER={PORT NUMBER}
 ```
 
 ## Environment Variables
@@ -34,3 +35,4 @@ The following is a list of all environment variables consumed by the PEN Request
 | KEYCLOAK_PUBLIC_KEY              | Public key for the SOAM keycloak instance                        |
 | ORACLE_PASS                      | The password for your oracle database                            |
 | ORACLE_USER                      | Username for your oracle database                                |
+| PORT_NUMBER                      | The port on which to serve the application                       |
