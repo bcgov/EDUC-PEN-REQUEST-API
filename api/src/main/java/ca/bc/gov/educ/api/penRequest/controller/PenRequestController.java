@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("penrequest")
+@RequestMapping("/")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer
 public class PenRequestController {
