@@ -1,22 +1,29 @@
 package ca.bc.gov.educ.api.penRequest.service;
 
-import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penRequest.repository.PenRequestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ca.bc.gov.educ.api.penRequest.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.penRequest.exception.InvalidParameterException;
-import ca.bc.gov.educ.api.penRequest.props.ApplicationProperties;
-
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ca.bc.gov.educ.api.penRequest.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.penRequest.exception.InvalidParameterException;
+import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penRequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penRequest.props.ApplicationProperties;
+import ca.bc.gov.educ.api.penRequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penRequest.repository.PenRequestStatusCodeTableRepository;
 
 @Service
 public class PenRequestService {
 
     @Autowired
     private PenRequestRepository penRequestRepository;
+    
+    @Autowired
+    private PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
 
     public PenRequestEntity retrievePenRequest(UUID id) throws EntityNotFoundException{
         Optional<PenRequestEntity> res = penRequestRepository.findById(id);
@@ -40,6 +47,15 @@ public class PenRequestService {
         penRequest.setCreateDate(new Date());
 
         return penRequestRepository.save(penRequest);
+    }
+    
+    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() throws EntityNotFoundException{
+        List<PenRequestStatusCodeEntity> result =  penRequestStatusCodeTableRepo.findAll();
+        if(result != null && result.size() > 0) {
+            return result;
+        } else {
+            throw new EntityNotFoundException(PenRequestStatusCodeEntity.class);
+        }
     }
 
     public Iterable<PenRequestEntity> retrieveAllRequests() throws EntityNotFoundException {
