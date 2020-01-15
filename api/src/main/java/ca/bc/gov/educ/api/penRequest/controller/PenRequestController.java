@@ -34,7 +34,7 @@ public class PenRequestController {
     }
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
-    @GetMapping("/all")
+    @GetMapping("/")
     public Iterable<PenRequestEntity> retrieveAllRequests() throws Exception {
         return service.retrieveAllRequests();
     }
