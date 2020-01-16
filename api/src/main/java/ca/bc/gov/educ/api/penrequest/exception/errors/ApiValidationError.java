@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.exception.errors;
 
-class ApiValidationError extends ApiSubError {
+class ApiValidationError implements ApiSubError {
 	private String object;
 	private String field;
 	private Object rejectedValue;
@@ -50,5 +50,6 @@ class ApiValidationError extends ApiSubError {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
 
 }
