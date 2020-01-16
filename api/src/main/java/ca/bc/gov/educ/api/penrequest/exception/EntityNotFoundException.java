@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.penrequest.exception;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class EntityNotFoundException extends RuntimeException {
 
