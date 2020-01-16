@@ -88,6 +88,7 @@ public class PenRequestService {
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setReviewer(penRequest.getReviewer());
             newPenRequest.setUpdateDate(new Date());
+            newPenRequest.setUpdateUser(penRequest.getUpdateUser());
             newPenRequest = penRequestRepository.save(newPenRequest);
 
             return newPenRequest;
