@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penRequest.service;
+package ca.bc.gov.educ.api.penrequest.service;
 
 import java.util.Date;
 import java.util.List;
@@ -8,13 +8,12 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ca.bc.gov.educ.api.penRequest.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.penRequest.exception.InvalidParameterException;
-import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penRequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penRequest.props.ApplicationProperties;
-import ca.bc.gov.educ.api.penRequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penRequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 
 @Service
 public class PenRequestService {
@@ -25,7 +24,7 @@ public class PenRequestService {
     @Autowired
     private PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
 
-    public PenRequestEntity retrievePenRequest(UUID id) throws EntityNotFoundException{
+    public PenRequestEntity retrievePenRequest(UUID id) {
         Optional<PenRequestEntity> res = penRequestRepository.findById(id);
         if(res.isPresent()){
             return res.get();
@@ -34,22 +33,20 @@ public class PenRequestService {
         }
     }
 
-    public PenRequestEntity createPenRequest(PenRequestEntity penRequest) throws EntityNotFoundException, InvalidParameterException {
+    public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
         validateParameters(penRequest);
         
         if(penRequest.getPenRequestID()!=null){
             throw new InvalidParameterException("penRequest");
         }
         penRequest.setPenRequestStatusCode("INITREV");
-        penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
         penRequest.setUpdateDate(new Date());
-        penRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
         penRequest.setCreateDate(new Date());
 
         return penRequestRepository.save(penRequest);
     }
     
-    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() throws EntityNotFoundException{
+    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
         List<PenRequestStatusCodeEntity> result =  penRequestStatusCodeTableRepo.findAll();
         if(result != null && result.size() > 0) {
             return result;
@@ -65,7 +62,7 @@ public class PenRequestService {
         return penRequestRepository.findAll();
     }
 
-    public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) throws EntityNotFoundException, InvalidParameterException {
+    public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
         
         validateParameters(penRequest);
         
@@ -90,7 +87,6 @@ public class PenRequestService {
             newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setReviewer(penRequest.getReviewer());
-            newPenRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
             newPenRequest.setUpdateDate(new Date());
             newPenRequest = penRequestRepository.save(newPenRequest);
 
@@ -100,15 +96,10 @@ public class PenRequestService {
         }
     }
 
-    private void validateParameters(PenRequestEntity penRequestEntity) throws InvalidParameterException {
-
+    private void validateParameters(PenRequestEntity penRequestEntity) {
         if(penRequestEntity.getCreateDate()!=null)
             throw new InvalidParameterException("createDate");
-        if(penRequestEntity.getCreateUser()!=null)
-            throw new InvalidParameterException("createUser");
         if(penRequestEntity.getUpdateDate()!=null)
             throw new InvalidParameterException("updateDate");
-        if(penRequestEntity.getUpdateUser()!=null)
-            throw new InvalidParameterException("updateUser");
     }
 }

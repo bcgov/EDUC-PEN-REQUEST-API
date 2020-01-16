@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penRequest.model;
+package ca.bc.gov.educ.api.penrequest.model;
 
 import java.util.Date;
 

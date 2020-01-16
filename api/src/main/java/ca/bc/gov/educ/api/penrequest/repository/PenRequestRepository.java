@@ -1,8 +1,9 @@
-package ca.bc.gov.educ.api.penRequest.repository;
+package ca.bc.gov.educ.api.penrequest.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
 import org.springframework.stereotype.Repository;
+
+import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 
 import java.util.UUID;
 

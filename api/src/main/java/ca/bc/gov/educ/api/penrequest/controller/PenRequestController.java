@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penRequest.controller;
+package ca.bc.gov.educ.api.penrequest.controller;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.bc.gov.educ.api.penRequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penRequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penRequest.service.PenRequestService;
+import ca.bc.gov.educ.api.penrequest.exception.PenRequestRuntimeException;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
 
 @RestController
 @RequestMapping("/")
@@ -35,36 +36,37 @@ public class PenRequestController {
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable UUID id) throws Exception {
+    public PenRequestEntity retrievePenRequest(@PathVariable UUID id) throws PenRequestRuntimeException {
         return service.retrievePenRequest(id);
     }
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/")
-    public Iterable<PenRequestEntity> retrieveAllRequests() throws Exception {
+    public Iterable<PenRequestEntity> retrieveAllRequests() throws PenRequestRuntimeException {
         return service.retrieveAllRequests();
     }
 
     @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PostMapping()
-    public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
+    public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws PenRequestRuntimeException {
         return service.createPenRequest(penRequest);
     }
 
     @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PutMapping()
-    public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws Exception {
+    public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws PenRequestRuntimeException {
         return service.updatePenRequest(penRequest);
     }
     
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST_STATUSES')")
     @GetMapping("/statuses")
-    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodes() throws Exception {
+    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodes() throws PenRequestRuntimeException {
         return service.getPenRequestStatusCodesList();
     }
 
     @GetMapping("/health")
     public void health(){
+    	//Used only to determine if service is up (health checks by the cloud platform)
     }
 
 }

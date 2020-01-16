@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penRequest.exception.errors;
+package ca.bc.gov.educ.api.penrequest.exception.errors;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

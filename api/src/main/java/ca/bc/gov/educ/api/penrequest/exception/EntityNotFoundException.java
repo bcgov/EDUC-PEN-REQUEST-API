@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penRequest.exception;
+package ca.bc.gov.educ.api.penrequest.exception;
 
 import org.apache.commons.lang3.StringUtils;
 
