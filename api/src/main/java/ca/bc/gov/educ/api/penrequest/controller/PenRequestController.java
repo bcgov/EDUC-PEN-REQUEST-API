@@ -36,31 +36,31 @@ public class PenRequestController {
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/{id}")
-    public PenRequestEntity retrievePenRequest(@PathVariable UUID id) throws PenRequestRuntimeException {
+    public PenRequestEntity retrievePenRequest(@PathVariable UUID id) {
         return service.retrievePenRequest(id);
     }
 
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
     @GetMapping("/")
-    public Iterable<PenRequestEntity> retrieveAllRequests() throws PenRequestRuntimeException {
+    public Iterable<PenRequestEntity> retrieveAllRequests() {
         return service.retrieveAllRequests();
     }
 
     @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PostMapping()
-    public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws PenRequestRuntimeException {
+    public PenRequestEntity createPenRequest(@Validated @RequestBody PenRequestEntity penRequest) {
         return service.createPenRequest(penRequest);
     }
 
     @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
     @PutMapping()
-    public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) throws PenRequestRuntimeException {
+    public PenRequestEntity updatePenRequest(@Validated @RequestBody PenRequestEntity penRequest) {
         return service.updatePenRequest(penRequest);
     }
     
     @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST_STATUSES')")
     @GetMapping("/statuses")
-    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodes() throws PenRequestRuntimeException {
+    public List<PenRequestStatusCodeEntity> getPenRequestStatusCodes() {
         return service.getPenRequestStatusCodesList();
     }
 
