@@ -40,7 +40,6 @@ public class PenRequestService {
             throw new InvalidParameterException("penRequest");
         }
         penRequest.setPenRequestStatusCode("INITREV");
-        penRequest.setCreateUser(penRequest.getDigitalID());
         penRequest.setUpdateDate(new Date());
         penRequest.setCreateDate(new Date());
 
@@ -88,7 +87,7 @@ public class PenRequestService {
             newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setReviewer(penRequest.getReviewer());
-            newPenRequest.setUpdateUser(penRequest.getDigitalID());
+            newPenRequest.setUpdateUser(penRequest.getUpdateUser());
             newPenRequest.setUpdateDate(new Date());
             newPenRequest = penRequestRepository.save(newPenRequest);
 
