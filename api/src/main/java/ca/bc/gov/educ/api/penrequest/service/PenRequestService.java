@@ -18,6 +18,8 @@ import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableReposit
 @Service
 public class PenRequestService {
 
+	private final String DIGITAL_ID_USER = "DIGITAL_ID_API";
+	
     @Autowired
     private PenRequestRepository penRequestRepository;
     
@@ -40,7 +42,7 @@ public class PenRequestService {
             throw new InvalidParameterException("penRequest");
         }
         penRequest.setPenRequestStatusCode("INITREV");
-        penRequest.setCreateUser(penRequest.getDigitalID().toString());
+        penRequest.setCreateUser(DIGITAL_ID_USER);
         penRequest.setCreateDate(new Date());
 
         return penRequestRepository.save(penRequest);
@@ -87,7 +89,7 @@ public class PenRequestService {
             newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setReviewer(penRequest.getReviewer());
-            newPenRequest.setUpdateUser(penRequest.getDigitalID().toString());
+            newPenRequest.setUpdateUser(DIGITAL_ID_USER);
             newPenRequest.setUpdateDate(new Date());
             newPenRequest = penRequestRepository.save(newPenRequest);
 
