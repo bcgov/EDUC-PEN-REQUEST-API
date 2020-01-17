@@ -48,14 +48,14 @@ public class PenRequestService {
     
     public List<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
         List<PenRequestStatusCodeEntity> result =  penRequestStatusCodeTableRepo.findAll();
-        if(result != null && result.size() > 0) {
+        if(result != null && !result.isEmpty()) {
             return result;
         } else {
             throw new EntityNotFoundException(PenRequestStatusCodeEntity.class);
         }
     }
 
-    public Iterable<PenRequestEntity> retrieveAllRequests() throws EntityNotFoundException {
+    public Iterable<PenRequestEntity> retrieveAllRequests() {
         if(penRequestRepository.findAll() == null) {
             throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", "any");
         }
