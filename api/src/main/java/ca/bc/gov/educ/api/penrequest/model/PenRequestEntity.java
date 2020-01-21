@@ -83,6 +83,14 @@ public class PenRequestEntity {
 	@Column(name = "failure_reason")
 	String failureReason;
 
+	@PastOrPresent
+	@Column(name = "INITIAL_SUBMIT_DATE")
+	Date initialSubmitDate;
+
+	@PastOrPresent
+	@Column(name = "STATUS_UPDATE_DATE")
+	Date statusUpdateDate;
+
 	@Column(name = "create_user", updatable = false)
 	String createUser;
 
@@ -256,6 +264,14 @@ public class PenRequestEntity {
 	public void setFailureReason(String failureReason) {
 		this.failureReason = failureReason;
 	}
+
+	public Date getStatusUpdateDate() { return statusUpdateDate; }
+
+	public void setStatusUpdateDate(Date statusUpdateDate) { this.statusUpdateDate = statusUpdateDate; }
+
+	public Date getInitialSubmitDate() { return initialSubmitDate; }
+
+	public void setInitialSubmitDate(Date initialSubmitDate) { this.initialSubmitDate = initialSubmitDate; }
 
 	public String getCreateUser() {
 		return createUser;
