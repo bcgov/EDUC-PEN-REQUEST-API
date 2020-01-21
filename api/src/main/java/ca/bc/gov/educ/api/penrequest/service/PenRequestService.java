@@ -93,7 +93,6 @@ public class PenRequestService {
             newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
             newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
             newPenRequest.setFailureReason(penRequest.getFailureReason());
-
             if(newPenRequest.getPenRequestStatusCode() != penRequest.getPenRequestStatusCode()) {
                 newPenRequest.setStatusUpdateDate(new Date());
             }
