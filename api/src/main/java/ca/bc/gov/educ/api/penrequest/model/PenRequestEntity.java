@@ -80,6 +80,9 @@ public class PenRequestEntity {
 	@Column(name = "reviewer")
 	String reviewer;
 
+	@Column(name = "failure_reason")
+	String failureReason;
+
 	@Column(name = "create_user", updatable = false)
 	String createUser;
 
@@ -244,6 +247,14 @@ public class PenRequestEntity {
 
 	public void setReviewer(String reviewer) {
 		this.reviewer = reviewer;
+	}
+	
+	public String getFailureReason() {
+		return failureReason;
+	}
+
+	public void setFailureReason(String failureReason) {
+		this.failureReason = failureReason;
 	}
 
 	public String getCreateUser() {
