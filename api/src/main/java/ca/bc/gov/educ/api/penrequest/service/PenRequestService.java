@@ -44,6 +44,8 @@ public class PenRequestService {
         penRequest.setPenRequestStatusCode("INITREV");
         penRequest.setCreateUser(DIGITAL_ID_USER);
         penRequest.setCreateDate(new Date());
+	penRequest.setUpdateUser(DIGITAL_ID_USER);
+        penRequest.setUpdateDate(new Date());
 
         return penRequestRepository.save(penRequest);
     }
