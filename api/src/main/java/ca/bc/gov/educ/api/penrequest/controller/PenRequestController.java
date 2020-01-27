@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.controller;
 import java.util.List;
 import java.util.UUID;
 
+import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -62,6 +63,10 @@ public class PenRequestController {
     public List<PenRequestStatusCodeEntity> getPenRequestStatusCodes() {
         return service.getPenRequestStatusCodesList();
     }
+
+    @PreAuthorize("#oauth2.hasScope('')")
+    @PostMapping("/{id}/comments")
+    public Iterable<PenRequestCommentsEntity> retrieveComments(@PathVariable UUID id) { return service.retrieveComments(id); }
 
     @GetMapping("/health")
     public void health(){
