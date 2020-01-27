@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,5 +115,9 @@ public class PenRequestService {
             throw new InvalidParameterException("updateDate");
         if(penRequestEntity.getInitialSubmitDate()!=null)
             throw new InvalidParameterException("initialSubmitDate");
+    }
+
+    public Iterable<PenRequestCommentsEntity> retrieveComments(UUID id) {
+        if()
     }
 }
