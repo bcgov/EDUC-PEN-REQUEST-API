@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer
 public class PenRequestController implements PenRequestEndpoint {
 
