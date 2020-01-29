@@ -36,6 +36,7 @@ public class PenRequest implements Serializable {
     private String currentSchool;
     private String reviewer;
     private String failureReason;
+    @NotNull(message = "initialSubmitDate cannot be null")
     private Date initialSubmitDate;
     private Date statusUpdateDate;
 }

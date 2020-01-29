@@ -36,7 +36,7 @@ public class PenRequestService {
   }
 
   public PenRequestEntity retrievePenRequest(UUID id) {
-    Optional<PenRequestEntity> res = penRequestRepository.findById(id);
+    Optional<PenRequestEntity> res = getPenRequestRepository().findById(id);
     if (res.isPresent()) {
       return res.get();
     } else {
@@ -45,8 +45,6 @@ public class PenRequestService {
   }
 
   public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
-    validateParameters(penRequest);
-
     if (penRequest.getPenRequestID() != null) {
       throw new InvalidParameterException("penRequest");
     }
@@ -71,12 +69,12 @@ public class PenRequestService {
 
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
 
-    validateParameters(penRequest);
 
     Optional<PenRequestEntity> curPenRequest = penRequestRepository.findById(penRequest.getPenRequestID());
 
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
+      penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
       newPenRequest.setUpdateUser(DIGITAL_ID_USER);
       newPenRequest.setUpdateDate(new Date());
@@ -85,15 +83,6 @@ public class PenRequestService {
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
-  }
-
-  private void validateParameters(PenRequestEntity penRequestEntity) {
-    if (penRequestEntity.getCreateDate() != null)
-      throw new InvalidParameterException("createDate");
-    if (penRequestEntity.getUpdateDate() != null)
-      throw new InvalidParameterException("updateDate");
-    if (penRequestEntity.getInitialSubmitDate() != null)
-      throw new InvalidParameterException("initialSubmitDate");
   }
 
 }
