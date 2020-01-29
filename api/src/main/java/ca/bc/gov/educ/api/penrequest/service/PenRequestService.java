@@ -15,14 +15,12 @@ import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 
 @Service
 public class PenRequestService {
-
-  private final String DIGITAL_ID_USER = "DIGITAL_ID_API";
-
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestRepository penRequestRepository;
@@ -51,9 +49,9 @@ public class PenRequestService {
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.INITREV.toString());
     penRequest.setStatusUpdateDate(new Date());
     penRequest.setInitialSubmitDate(new Date());
-    penRequest.setCreateUser(DIGITAL_ID_USER);
+    penRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
     penRequest.setCreateDate(new Date());
-    penRequest.setUpdateUser(DIGITAL_ID_USER);
+    penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
     penRequest.setUpdateDate(new Date());
 
     return penRequestRepository.save(penRequest);
@@ -76,7 +74,7 @@ public class PenRequestService {
       PenRequestEntity newPenRequest = curPenRequest.get();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
-      newPenRequest.setUpdateUser(DIGITAL_ID_USER);
+      newPenRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
       newPenRequest.setUpdateDate(new Date());
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;

@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.service;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import lombok.AccessLevel;
@@ -17,8 +18,6 @@ import java.util.UUID;
 
 @Service
 public class PenRequestCommentService {
-
-  private final String COMMENTS_CREATE_USER = "DIGITAL_ID_API";
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestRepository penRequestRepository;
@@ -50,9 +49,9 @@ public class PenRequestCommentService {
     val result = getPenRequestRepository().findById(penRetrievalRequestId);
     if (result.isPresent()) {
       penRequestCommentsEntity.setPenRequestEntity(result.get());
-      penRequestCommentsEntity.setCreateUser(COMMENTS_CREATE_USER);
+      penRequestCommentsEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
       penRequestCommentsEntity.setCreateDate(new Date());
-      penRequestCommentsEntity.setUpdateUser(COMMENTS_CREATE_USER);
+      penRequestCommentsEntity.setUpdateUser(ApplicationProperties.CLIENT_ID);
       penRequestCommentsEntity.setUpdateDate(new Date());
       return getPenRequestCommentRepository().save(penRequestCommentsEntity);
     }

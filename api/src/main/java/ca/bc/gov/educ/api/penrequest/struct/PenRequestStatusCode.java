@@ -6,13 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PenRequestStatusCode {
+public class PenRequestStatusCode implements Serializable {
+
+    private static final long serialVersionUID = -8596549361135591976L;
 
     String penRequestStatusCode;
 

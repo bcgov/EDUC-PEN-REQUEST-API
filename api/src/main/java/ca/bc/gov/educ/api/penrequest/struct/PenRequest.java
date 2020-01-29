@@ -14,6 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class PenRequest implements Serializable {
+    private static final long serialVersionUID = 583620260139143932L;
+    
     private String penRequestID;
     @NotNull(message = "digitalID cannot be null")
     private String digitalID;

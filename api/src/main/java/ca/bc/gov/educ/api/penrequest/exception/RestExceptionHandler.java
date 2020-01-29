@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.exception;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import org.jboss.logging.Logger;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,8 @@ import ca.bc.gov.educ.api.penrequest.exception.errors.ApiError;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-
+    private static Logger logger = Logger.getLogger(RestExceptionHandler.class);
+    
     /**
      * Handles HttpMessageNotReadableException
      *
@@ -33,6 +35,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.warn("handleHttpMessageNotReadable: ", ex);
         String error = "Malformed JSON request";
         return buildResponseEntity(new ApiError(BAD_REQUEST, error, ex));
     }
@@ -50,19 +53,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(
             EntityNotFoundException ex) {
+        logger.info("handleEntityNotFound", ex);
         ApiError apiError = new ApiError(NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
 
     /**
-     * Handles InvalidParameterException
+     * Handles InvalidParameterException, InvalidValueException
      *
      * @param ex the InvalidParameterException
      * @return the ApiError object
      */
-    @ExceptionHandler(InvalidParameterException.class)
-    protected ResponseEntity<Object> handleInvalidParameter(InvalidParameterException ex) {
+    @ExceptionHandler({InvalidParameterException.class, InvalidValueException.class})
+    protected ResponseEntity<Object> handleInvalidParameter(RuntimeException ex) {
+        logger.warn("handleInvalidParameter or InvalidValue", ex);
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage(ex.getMessage());
         return buildResponseEntity(apiError);
@@ -83,6 +88,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
+        logger.warn("handleMethodArgumentNotValid", ex);
         ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
