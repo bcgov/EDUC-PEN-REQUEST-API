@@ -11,19 +11,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RequestMapping("/")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer
 public interface PenRequestCommentEndpoint {
 
-  @PreAuthorize("#oauth2.hasScope('')")
+  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
   @GetMapping("/{penRequestId}/comments")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   List<PenRequestComments> retrieveComments(@PathVariable String penRequestId);
 
-  @PreAuthorize("#oauth2.hasScope('')")
+  @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
   @PostMapping("/{penRequestId}/comments")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   PenRequestComments save(@PathVariable String penRequestId, @Validated @RequestBody PenRequestComments penRequestComments);
+
 
 }

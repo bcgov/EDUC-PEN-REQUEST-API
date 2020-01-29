@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class PenRequestCommentService {
 
   private final String COMMENTS_CREATE_USER = "DIGITAL_ID_API";
+
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestRepository penRequestRepository;
 
@@ -30,9 +32,9 @@ public class PenRequestCommentService {
   }
 
   public Iterable<PenRequestCommentsEntity> retrieveComments(UUID penRetrievalRequestId) {
-    val result = getPenRequestRepository().findById(penRetrievalRequestId);
-    if (result.isPresent()) {
-      return result.get().getPenRequestComments();
+    final Optional<PenRequestEntity> entity = getPenRequestRepository().findById(penRetrievalRequestId);
+    if (entity.isPresent()) {
+      return entity.get().getPenRequestComments();
     }
     throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRetrievalRequestId.toString());
   }
@@ -47,7 +49,6 @@ public class PenRequestCommentService {
   public PenRequestCommentsEntity save(UUID penRetrievalRequestId, PenRequestCommentsEntity penRequestCommentsEntity) {
     val result = getPenRequestRepository().findById(penRetrievalRequestId);
     if (result.isPresent()) {
-
       penRequestCommentsEntity.setPenRequestEntity(result.get());
       penRequestCommentsEntity.setCreateUser(COMMENTS_CREATE_USER);
       penRequestCommentsEntity.setCreateDate(new Date());
