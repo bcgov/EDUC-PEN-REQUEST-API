@@ -9,22 +9,22 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @SpringBootApplication
 public class PenRequestApiResourceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(PenRequestApiResourceApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(PenRequestApiResourceApplication.class, args);
+  }
 
-    /**
-     * Add security exceptions for swagger UI and prometheus.
-     */
-    @Configuration
-    static
-    class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+  /**
+   * Add security exceptions for swagger UI and prometheus.
+   */
+  @Configuration
+  static
+  class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-        @Override
-        public void configure(WebSecurity web) {
-            web.ignoring().antMatchers("/v3/api-docs/**",
-                    "/actuator/**",
-                    "/swagger-ui/**");
-        }
+    @Override
+    public void configure(WebSecurity web) {
+      web.ignoring().antMatchers("/v3/api-docs/**",
+              "/actuator/**",
+              "/swagger-ui/**");
     }
+  }
 }

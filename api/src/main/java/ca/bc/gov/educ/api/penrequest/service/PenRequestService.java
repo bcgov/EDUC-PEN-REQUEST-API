@@ -4,8 +4,10 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
+import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,99 +21,79 @@ import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableReposit
 @Service
 public class PenRequestService {
 
-    private final String DIGITAL_ID_USER = "DIGITAL_ID_API";
+  private final String DIGITAL_ID_USER = "DIGITAL_ID_API";
 
 
-    @Getter(AccessLevel.PRIVATE)
-    private final PenRequestRepository penRequestRepository;
+  @Getter(AccessLevel.PRIVATE)
+  private final PenRequestRepository penRequestRepository;
 
-    @Getter(AccessLevel.PRIVATE)
-    private final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
+  @Getter(AccessLevel.PRIVATE)
+  private final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
 
-    PenRequestService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo) {
-        this.penRequestRepository = penRequestRepository;
-        this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
+  PenRequestService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo) {
+    this.penRequestRepository = penRequestRepository;
+    this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
+  }
+
+  public PenRequestEntity retrievePenRequest(UUID id) {
+    Optional<PenRequestEntity> res = penRequestRepository.findById(id);
+    if (res.isPresent()) {
+      return res.get();
+    } else {
+      throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", id.toString());
     }
+  }
 
-    public PenRequestEntity retrievePenRequest(UUID id) {
-        Optional<PenRequestEntity> res = penRequestRepository.findById(id);
-        if (res.isPresent()) {
-            return res.get();
-        } else {
-            throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", id.toString());
-        }
+  public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
+    validateParameters(penRequest);
+
+    if (penRequest.getPenRequestID() != null) {
+      throw new InvalidParameterException("penRequest");
     }
+    penRequest.setPenRequestStatusCode(PenRequestStatusCode.INITREV.toString());
+    penRequest.setStatusUpdateDate(new Date());
+    penRequest.setInitialSubmitDate(new Date());
+    penRequest.setCreateUser(DIGITAL_ID_USER);
+    penRequest.setCreateDate(new Date());
+    penRequest.setUpdateUser(DIGITAL_ID_USER);
+    penRequest.setUpdateDate(new Date());
 
-    public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
-        validateParameters(penRequest);
+    return penRequestRepository.save(penRequest);
+  }
 
-        if (penRequest.getPenRequestID() != null) {
-            throw new InvalidParameterException("penRequest");
-        }
-        penRequest.setPenRequestStatusCode("INITREV");
-        penRequest.setStatusUpdateDate(new Date());
-        penRequest.setInitialSubmitDate(new Date());
-        penRequest.setCreateUser(DIGITAL_ID_USER);
-        penRequest.setCreateDate(new Date());
-        penRequest.setUpdateUser(DIGITAL_ID_USER);
-        penRequest.setUpdateDate(new Date());
+  public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
+    return penRequestStatusCodeTableRepo.findAll();
+  }
 
-        return penRequestRepository.save(penRequest);
+  public Iterable<PenRequestEntity> retrieveAllRequests() {
+    return penRequestRepository.findAll();
+  }
+
+  public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
+
+    validateParameters(penRequest);
+
+    Optional<PenRequestEntity> curPenRequest = penRequestRepository.findById(penRequest.getPenRequestID());
+
+    if (curPenRequest.isPresent()) {
+      PenRequestEntity newPenRequest = curPenRequest.get();
+      BeanUtils.copyProperties(penRequest, newPenRequest);
+      newPenRequest.setUpdateUser(DIGITAL_ID_USER);
+      newPenRequest.setUpdateDate(new Date());
+      newPenRequest = penRequestRepository.save(newPenRequest);
+      return newPenRequest;
+    } else {
+      throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
+  }
 
-    public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
-        return penRequestStatusCodeTableRepo.findAll();
-    }
-
-    public Iterable<PenRequestEntity> retrieveAllRequests() {
-        return penRequestRepository.findAll();
-    }
-
-    public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
-
-        validateParameters(penRequest);
-
-        Optional<PenRequestEntity> curPenRequest = penRequestRepository.findById(penRequest.getPenRequestID());
-
-        if (curPenRequest.isPresent()) {
-            PenRequestEntity newPenRequest = curPenRequest.get();
-            newPenRequest.setPenRequestStatusCode(penRequest.getPenRequestStatusCode());
-            newPenRequest.setLegalFirstName(penRequest.getLegalFirstName());
-            newPenRequest.setLegalLastName(penRequest.getLegalLastName());
-            newPenRequest.setDob(penRequest.getDob());
-            newPenRequest.setGenderCode(penRequest.getGenderCode());
-            newPenRequest.setDataSourceCode(penRequest.getDataSourceCode());
-            newPenRequest.setUsualFirstName(penRequest.getUsualFirstName());
-            newPenRequest.setUsualMiddleName(penRequest.getUsualMiddleName());
-            newPenRequest.setUsualLastName(penRequest.getUsualLastName());
-            newPenRequest.setEmail(penRequest.getEmail());
-            newPenRequest.setMaidenName(penRequest.getMaidenName());
-            newPenRequest.setPastNames(penRequest.getPastNames());
-            newPenRequest.setLastBCSchool(penRequest.getLastBCSchool());
-            newPenRequest.setLastBCSchoolStudentNumber(penRequest.getLastBCSchoolStudentNumber());
-            newPenRequest.setCurrentSchool(penRequest.getCurrentSchool());
-            newPenRequest.setFailureReason(penRequest.getFailureReason());
-            if (newPenRequest.getPenRequestStatusCode() != penRequest.getPenRequestStatusCode()) {
-                newPenRequest.setStatusUpdateDate(new Date());
-            }
-            newPenRequest.setReviewer(penRequest.getReviewer());
-            newPenRequest.setUpdateUser(DIGITAL_ID_USER);
-            newPenRequest.setUpdateDate(new Date());
-            newPenRequest = penRequestRepository.save(newPenRequest);
-
-            return newPenRequest;
-        } else {
-            throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
-        }
-    }
-
-    private void validateParameters(PenRequestEntity penRequestEntity) {
-        if (penRequestEntity.getCreateDate() != null)
-            throw new InvalidParameterException("createDate");
-        if (penRequestEntity.getUpdateDate() != null)
-            throw new InvalidParameterException("updateDate");
-        if (penRequestEntity.getInitialSubmitDate() != null)
-            throw new InvalidParameterException("initialSubmitDate");
-    }
+  private void validateParameters(PenRequestEntity penRequestEntity) {
+    if (penRequestEntity.getCreateDate() != null)
+      throw new InvalidParameterException("createDate");
+    if (penRequestEntity.getUpdateDate() != null)
+      throw new InvalidParameterException("updateDate");
+    if (penRequestEntity.getInitialSubmitDate() != null)
+      throw new InvalidParameterException("initialSubmitDate");
+  }
 
 }

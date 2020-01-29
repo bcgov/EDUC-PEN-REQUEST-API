@@ -13,13 +13,11 @@ import java.util.Date;
 @Data
 @Builder
 public class PenRequestComments {
-    String penRetrievalReqCommentID;
-    String penRetrievalRequestID;
-    String staffMemberIDIRGUID;
-    @NotNull(message = "Staff Member Name cannot be null")
-    String staffMemberName;
-    String commentContent;
-    Date commentTimestamp;
-    @NotNull(message = "expiryDate cannot be null")
-    Date expiryDate;
+  String penRetrievalReqCommentID;
+  String penRetrievalRequestID;
+  String staffMemberIDIRGUID;
+  String staffMemberName;
+  @NotNull(message = "Comment content can not be null")
+  String commentContent;
+  Date commentTimestamp;
 }
