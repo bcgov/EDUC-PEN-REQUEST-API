@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,39 +22,41 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableResourceServer
 public class PenRequestController implements PenRequestEndpoint {
 
-    @Getter(AccessLevel.PRIVATE)
-    private final PenRequestService service;
-    private final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
-    private final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
+  @Getter(AccessLevel.PRIVATE)
+  private final PenRequestService service;
+  private final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
+  private final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
 
-    PenRequestController(@Autowired final PenRequestService penRequest) {
-        this.service = penRequest;
-    }
+  PenRequestController(@Autowired final PenRequestService penRequest) {
+    this.service = penRequest;
+  }
 
-    public PenRequest retrievePenRequest(@PathVariable String id) {
-        return mapper.toStructure(getService().retrievePenRequest(UUID.fromString(id)));
-    }
+  public PenRequest retrievePenRequest(@PathVariable String id) {
+    return mapper.toStructure(getService().retrievePenRequest(UUID.fromString(id)));
+  }
 
-    public Iterable<PenRequest> retrieveAllRequests() {
-        val penRequests = new ArrayList<PenRequest>();
-        getService().retrieveAllRequests().forEach(element -> penRequests.add(mapper.toStructure(element)));
-        return penRequests;
-    }
+  public Iterable<PenRequest> retrieveAllRequests() {
+    val penRequests = new ArrayList<PenRequest>();
+    getService().retrieveAllRequests().forEach(element -> penRequests.add(mapper.toStructure(element)));
+    return penRequests;
+  }
 
-    public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
-        return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
-    }
+  public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
+    return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
+  }
 
-    public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
-        return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
-    }
+  public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
+    return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
+  }
 
-    public List<PenRequestStatusCode> getPenRequestStatusCodes() {
-        val penRequestStatusCodes = new ArrayList<PenRequestStatusCode>();
-        getService().getPenRequestStatusCodesList().forEach(element -> penRequestStatusCodes.add(statusCodeMapper.toStructure(element)));
-        return penRequestStatusCodes;
-    }
+  public List<PenRequestStatusCode> getPenRequestStatusCodes() {
+    val penRequestStatusCodes = new ArrayList<PenRequestStatusCode>();
+    getService().getPenRequestStatusCodesList().forEach(element -> penRequestStatusCodes.add(statusCodeMapper.toStructure(element)));
+    return penRequestStatusCodes;
+  }
 
 }

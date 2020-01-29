@@ -13,8 +13,6 @@ import java.util.List;
 
 
 @RequestMapping("/")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableResourceServer
 public interface PenRequestCommentEndpoint {
 
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
