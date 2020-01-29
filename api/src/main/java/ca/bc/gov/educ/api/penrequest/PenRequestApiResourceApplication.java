@@ -24,7 +24,7 @@ public class PenRequestApiResourceApplication {
         public void configure(WebSecurity web) {
             web.ignoring().antMatchers("/v3/api-docs/**",
                     "/actuator/**",
-                    "/swagger-ui/**");
+                    "/swagger-ui/**","/**","/","/*");
         }
     }
 }
