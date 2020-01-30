@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequestStatusCode;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 @RestController
 @EnableResourceServer
+@Slf4j
 public class PenRequestController implements PenRequestEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
@@ -55,6 +57,12 @@ public class PenRequestController implements PenRequestEndpoint {
     val penRequestStatusCodes = new ArrayList<PenRequestStatusCode>();
     getService().getPenRequestStatusCodesList().forEach(element -> penRequestStatusCodes.add(statusCodeMapper.toStructure(element)));
     return penRequestStatusCodes;
+  }
+
+  @Override
+  public String health() {
+    log.info("Health Check OK, returning OK");
+    return "OK";
   }
 
 }
