@@ -44,5 +44,7 @@ public interface PenRequestEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<PenRequestStatusCode> getPenRequestStatusCodes();
 
-
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @GetMapping("/health")
+  String health();
 }
