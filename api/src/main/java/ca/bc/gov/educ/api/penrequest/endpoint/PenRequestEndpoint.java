@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public interface PenRequestEndpoint {
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
   @GetMapping("/")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  Iterable<PenRequest> retrieveAllRequests();
+  Iterable<PenRequest> findPenRequests(@Param("digitalID") String digitalID, @Param("status") String status);
 
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
   @PostMapping()

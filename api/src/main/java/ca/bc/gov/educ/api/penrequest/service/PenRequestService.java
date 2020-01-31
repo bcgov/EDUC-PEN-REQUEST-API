@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,6 +66,10 @@ public class PenRequestService {
 
   public Iterable<PenRequestEntity> retrieveAllRequests() {
     return penRequestRepository.findAll();
+  }
+
+  public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
+    return penRequestRepository.findPenRequestEntitiesByDigitalIDAndPenRequestStatusCode(digitalID, statusCode);
   }
 
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
