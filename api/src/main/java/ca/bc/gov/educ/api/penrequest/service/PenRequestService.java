@@ -51,7 +51,6 @@ public class PenRequestService {
     }
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.INITREV.toString());
     penRequest.setStatusUpdateDate(new Date());
-    penRequest.setInitialSubmitDate(new Date());
     penRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
     penRequest.setCreateDate(new Date());
     penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
