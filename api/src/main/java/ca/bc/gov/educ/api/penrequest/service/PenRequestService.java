@@ -46,6 +46,9 @@ public class PenRequestService {
     if (penRequest.getPenRequestID() != null) {
       throw new InvalidParameterException("penRequest");
     }
+    if (penRequest.getInitialSubmitDate() != null) {
+      throw new InvalidParameterException("initialSubmitDate");
+    }
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.INITREV.toString());
     penRequest.setStatusUpdateDate(new Date());
     penRequest.setInitialSubmitDate(new Date());
