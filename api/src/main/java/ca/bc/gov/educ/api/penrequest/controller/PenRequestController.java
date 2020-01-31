@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
@@ -39,10 +41,15 @@ public class PenRequestController implements PenRequestEndpoint {
     return mapper.toStructure(getService().retrievePenRequest(UUID.fromString(id)));
   }
 
-  public Iterable<PenRequest> retrieveAllRequests() {
-    val penRequests = new ArrayList<PenRequest>();
-    getService().retrieveAllRequests().forEach(element -> penRequests.add(mapper.toStructure(element)));
-    return penRequests;
+  @Override
+  public Iterable<PenRequest> findPenRequests(final String digitalID, final String status) {
+    if (StringUtils.isNotBlank(digitalID) && StringUtils.isNotBlank(status)) {
+      return getService().findPenRequests(UUID.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
+    } else {
+      val result = new ArrayList<PenRequest>();
+      getService().retrieveAllRequests().forEach(entity -> result.add(mapper.toStructure(entity)));
+      return result;
+    }
   }
 
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
