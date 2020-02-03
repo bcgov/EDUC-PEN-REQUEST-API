@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 
+import javax.validation.constraints.NotNull;
+
 @Repository
-public interface PenRequestRepository extends CrudRepository<PenRequestEntity, UUID> {
-  List<PenRequestEntity> findPenRequestEntitiesByDigitalIDAndPenRequestStatusCode(UUID digitalID, String statusCode);
+public interface PenRequestRepository extends CrudRepository<PenRequestEntity, UUID>, PenRequestRepositoryCustom {
 }

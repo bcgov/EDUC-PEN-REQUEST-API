@@ -24,17 +24,17 @@ public interface PenRequestEndpoint {
   PenRequest retrievePenRequest(@PathVariable String id);
 
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
-  @GetMapping("/")
+  @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<PenRequest> findPenRequests(@Param("digitalID") String digitalID, @Param("status") String status);
 
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
-  @PostMapping()
+  @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest);
 
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
-  @PutMapping()
+  @PutMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest);
 

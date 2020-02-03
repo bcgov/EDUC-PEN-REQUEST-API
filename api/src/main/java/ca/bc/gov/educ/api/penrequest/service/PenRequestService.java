@@ -69,7 +69,7 @@ public class PenRequestService {
   }
 
   public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
-    return penRequestRepository.findPenRequestEntitiesByDigitalIDAndPenRequestStatusCode(digitalID, statusCode);
+    return penRequestRepository.findPenRequests(digitalID, statusCode);
   }
 
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
