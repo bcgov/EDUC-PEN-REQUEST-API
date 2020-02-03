@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.penrequest.mappers.PenRequestStatusCodeMapper;
 import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequestStatusCode;
+import ca.bc.gov.educ.api.penrequest.utils.UUIDUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,19 +39,14 @@ public class PenRequestController implements PenRequestEndpoint {
   }
 
   public PenRequest retrievePenRequest(@PathVariable String id) {
-    return mapper.toStructure(getService().retrievePenRequest(UUID.fromString(id)));
+    return mapper.toStructure(getService().retrievePenRequest(UUIDUtil.fromString(id)));
   }
 
   @Override
   public Iterable<PenRequest> findPenRequests(final String digitalID, final String status) {
-    if (StringUtils.isNotBlank(digitalID) && StringUtils.isNotBlank(status)) {
-      return getService().findPenRequests(UUID.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
-    } else {
-      val result = new ArrayList<PenRequest>();
-      getService().retrieveAllRequests().forEach(entity -> result.add(mapper.toStructure(entity)));
-      return result;
-    }
+    return getService().findPenRequests(UUIDUtil.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
+
 
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
