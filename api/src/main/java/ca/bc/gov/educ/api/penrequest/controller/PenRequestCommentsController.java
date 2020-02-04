@@ -17,9 +17,10 @@ import java.util.UUID;
 
 @RestController
 @EnableResourceServer
+@SuppressWarnings("squid:ModifiersOrderCheck")
 public class PenRequestCommentsController implements PenRequestCommentEndpoint {
 
-  private final PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
+  private final static PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestCommentService penRequestCommentService;
 

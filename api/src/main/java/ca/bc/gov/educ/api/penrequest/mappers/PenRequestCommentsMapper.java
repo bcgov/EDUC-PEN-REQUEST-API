@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = UUIDMapper.class)
+@SuppressWarnings("squid:S1214")
 public interface PenRequestCommentsMapper {
     PenRequestCommentsMapper mapper = Mappers.getMapper(PenRequestCommentsMapper.class);
 

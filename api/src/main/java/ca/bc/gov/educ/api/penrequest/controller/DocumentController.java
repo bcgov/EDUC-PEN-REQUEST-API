@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
+@SuppressWarnings("squid:ModifiersOrderCheck")
 public class DocumentController implements DocumentEndpoint {
 
-  private final DocumentMapper mapper = DocumentMapper.mapper;
-  private final DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
+  private final static DocumentMapper mapper = DocumentMapper.mapper;
+  private final static DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;
@@ -52,12 +53,12 @@ public class DocumentController implements DocumentEndpoint {
   }
 
   public DocumentRequirement getDocumentRequirements() {
-      return documentService.getDocumentRequirements();
+    return documentService.getDocumentRequirements();
   }
 
   public List<DocumentTypeCode> getDocumentTypeCodes() {
-      return getDocumentService().getDocumentTypeCodeList().stream()
-              .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
+    return getDocumentService().getDocumentTypeCodeList().stream()
+            .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
   }
 
 }

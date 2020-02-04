@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = { UUIDMapper.class, Base64Mapper.class })
+@SuppressWarnings("squid:S1214")
 public interface DocumentMapper {
 
     DocumentMapper mapper = Mappers.getMapper(DocumentMapper.class);
