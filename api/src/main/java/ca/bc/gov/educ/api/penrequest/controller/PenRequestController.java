@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.validation.annotation.Validated;
@@ -21,18 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
 @Slf4j
+@SuppressWarnings("squid:ModifiersOrderCheck")
 public class PenRequestController implements PenRequestEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestService service;
-  private final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
-  private final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
+  private final static PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
+  private final static PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
 
   PenRequestController(@Autowired final PenRequestService penRequest) {
     this.service = penRequest;

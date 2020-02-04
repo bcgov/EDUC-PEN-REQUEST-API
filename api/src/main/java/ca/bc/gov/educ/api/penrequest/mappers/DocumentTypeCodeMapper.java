@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = UUIDMapper.class)
+@SuppressWarnings("squid:S1214")
 public interface DocumentTypeCodeMapper {
 
     DocumentTypeCodeMapper mapper = Mappers.getMapper(DocumentTypeCodeMapper.class);

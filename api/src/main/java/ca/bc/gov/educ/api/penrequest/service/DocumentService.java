@@ -90,7 +90,7 @@ public class DocumentService {
      */
     public List<DocumentEntity> retrieveAllDocumentMetadata(UUID penrequestId) {
         List<DocumentEntity> documents = documentRepository.findByPenRequestPenRequestID(penrequestId);
-        if(documents == null || documents.size() == 0) {
+        if(documents == null || documents.isEmpty()) {
             throw new EntityNotFoundException(DocumentEntity.class, "penrequestId", penrequestId.toString());
         }
         return documents;

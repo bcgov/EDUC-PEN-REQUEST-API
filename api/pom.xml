@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ.api.penrequest</groupId>
     <artifactId>penrequest-api</artifactId>
-    <version>0.0.1.SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
