@@ -20,11 +20,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
-@SuppressWarnings("squid:ModifiersOrderCheck")
 public class DocumentController implements DocumentEndpoint {
 
-  private final static DocumentMapper mapper = DocumentMapper.mapper;
-  private final static DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
+  private static final DocumentMapper mapper = DocumentMapper.mapper;
+  private static final  DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;

@@ -25,13 +25,12 @@ import java.util.stream.Collectors;
 @RestController
 @EnableResourceServer
 @Slf4j
-@SuppressWarnings("squid:ModifiersOrderCheck")
 public class PenRequestController implements PenRequestEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestService service;
-  private final static PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
-  private final static PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
+  private static final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
+  private static final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
 
   PenRequestController(@Autowired final PenRequestService penRequest) {
     this.service = penRequest;
