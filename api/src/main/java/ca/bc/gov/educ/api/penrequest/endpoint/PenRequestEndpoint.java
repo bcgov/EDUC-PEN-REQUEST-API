@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RequestMapping("/")
 @OpenAPIDefinition(info = @Info(title = "API for Pen Requests.", description = "This CRUD API is for Pen Requests tied to a Digital ID for a particular student in BC.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_PEN_REQUEST", "WRITE_PEN_REQUEST"})})
 public interface PenRequestEndpoint {
@@ -31,6 +33,7 @@ public interface PenRequestEndpoint {
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
   @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
+  @ResponseStatus(CREATED)
   PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest);
 
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
