@@ -199,12 +199,6 @@ public class DocumentServiceTests {
         assertThat(documents.size()).isEqualTo(2);
     }
 
-    @Test
-    public void retrieveAllDocumentMetadataThrowsExceptionWhenInvalidPenRequestIdGivenTest() throws ParseException {
-        assertThatThrownBy(() -> service.retrieveAllDocumentMetadata(UUID.randomUUID()))
-            .isInstanceOf(EntityNotFoundException.class)
-            .hasMessageContaining("DocumentEntity");
-    }
 
     @Test
     public void deleteDocumentTest() throws ParseException{
