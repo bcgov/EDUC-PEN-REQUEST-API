@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class DocumentController implements DocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;
+
   private static final DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
@@ -53,12 +54,12 @@ public class DocumentController implements DocumentEndpoint {
   }
 
   public DocumentRequirement getDocumentRequirements() {
-      return documentService.getDocumentRequirements();
+    return documentService.getDocumentRequirements();
   }
 
   public List<DocumentTypeCode> getDocumentTypeCodes() {
-      return getDocumentService().getDocumentTypeCodeList().stream()
-              .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
+    return getDocumentService().getDocumentTypeCodeList().stream()
+            .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
   }
 
 }

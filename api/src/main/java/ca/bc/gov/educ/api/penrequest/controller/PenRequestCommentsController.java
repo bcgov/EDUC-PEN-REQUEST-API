@@ -19,7 +19,7 @@ import java.util.UUID;
 @EnableResourceServer
 public class PenRequestCommentsController implements PenRequestCommentEndpoint {
 
-  private final PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
+  private static final PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestCommentService penRequestCommentService;
 
