@@ -13,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RequestMapping("/")
 @OpenAPIDefinition(info = @Info(title = "API for Pen Request Documents.", description = "This API is for Pen Request Documents.", version = "1"), 
                   security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_DOCUMENT", "WRITE_DOCUMENT", "DELETE_DOCUMENT", "READ_DOCUMENT_REQUIREMENTS", "READ_DOCUMENT_TYPES"})})
@@ -26,6 +28,7 @@ public interface DocumentEndpoint {
   @PostMapping("/{penRequestID}/documents")
   @PreAuthorize("#oauth2.hasAnyScope('WRITE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
+  @ResponseStatus(CREATED)
   DocumentMetadata createDocument(@PathVariable String penRequestID, @Validated @RequestBody Document document);
 
   @DeleteMapping("/{penRequestID}/documents/{documentID}")

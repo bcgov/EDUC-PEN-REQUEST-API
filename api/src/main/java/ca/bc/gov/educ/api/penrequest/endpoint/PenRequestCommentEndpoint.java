@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 
 @RequestMapping("/")
 public interface PenRequestCommentEndpoint {
@@ -21,6 +23,7 @@ public interface PenRequestCommentEndpoint {
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
   @PostMapping("/{penRequestId}/comments")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
   PenRequestComments save(@PathVariable String penRequestId, @Validated @RequestBody PenRequestComments penRequestComments);
 
 
