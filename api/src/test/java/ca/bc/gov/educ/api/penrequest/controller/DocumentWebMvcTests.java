@@ -105,7 +105,7 @@ public class DocumentWebMvcTests {
             .content(Files.readAllBytes(new ClassPathResource(
                 "../model/document-req.json", DocumentWebMvcTests.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(print())
             .andExpect(jsonPath("$.documentID", not(is(this.documentID.toString()))))
             .andExpect(jsonPath("$.documentTypeCode", is("BCSCPHOTO")))
