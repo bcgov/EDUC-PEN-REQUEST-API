@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 public class DocumentController implements DocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;
-  private static final  DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
+
+  private static final DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;
 
-  DocumentController(@Autowired final DocumentService documentService) {
+  @Autowired
+  DocumentController(final DocumentService documentService) {
     this.documentService = documentService;
   }
 

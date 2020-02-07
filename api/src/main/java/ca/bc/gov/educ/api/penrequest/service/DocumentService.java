@@ -11,178 +11,171 @@ import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentRequirement;
-
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
-
 @Service
 public class DocumentService {
 
-    private static Logger logger = Logger.getLogger(DocumentService.class);
+  private static Logger logger = Logger.getLogger(DocumentService.class);
 
-    @Autowired
-    private DocumentRepository documentRepository;
+  private final DocumentRepository documentRepository;
 
-    @Autowired
-    private PenRequestRepository penRequestRepository;
+  private final PenRequestRepository penRequestRepository;
 
-    @Autowired
-    private DocumentTypeCodeTableRepository documentTypeCodeRepository;
+  private final DocumentTypeCodeTableRepository documentTypeCodeRepository;
 
-    @Autowired
-    private ApplicationProperties properties;
+  private final ApplicationProperties properties;
 
-    /**
-     * Search for Document Metadata by id
-     *
-     * @param documentID
-     * @return
-     * @throws EntityNotFoundException
-     */
-    public DocumentEntity retrieveDocumentMetadata(UUID penrequestId, UUID documentID) throws EntityNotFoundException {
-        logger.info("retrieving Document Metadata, documentID: " + documentID.toString());
+  @Autowired
+  public DocumentService(final DocumentRepository documentRepository, final PenRequestRepository penRequestRepository, final DocumentTypeCodeTableRepository documentTypeCodeRepository, final ApplicationProperties properties) {
+    this.documentRepository = documentRepository;
+    this.penRequestRepository = penRequestRepository;
+    this.documentTypeCodeRepository = documentTypeCodeRepository;
+    this.properties = properties;
+  }
 
-        Optional<DocumentEntity> result = documentRepository.findById(documentID);
-        if (! result.isPresent()) {
-            throw new EntityNotFoundException(DocumentEntity.class, "documentID", documentID.toString());
-        }
 
-        DocumentEntity document = result.get();
+  /**
+   * Search for Document Metadata by id
+   *
+   * @param documentID the documentID to fetch the Document from DB
+   * @return The Document {@link DocumentEntity} if found.
+   * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
+   */
+  public DocumentEntity retrieveDocumentMetadata(UUID penRequestId, UUID documentID) {
+    logger.info("retrieving Document Metadata, documentID: " + documentID.toString());
 
-        if(! document.getPenRequest().getPenRequestID().equals(penrequestId)) {
-            throw new EntityNotFoundException(DocumentEntity.class, "penrequestId", penrequestId.toString());
-        }
-        
-        return document;
+    Optional<DocumentEntity> result = documentRepository.findById(documentID);
+    if (!result.isPresent()) {
+      throw new EntityNotFoundException(DocumentEntity.class, "documentID", documentID.toString());
     }
 
-    /**
-     * Search for Document with data by id
-     *
-     * @param documentID
-     * @return
-     * @throws EntityNotFoundException
-     */
-    @Transactional
-    public DocumentEntity retrieveDocument(UUID penrequestId, UUID documentID) throws EntityNotFoundException {
-        logger.info("retrieving Document, documentID: " + documentID.toString());
+    DocumentEntity document = result.get();
 
-        DocumentEntity document = retrieveDocumentMetadata(penrequestId, documentID);
-        // triger lazy loading
-        if (document.getDocumentData().length == 0) {
-            document.setFileSize(0);
-        }
-        return document;
+    if (!document.getPenRequest().getPenRequestID().equals(penRequestId)) {
+      throw new EntityNotFoundException(DocumentEntity.class, "penRequestId", penRequestId.toString());
     }
 
-    /**
-     * Search for all document metadata by penrequestId 
-     * 
-     * @return
-     */
-    public List<DocumentEntity> retrieveAllDocumentMetadata(UUID penrequestId) {
-        List<DocumentEntity> documents = documentRepository.findByPenRequestPenRequestID(penrequestId);
-        if(documents == null || documents.isEmpty()) {
-            throw new EntityNotFoundException(DocumentEntity.class, "penrequestId", penrequestId.toString());
-        }
-        return documents;
+    return document;
+  }
+
+  /**
+   * Search for Document with data by id
+   *
+   * @param documentID the documentID to fetch the Document from DB
+   * @return The Document {@link DocumentEntity} if found.
+   * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
+   */
+  @Transactional
+  public DocumentEntity retrieveDocument(UUID penRequestId, UUID documentID) {
+    logger.info("retrieving Document, documentID: " + documentID.toString());
+
+    DocumentEntity document = retrieveDocumentMetadata(penRequestId, documentID);
+    // trigger lazy loading
+    if (document.getDocumentData().length == 0) {
+      document.setFileSize(0);
+    }
+    return document;
+  }
+
+  /**
+   * Search for all document metadata by penRequestId
+   *
+   * @return {@link List<DocumentEntity> }
+   */
+  public List<DocumentEntity> retrieveAllDocumentMetadata(UUID penRequestId) {
+    return documentRepository.findByPenRequestPenRequestID(penRequestId);
+  }
+
+  /**
+   * Creates a DocumentEntity
+   *
+   * @param document DocumentEntity payload to be saved in DB
+   * @return saved DocumentEntity.
+   * @throws InvalidParameterException,EntityNotFoundException if payload contains invalid parameters
+   */
+  public DocumentEntity createDocument(UUID penRequestId, DocumentEntity document) {
+    logger.info(
+            "creating Document, penRequestId: " + penRequestId.toString() + ", document: " + document.toString());
+
+    validateParameters(document);
+
+    Optional<PenRequestEntity> option = penRequestRepository.findById(penRequestId);
+
+    if (option.isPresent()) {
+      PenRequestEntity penRequest = option.get();
+      document.setPenRequest(penRequest);
+
+      Date curDate = new Date();
+      document.setUpdateUser(ApplicationProperties.CLIENT_ID);
+      document.setUpdateDate(curDate);
+      document.setCreateUser(ApplicationProperties.CLIENT_ID);
+      document.setCreateDate(curDate);
+      return documentRepository.save(document);
+    } else {
+      throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", penRequestId.toString());
+    }
+  }
+
+  /**
+   * Delete DocumentEntity by id
+   *
+   * @param documentID delete the document with this id.
+   * @return DocumentEntity which was deleted.
+   * @throws EntityNotFoundException if no entity exist by this id
+   */
+  public DocumentEntity deleteDocument(UUID penRequestId, UUID documentID) {
+    logger.info("deleting Document, documentID: " + documentID.toString());
+    DocumentEntity document = retrieveDocumentMetadata(penRequestId, documentID);
+    documentRepository.delete(document);
+    return document;
+  }
+
+  public List<DocumentTypeCodeEntity> getDocumentTypeCodeList() {
+    return documentTypeCodeRepository.findAll();
+  }
+
+  /**
+   * Get File Upload Requirement
+   *
+   * @return DocumentRequirementEntity
+   */
+  public DocumentRequirement getDocumentRequirements() {
+    logger.info("retrieving Document Requirements");
+
+    return new DocumentRequirement(properties.getMaxFileSize(), properties.getFileExtensions());
+  }
+
+  private void validateParameters(DocumentEntity document) {
+
+    if (document.getDocumentID() != null) {
+      throw new InvalidParameterException("documentID");
     }
 
-    /**
-     * Creates a DocumentEntity
-     *
-     * @param document
-     * @return
-     * @throws InvalidParameterException
-     */
-    public DocumentEntity createDocument(UUID penRequestId, DocumentEntity document) throws InvalidParameterException {
-        logger.info(
-                "creating Document, penRequestId: " + penRequestId.toString() + ", document: " + document.toString());
-
-        validateParameters(document);
-
-        Optional<PenRequestEntity> option = penRequestRepository.findById(penRequestId);
-
-        if (option.isPresent()) {
-            PenRequestEntity penRequest = option.get();
-            document.setPenRequest(penRequest);
-
-            Date curDate = new Date();
-            document.setUpdateUser(ApplicationProperties.CLIENT_ID);
-            document.setUpdateDate(curDate);
-            document.setCreateUser(ApplicationProperties.CLIENT_ID);
-            document.setCreateDate(curDate);
-            return documentRepository.save(document);
-        } else {
-            throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", penRequestId.toString());
-        }
+    if (!properties.getFileExtensions().contains(document.getFileExtension())) {
+      throw new InvalidValueException("fileExtension", document.getFileExtension());
     }
 
-    /**
-     * Delete DocumentEntity by id
-     *
-     * @param documentID
-     * @return
-     * @throws EntityNotFoundException
-     */
-    public DocumentEntity deleteDocument(UUID penrequestId, UUID documentID) throws EntityNotFoundException {
-        logger.info("deleting Document, documentID: " + documentID.toString());
-
-        DocumentEntity document = retrieveDocumentMetadata(penrequestId, documentID);
-        documentRepository.delete(document);
-        return document;
+    if (document.getFileSize() > properties.getMaxFileSize()) {
+      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max fileSize",
+              String.valueOf(properties.getMaxFileSize()));
     }
 
-    public List<DocumentTypeCodeEntity> getDocumentTypeCodeList() {
-        List<DocumentTypeCodeEntity> result =  documentTypeCodeRepository.findAll();
-        if(result != null && !result.isEmpty()) {
-            return result;
-        } else {
-            throw new EntityNotFoundException(DocumentTypeCodeEntity.class);
-        }
+    if (document.getFileSize() != document.getDocumentData().length) {
+      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "documentData length",
+              String.valueOf(document.getDocumentData().length));
     }
 
-    /**
-     * Get File Upload Requirement
-     *
-     * @return DocumentRequirementEntity
-     */
-    public DocumentRequirement getDocumentRequirements() {
-        logger.info("retrieving Document Requirements");
-
-        return new DocumentRequirement(properties.getMaxFileSize(), properties.getFileExtensions());
+    if (!documentTypeCodeRepository.findById(document.getDocumentTypeCode()).isPresent()) {
+      throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
     }
-
-    private void validateParameters(DocumentEntity document) throws InvalidParameterException {
-
-        if (document.getDocumentID() != null) {
-            throw new InvalidParameterException("documentID");
-        }
-
-        if (!properties.getFileExtensions().contains(document.getFileExtension())) {
-            throw new InvalidValueException("fileExtension", document.getFileExtension());
-        }
-
-        if (document.getFileSize() > properties.getMaxFileSize()) {
-            throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max fileSize",
-                    String.valueOf(properties.getMaxFileSize()));
-        }
-
-        if (document.getFileSize() != document.getDocumentData().length) {
-            throw new InvalidValueException("fileSize", document.getFileSize().toString(), "documentData length",
-                    String.valueOf(document.getDocumentData().length));
-        }
-
-        if (! documentTypeCodeRepository.findById(document.getDocumentTypeCode()).isPresent()) {
-            throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
-        }
-    }
+  }
 }
