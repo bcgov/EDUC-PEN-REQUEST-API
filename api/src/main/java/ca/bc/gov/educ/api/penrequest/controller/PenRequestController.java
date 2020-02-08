@@ -62,7 +62,6 @@ public class PenRequestController implements PenRequestEndpoint {
 
   @Override
   public String health() {
-    log.info("Health Check OK, returning OK");
     return "OK";
   }
 
