@@ -45,7 +45,6 @@ public class PenRequestController implements PenRequestEndpoint {
     return getService().findPenRequests(UUIDUtil.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
-
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
   }
