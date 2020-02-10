@@ -12,19 +12,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@SuppressWarnings("squid:S1700")
 public class DocumentTypeCode implements Serializable {
 
-    private static final long serialVersionUID = 6118916290604876032L;
+  private static final long serialVersionUID = 6118916290604876032L;
 
-    private String documentTypeCode;
-    
-    private String label;
-    
-    private String description;
+  private String documentTypeCode;
 
-    private Integer displayOrder;
+  private String label;
 
-    private Date effectiveDate;
-    
-    private Date expiryDate;
+  private String description;
+
+  private Integer displayOrder;
+
+  private Date effectiveDate;
+
+  private Date expiryDate;
 }

@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DocumentRequirement implements Serializable {
 
-	private static final long serialVersionUID = 1290327040864105148L;
+  private static final long serialVersionUID = 1290327040864105148L;
 
-	private int maxSize;
+  private int maxSize;
 
-	private List<String> extensions;
+  private List<String> extensions;
 
 }

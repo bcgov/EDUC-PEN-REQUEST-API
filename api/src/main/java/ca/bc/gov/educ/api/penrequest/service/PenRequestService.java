@@ -56,21 +56,21 @@ public class PenRequestService {
     penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
     penRequest.setUpdateDate(new Date());
 
-    return penRequestRepository.save(penRequest);
+    return getPenRequestRepository().save(penRequest);
   }
 
   public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
-    return penRequestStatusCodeTableRepo.findAll();
+    return getPenRequestStatusCodeTableRepo().findAll();
   }
 
   public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
-    return penRequestRepository.findPenRequests(digitalID, statusCode);
+    return getPenRequestRepository().findPenRequests(digitalID, statusCode);
   }
 
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
 
 
-    Optional<PenRequestEntity> curPenRequest = penRequestRepository.findById(penRequest.getPenRequestID());
+    Optional<PenRequestEntity> curPenRequest = getPenRequestRepository().findById(penRequest.getPenRequestID());
 
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();

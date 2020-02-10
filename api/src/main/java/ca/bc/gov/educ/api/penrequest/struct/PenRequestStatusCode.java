@@ -14,24 +14,25 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuppressWarnings("squid:S1700")
 public class PenRequestStatusCode implements Serializable {
 
-    private static final long serialVersionUID = -8596549361135591976L;
+  private static final long serialVersionUID = -8596549361135591976L;
 
-    String penRequestStatusCode;
+  String penRequestStatusCode;
 
-    @NotNull(message = "label cannot be null")
-    String label;
+  @NotNull(message = "label cannot be null")
+  String label;
 
-    @NotNull(message = "description cannot be null")
-    String description;
+  @NotNull(message = "description cannot be null")
+  String description;
 
-    @NotNull(message = "displayOrder cannot be null")
-    Integer displayOrder;
+  @NotNull(message = "displayOrder cannot be null")
+  Integer displayOrder;
 
-    @NotNull(message = "effectiveDate cannot be null")
-    Date effectiveDate;
+  @NotNull(message = "effectiveDate cannot be null")
+  Date effectiveDate;
 
-    @NotNull(message = "expiryDate cannot be null")
-    Date expiryDate;
+  @NotNull(message = "expiryDate cannot be null")
+  Date expiryDate;
 }

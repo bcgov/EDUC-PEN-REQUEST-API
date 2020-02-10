@@ -77,6 +77,14 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId, "comment1"))).andDo(print()).andExpect(status().isCreated());
   }
 
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
+  public void testCreatePenRequestComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
+    String penReqId = UUID.randomUUID().toString();
+    this.mockMvc.perform(post("/" + penReqId + "/comments").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId, "comment1"))).andDo(print()).andExpect(status().isNotFound());
+  }
+
   private String dummyPenRequestCommentsJsonWithValidPenReqID(String penReqId, String comment) {
     return "{\n" +
             "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +

@@ -2,8 +2,10 @@ package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 import ca.bc.gov.educ.api.support.WithMockOAuth2Scope;
 import org.junit.After;
 import org.junit.Before;
@@ -18,13 +20,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -39,6 +44,9 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Autowired
   DocumentRepository documentRepository;
+
+  @Autowired
+  PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
 
   @Before
   public void setUp() {
@@ -89,6 +97,13 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
+  public void testCreatePenRequest_GivenPenReqIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
+    this.mockMvc.perform(post("/").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testUpdatePenRequest_GivenInvalidPenReqIDInPayload_ShouldReturnStatusNotFound() throws Exception {
     this.mockMvc.perform(put("/").contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isNotFound());
@@ -105,7 +120,32 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST_STATUSES")
-  public void testReadPenRequestStatus_Always_ShouldReturnStatusOk() throws Exception {
-    this.mockMvc.perform(get("/statuses")).andDo(print()).andExpect(status().isOk());
+  public void testReadPenRequestStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
+    penRequestStatusCodeTableRepo.save(createPenReqStatus());
+    this.mockMvc.perform(get("/statuses")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
   }
+
+
+  @Test
+  public void testHealth_GivenServerIsRunning_ShouldReturnOK() throws Exception {
+    this.mockMvc.perform(get("/health")).andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string(containsString("OK")));
+  }
+
+  private PenRequestStatusCodeEntity createPenReqStatus() {
+    PenRequestStatusCodeEntity entity = new PenRequestStatusCodeEntity();
+    entity.setPenRequestStatusCode("INITREV");
+    entity.setDescription("Initial Review");
+    entity.setDisplayOrder(1);
+    entity.setEffectiveDate(new Date());
+    entity.setLabel("Initial Review");
+    entity.setCreateDate(new Date());
+    entity.setCreateUser("TEST");
+    entity.setUpdateUser("TEST");
+    entity.setUpdateDate(new Date());
+    entity.setExpiryDate(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).getTime());
+    return entity;
+  }
+
+
 }

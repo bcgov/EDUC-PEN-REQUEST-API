@@ -8,8 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,13 +27,11 @@ public class PenRequestCommentsController implements PenRequestCommentEndpoint {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public List<PenRequestComments> retrieveComments(String penRequestId) {
     return getPenRequestCommentService().retrieveComments(UUID.fromString(penRequestId)).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
   public PenRequestComments save(String penRequestId, PenRequestComments penRequestComments) {
     return mapper.toStructure(getPenRequestCommentService().save(UUID.fromString(penRequestId), mapper.toModel(penRequestComments)));
   }
