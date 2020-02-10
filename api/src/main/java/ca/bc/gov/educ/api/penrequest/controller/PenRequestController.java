@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,11 +47,11 @@ public class PenRequestController implements PenRequestEndpoint {
     return getService().findPenRequests(UUIDUtil.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
-
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
     return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
   }

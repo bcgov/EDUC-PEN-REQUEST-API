@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,12 +26,13 @@ public class PenRequestCommentService {
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestCommentRepository penRequestCommentRepository;
 
-  PenRequestCommentService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestCommentRepository penRequestCommentRepository) {
+  @Autowired
+  PenRequestCommentService(final PenRequestRepository penRequestRepository, final PenRequestCommentRepository penRequestCommentRepository) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestCommentRepository = penRequestCommentRepository;
   }
 
-  public Iterable<PenRequestCommentsEntity> retrieveComments(UUID penRetrievalRequestId) {
+  public Set<PenRequestCommentsEntity> retrieveComments(UUID penRetrievalRequestId) {
     final Optional<PenRequestEntity> entity = getPenRequestRepository().findById(penRetrievalRequestId);
     if (entity.isPresent()) {
       return entity.get().getPenRequestComments();

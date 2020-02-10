@@ -1,17 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
-import lombok.AccessLevel;
-import lombok.Getter;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
@@ -19,6 +8,16 @@ import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import lombok.AccessLevel;
+import lombok.Getter;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PenRequestService {
@@ -62,10 +61,6 @@ public class PenRequestService {
 
   public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
     return penRequestStatusCodeTableRepo.findAll();
-  }
-
-  public Iterable<PenRequestEntity> retrieveAllRequests() {
-    return penRequestRepository.findAll();
   }
 
   public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
