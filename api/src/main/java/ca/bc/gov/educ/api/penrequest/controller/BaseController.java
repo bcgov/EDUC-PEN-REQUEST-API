@@ -4,10 +4,11 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.struct.BaseRequest;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public abstract class BaseController {
-  protected void setAuditColumns(BaseRequest baseRequest) {
+  protected void setAuditColumns(@NotNull BaseRequest baseRequest) {
     if (StringUtils.isBlank(baseRequest.getCreateUser())) {
       baseRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
     }

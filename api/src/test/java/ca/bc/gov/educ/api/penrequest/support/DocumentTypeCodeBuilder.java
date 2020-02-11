@@ -69,7 +69,15 @@ public class DocumentTypeCodeBuilder {
                                             .withDocumentTypeCode("CAPASSPORT").build();
         DocumentTypeCodeEntity bcsc = new DocumentTypeCodeBuilder()
                                         .withDocumentTypeCode("BCSCPHOTO").build();
+        DocumentTypeCodeEntity bCeIdPHOTONotEffective = new DocumentTypeCodeBuilder()
+                .withDocumentTypeCode("BCeIdPHOTO").build();
+        bCeIdPHOTONotEffective.setEffectiveDate(new GregorianCalendar(2199, Calendar.FEBRUARY, 1).getTime());
+        DocumentTypeCodeEntity dlExpired = new DocumentTypeCodeBuilder()
+                .withDocumentTypeCode("dl").build();
+        dlExpired.setExpiryDate(new GregorianCalendar(2020, Calendar.FEBRUARY, 1).getTime());
         documentTypeCodeRepository.save(passport);
         documentTypeCodeRepository.save(bcsc);
+        documentTypeCodeRepository.save(bCeIdPHOTONotEffective);
+        documentTypeCodeRepository.save(dlExpired);
     }
 }

@@ -61,19 +61,29 @@ public class PenRequestService {
     return getPenRequestRepository().findPenRequests(digitalID, statusCode);
   }
 
+  /**
+   * This method has to add some DB fields values to the incoming to keep track of audit columns and parent child relationship.
+   *
+   * @param penRequest the object which needs to be updated.
+   * @return updated object.
+   */
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
     Optional<PenRequestEntity> curPenRequest = getPenRequestRepository().findById(penRequest.getPenRequestID());
+
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
+      Date createDate = newPenRequest.getCreateDate();
+      String createUser = newPenRequest.getCreateUser();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
+      newPenRequest.setCreateDate(createDate);
+      newPenRequest.setCreateUser(createUser);
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
   }
-
 
 
 }
