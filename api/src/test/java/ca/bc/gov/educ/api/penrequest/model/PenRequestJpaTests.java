@@ -11,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

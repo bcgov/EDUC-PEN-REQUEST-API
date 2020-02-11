@@ -1,22 +1,16 @@
 package ca.bc.gov.educ.api.penrequest.struct;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
 import java.io.Serializable;
-import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Document implements Serializable {
+public class Document extends BaseRequest implements Serializable {
 
   private static final long serialVersionUID = -7471585921119777006L;
 
@@ -37,7 +31,4 @@ public class Document implements Serializable {
   @NotNull(message = "documentData cannot be null")
   @ToString.Exclude
   private String documentData;
-
-  @Null(message = "Create Date should be null")
-  private Date createDate;
 }

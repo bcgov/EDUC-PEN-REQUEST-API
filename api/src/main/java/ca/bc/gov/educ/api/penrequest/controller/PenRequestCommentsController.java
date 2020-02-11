@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
-public class PenRequestCommentsController implements PenRequestCommentEndpoint {
+public class PenRequestCommentsController extends BaseController implements PenRequestCommentEndpoint {
 
   private static final PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
@@ -33,6 +33,7 @@ public class PenRequestCommentsController implements PenRequestCommentEndpoint {
 
   @Override
   public PenRequestComments save(String penRequestId, PenRequestComments penRequestComments) {
+    setAuditColumns(penRequestComments);
     return mapper.toStructure(getPenRequestCommentService().save(UUID.fromString(penRequestId), mapper.toModel(penRequestComments)));
   }
 }

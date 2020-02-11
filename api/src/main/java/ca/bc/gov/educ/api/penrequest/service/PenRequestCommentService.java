@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.penrequest.service;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import lombok.AccessLevel;
@@ -12,7 +11,6 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -51,12 +49,9 @@ public class PenRequestCommentService {
     val result = getPenRequestRepository().findById(penRetrievalRequestId);
     if (result.isPresent()) {
       penRequestCommentsEntity.setPenRequestEntity(result.get());
-      penRequestCommentsEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
-      penRequestCommentsEntity.setCreateDate(new Date());
-      penRequestCommentsEntity.setUpdateUser(ApplicationProperties.CLIENT_ID);
-      penRequestCommentsEntity.setUpdateDate(new Date());
       return getPenRequestCommentRepository().save(penRequestCommentsEntity);
     }
     throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRetrievalRequestId.toString());
   }
+
 }

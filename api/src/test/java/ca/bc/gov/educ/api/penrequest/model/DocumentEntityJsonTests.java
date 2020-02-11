@@ -16,7 +16,7 @@ import ca.bc.gov.educ.api.penrequest.mappers.DocumentMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.DocumentMapperImpl;
 import ca.bc.gov.educ.api.penrequest.struct.Document;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentMetadata;
-import ca.bc.gov.educ.api.support.DocumentBuilder;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 
 
 @RunWith(SpringRunner.class)

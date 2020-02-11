@@ -13,8 +13,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
-import ca.bc.gov.educ.api.support.DocumentBuilder;
-import ca.bc.gov.educ.api.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
+import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

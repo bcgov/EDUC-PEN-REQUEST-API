@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.endpoint.PenRequestEndpoint;
+import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestStatusCodeMapper;
 import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @EnableResourceServer
 @Slf4j
-public class PenRequestController implements PenRequestEndpoint {
+public class PenRequestController extends BaseController implements PenRequestEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestService service;
@@ -46,10 +47,18 @@ public class PenRequestController implements PenRequestEndpoint {
   }
 
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
+    if (penRequest.getPenRequestID() != null) {
+      throw new InvalidParameterException("penRequest");
+    }
+    if (penRequest.getInitialSubmitDate() != null) {
+      throw new InvalidParameterException("initialSubmitDate");
+    }
+    setAuditColumns(penRequest);
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
   }
 
   public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
+    setAuditColumns(penRequest);
     return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
   }
 
