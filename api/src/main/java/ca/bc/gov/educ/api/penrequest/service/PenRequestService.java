@@ -2,10 +2,8 @@ package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 import lombok.AccessLevel;
@@ -42,22 +40,18 @@ public class PenRequestService {
     }
   }
 
+  /**
+   * set the status to DRAFT in the initial submit of pen request.
+   *
+   * @param penRequest the pen request object to be persisted in the DB.
+   * @return the persisted entity.
+   */
   public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
-    if (penRequest.getPenRequestID() != null) {
-      throw new InvalidParameterException("penRequest");
-    }
-    if (penRequest.getInitialSubmitDate() != null) {
-      throw new InvalidParameterException("initialSubmitDate");
-    }
-    penRequest.setPenRequestStatusCode(PenRequestStatusCode.INITREV.toString());
+    penRequest.setPenRequestStatusCode(PenRequestStatusCode.DRAFT.toString());
     penRequest.setStatusUpdateDate(new Date());
-    penRequest.setCreateUser(ApplicationProperties.CLIENT_ID);
-    penRequest.setCreateDate(new Date());
-    penRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
-    penRequest.setUpdateDate(new Date());
-
     return getPenRequestRepository().save(penRequest);
   }
+
 
   public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
     return getPenRequestStatusCodeTableRepo().findAll();
@@ -68,21 +62,18 @@ public class PenRequestService {
   }
 
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
-
-
     Optional<PenRequestEntity> curPenRequest = getPenRequestRepository().findById(penRequest.getPenRequestID());
-
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
-      newPenRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
-      newPenRequest.setUpdateDate(new Date());
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
   }
+
+
 
 }

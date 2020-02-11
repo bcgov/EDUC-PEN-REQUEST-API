@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
-import ca.bc.gov.educ.api.penrequest.exception.InvalidValueException;
 import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
 import ca.bc.gov.educ.api.penrequest.model.DocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
@@ -13,10 +12,10 @@ import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentRequirement;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,20 +104,10 @@ public class DocumentService {
   public DocumentEntity createDocument(UUID penRequestId, DocumentEntity document) {
     logger.info(
             "creating Document, penRequestId: " + penRequestId.toString() + ", document: " + document.toString());
-
-    validateParameters(document);
-
     Optional<PenRequestEntity> option = penRequestRepository.findById(penRequestId);
-
     if (option.isPresent()) {
       PenRequestEntity penRequest = option.get();
       document.setPenRequest(penRequest);
-
-      Date curDate = new Date();
-      document.setUpdateUser(ApplicationProperties.CLIENT_ID);
-      document.setUpdateDate(curDate);
-      document.setCreateUser(ApplicationProperties.CLIENT_ID);
-      document.setCreateDate(curDate);
       return documentRepository.save(document);
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", penRequestId.toString());
@@ -139,6 +128,7 @@ public class DocumentService {
     return document;
   }
 
+  @Cacheable("documentTypeCodeList")
   public List<DocumentTypeCodeEntity> getDocumentTypeCodeList() {
     return documentTypeCodeRepository.findAll();
   }
@@ -150,32 +140,6 @@ public class DocumentService {
    */
   public DocumentRequirement getDocumentRequirements() {
     logger.info("retrieving Document Requirements");
-
     return new DocumentRequirement(properties.getMaxFileSize(), properties.getFileExtensions());
-  }
-
-  private void validateParameters(DocumentEntity document) {
-
-    if (document.getDocumentID() != null) {
-      throw new InvalidParameterException("documentID");
-    }
-
-    if (!properties.getFileExtensions().contains(document.getFileExtension())) {
-      throw new InvalidValueException("fileExtension", document.getFileExtension());
-    }
-
-    if (document.getFileSize() > properties.getMaxFileSize()) {
-      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max fileSize",
-              String.valueOf(properties.getMaxFileSize()));
-    }
-
-    if (document.getFileSize() != document.getDocumentData().length) {
-      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "documentData length",
-              String.valueOf(document.getDocumentData().length));
-    }
-
-    if (!documentTypeCodeRepository.findById(document.getDocumentTypeCode()).isPresent()) {
-      throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
-    }
   }
 }

@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.support;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import ca.bc.gov.educ.api.penrequest.model.DocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
@@ -17,7 +19,7 @@ public class DocumentTypeCodeBuilder {
 
     Date effectiveDate = new Date();
     
-    Date expiryDate = new Date();
+    Date expiryDate = new GregorianCalendar(2099, Calendar.FEBRUARY, 1).getTime();
 
     String createUser = "API";
 

@@ -1,19 +1,17 @@
 package ca.bc.gov.educ.api.penrequest.struct;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PenRequest implements Serializable {
+public class PenRequest extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
   private String penRequestID;

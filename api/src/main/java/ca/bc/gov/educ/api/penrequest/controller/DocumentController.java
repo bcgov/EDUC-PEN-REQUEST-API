@@ -8,8 +8,10 @@ import ca.bc.gov.educ.api.penrequest.struct.Document;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentMetadata;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentRequirement;
 import ca.bc.gov.educ.api.penrequest.struct.DocumentTypeCode;
+import ca.bc.gov.educ.api.penrequest.validator.PenRequestDocumentsValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
-public class DocumentController implements DocumentEndpoint {
+public class DocumentController extends BaseController implements DocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;
 
@@ -28,10 +30,13 @@ public class DocumentController implements DocumentEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;
+  @Getter(AccessLevel.PRIVATE)
+  private final PenRequestDocumentsValidator validator;
 
   @Autowired
-  DocumentController(final DocumentService documentService) {
+  DocumentController(final DocumentService documentService, final PenRequestDocumentsValidator validator) {
     this.documentService = documentService;
+    this.validator = validator;
   }
 
   @Override
@@ -41,7 +46,10 @@ public class DocumentController implements DocumentEndpoint {
 
   @Override
   public DocumentMetadata createDocument(String penRequestID, Document document) {
-    return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(penRequestID), mapper.toModel(document)));
+    setAuditColumns(document);
+    val model = mapper.toModel(document);
+    getValidator().validateDocumentPayload(model);
+    return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(penRequestID), model));
   }
 
   public DocumentMetadata deleteDocument(String penRequestID, String documentID) {
