@@ -61,6 +61,12 @@ public class PenRequestService {
     return getPenRequestRepository().findPenRequests(digitalID, statusCode);
   }
 
+  /**
+   * This method has to add some DB fields values to the incoming to keep track of audit columns and parent child relationship.
+   *
+   * @param penRequest the object which needs to be updated.
+   * @return updated object.
+   */
   public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
     Optional<PenRequestEntity> curPenRequest = getPenRequestRepository().findById(penRequest.getPenRequestID());
 
