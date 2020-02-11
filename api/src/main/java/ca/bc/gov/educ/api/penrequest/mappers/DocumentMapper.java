@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.penrequest.mappers;
 
 import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.struct.Document;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -13,9 +13,9 @@ public interface DocumentMapper {
 
     DocumentMapper mapper = Mappers.getMapper(DocumentMapper.class);
 
-    Document toStructure(DocumentEntity entity);
+    PenReqDocument toStructure(DocumentEntity entity);
 
-    DocumentEntity toModel(Document struct);
+    DocumentEntity toModel(PenReqDocument struct);
 
-    DocumentMetadata toMetadataStructure(DocumentEntity struct);
+    PenReqDocMetadata toMetadataStructure(DocumentEntity struct);
 }

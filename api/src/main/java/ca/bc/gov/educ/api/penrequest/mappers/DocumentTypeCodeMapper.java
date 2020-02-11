@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.mappers;
 
 import ca.bc.gov.educ.api.penrequest.model.DocumentTypeCodeEntity;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentTypeCode;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocTypeCode;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -12,8 +12,8 @@ public interface DocumentTypeCodeMapper {
 
     DocumentTypeCodeMapper mapper = Mappers.getMapper(DocumentTypeCodeMapper.class);
 
-    DocumentTypeCode toStructure(DocumentTypeCodeEntity entity);
+    PenReqDocTypeCode toStructure(DocumentTypeCodeEntity entity);
 
-    DocumentTypeCodeEntity toModel(DocumentTypeCode struct);
+    DocumentTypeCodeEntity toModel(PenReqDocTypeCode struct);
 
 }

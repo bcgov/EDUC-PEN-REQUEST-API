@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentRequirement;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -138,8 +138,8 @@ public class DocumentService {
    *
    * @return DocumentRequirementEntity
    */
-  public DocumentRequirement getDocumentRequirements() {
+  public PenReqDocRequirement getDocumentRequirements() {
     logger.info("retrieving Document Requirements");
-    return new DocumentRequirement(properties.getMaxFileSize(), properties.getFileExtensions());
+    return new PenReqDocRequirement(properties.getMaxFileSize(), properties.getFileExtensions());
   }
 }

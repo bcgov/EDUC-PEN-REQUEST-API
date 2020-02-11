@@ -1,13 +1,13 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import ca.bc.gov.educ.api.penrequest.endpoint.DocumentEndpoint;
+import ca.bc.gov.educ.api.penrequest.endpoint.PenReqDocumentEndpoint;
 import ca.bc.gov.educ.api.penrequest.mappers.DocumentMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.DocumentTypeCodeMapper;
 import ca.bc.gov.educ.api.penrequest.service.DocumentService;
-import ca.bc.gov.educ.api.penrequest.struct.Document;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentMetadata;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentRequirement;
-import ca.bc.gov.educ.api.penrequest.struct.DocumentTypeCode;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocTypeCode;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import ca.bc.gov.educ.api.penrequest.validator.PenRequestDocumentsValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @EnableResourceServer
-public class DocumentController extends BaseController implements DocumentEndpoint {
+public class PenReqDocumentController extends BaseController implements PenReqDocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;
 
@@ -34,38 +34,38 @@ public class DocumentController extends BaseController implements DocumentEndpoi
   private final PenRequestDocumentsValidator validator;
 
   @Autowired
-  DocumentController(final DocumentService documentService, final PenRequestDocumentsValidator validator) {
+  PenReqDocumentController(final DocumentService documentService, final PenRequestDocumentsValidator validator) {
     this.documentService = documentService;
     this.validator = validator;
   }
 
   @Override
-  public Document readDocument(String penRequestID, String documentID) {
+  public PenReqDocument readDocument(String penRequestID, String documentID) {
     return mapper.toStructure(getDocumentService().retrieveDocument(UUID.fromString(penRequestID), UUID.fromString(documentID)));
   }
 
   @Override
-  public DocumentMetadata createDocument(String penRequestID, Document document) {
-    setAuditColumns(document);
-    val model = mapper.toModel(document);
+  public PenReqDocMetadata createDocument(String penRequestID, PenReqDocument penReqDocument) {
+    setAuditColumns(penReqDocument);
+    val model = mapper.toModel(penReqDocument);
     getValidator().validateDocumentPayload(model);
     return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(penRequestID), model));
   }
 
-  public DocumentMetadata deleteDocument(String penRequestID, String documentID) {
+  public PenReqDocMetadata deleteDocument(String penRequestID, String documentID) {
     return mapper.toMetadataStructure(getDocumentService().deleteDocument(UUID.fromString(penRequestID), UUID.fromString(documentID)));
   }
 
-  public Iterable<DocumentMetadata> readAllDocumentMetadata(String penRequestID) {
+  public Iterable<PenReqDocMetadata> readAllDocumentMetadata(String penRequestID) {
     return getDocumentService().retrieveAllDocumentMetadata(UUID.fromString(penRequestID))
             .stream().map(mapper::toMetadataStructure).collect(Collectors.toList());
   }
 
-  public DocumentRequirement getDocumentRequirements() {
+  public PenReqDocRequirement getDocumentRequirements() {
     return documentService.getDocumentRequirements();
   }
 
-  public List<DocumentTypeCode> getDocumentTypeCodes() {
+  public List<PenReqDocTypeCode> getDocumentTypeCodes() {
     return getDocumentService().getDocumentTypeCodeList().stream()
             .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
   }

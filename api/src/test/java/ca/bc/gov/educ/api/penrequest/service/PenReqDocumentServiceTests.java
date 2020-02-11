@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 //@Transactional
-public class DocumentServiceTests {
+public class PenReqDocumentServiceTests {
 
   @Autowired
   DocumentService service;

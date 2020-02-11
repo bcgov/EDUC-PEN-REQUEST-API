@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.struct;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,7 +18,9 @@ public class PenRequestComments extends BaseRequest implements Serializable {
 
   String penRetrievalReqCommentID;
   String penRetrievalRequestID;
+  @Size(max = 50)
   String staffMemberIDIRGUID;
+  @Size(max = 255)
   String staffMemberName;
   @NotNull(message = "Comment content can not be null")
   String commentContent;

@@ -7,11 +7,11 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.struct.Document;
-import ca.bc.gov.educ.api.support.DocumentBuilder;
-import ca.bc.gov.educ.api.support.DocumentTypeCodeBuilder;
-import ca.bc.gov.educ.api.support.PenRequestBuilder;
-import ca.bc.gov.educ.api.support.WithMockOAuth2Scope;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
+import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
+import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DocumentControllerTest {
+public class PenReqDocumentControllerTest {
   private MockMvc mvc;
 
   @Autowired
-  DocumentController documentController;
+  PenReqDocumentController penReqDocumentController;
 
   @Autowired
   private DocumentRepository repository;
@@ -63,7 +63,7 @@ public class DocumentControllerTest {
   public void setUp() {
 
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(documentTypeCodeRepository);
-    mvc = MockMvcBuilders.standaloneSetup(documentController)
+    mvc = MockMvcBuilders.standaloneSetup(penReqDocumentController)
             .setControllerAdvice(new RestExceptionHandler()).build();
 
     PenRequestEntity penRequest = new PenRequestBuilder()
@@ -98,7 +98,7 @@ public class DocumentControllerTest {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req.json", DocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req.json", PenReqDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andDo(print())
@@ -123,10 +123,10 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenDocumentIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(UUID.randomUUID().toString());
+    PenReqDocument penReqDocument = getDummyDocument(UUID.randomUUID().toString());
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -136,11 +136,11 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenInvalidFileExtension_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(null);
-    document.setFileExtension("exe");
+    PenReqDocument penReqDocument = getDummyDocument(null);
+    penReqDocument.setFileExtension("exe");
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -150,11 +150,11 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenInvalidDocumentTypeCode_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(null);
-    document.setDocumentTypeCode("doc");
+    PenReqDocument penReqDocument = getDummyDocument(null);
+    penReqDocument.setDocumentTypeCode("doc");
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -164,11 +164,11 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenFileSizeIsMore_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(null);
-    document.setFileSize(99999999);
+    PenReqDocument penReqDocument = getDummyDocument(null);
+    penReqDocument.setFileSize(99999999);
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -178,11 +178,11 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenDocTypeNotEffective_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(null);
-    document.setDocumentTypeCode("BCeIdPHOTO");
+    PenReqDocument penReqDocument = getDummyDocument(null);
+    penReqDocument.setDocumentTypeCode("BCeIdPHOTO");
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -192,11 +192,11 @@ public class DocumentControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void testCreateDocument_GivenDocTypeExpired_ShouldReturnStatusBadRequest() throws Exception {
-    Document document = getDummyDocument(null);
-    document.setDocumentTypeCode("dl");
+    PenReqDocument penReqDocument = getDummyDocument(null);
+    penReqDocument.setDocumentTypeCode("dl");
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(getDummyDocJsonString(document))
+            .content(getDummyDocJsonString(penReqDocument))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -209,7 +209,7 @@ public class DocumentControllerTest {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-invalid-filesize.json", DocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req-invalid-filesize.json", PenReqDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -222,7 +222,7 @@ public class DocumentControllerTest {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-without-doc-data.json", DocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req-without-doc-data.json", PenReqDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -289,13 +289,13 @@ public class DocumentControllerTest {
             "}";
   }
 
-  private Document getDummyDocument(String documentId) {
-    return Document.builder().documentID(documentId).documentData("TXkgY2FyZCE=").documentTypeCode("BCSCPHOTO").fileName("card.jpg").fileExtension("jpg").fileSize(8).build();
+  private PenReqDocument getDummyDocument(String documentId) {
+    return PenReqDocument.builder().documentID(documentId).documentData("TXkgY2FyZCE=").documentTypeCode("BCSCPHOTO").fileName("card.jpg").fileExtension("jpg").fileSize(8).build();
   }
 
-  protected String getDummyDocJsonString(Document document) {
+  protected String getDummyDocJsonString(PenReqDocument penReqDocument) {
     try {
-      return new ObjectMapper().writeValueAsString(document);
+      return new ObjectMapper().writeValueAsString(penReqDocument);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

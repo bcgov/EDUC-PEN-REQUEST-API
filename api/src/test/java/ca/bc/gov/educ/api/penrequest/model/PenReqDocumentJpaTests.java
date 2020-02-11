@@ -18,7 +18,7 @@ import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class DocumentJpaTests {
+public class PenReqDocumentJpaTests {
 
     @Autowired
     private TestEntityManager entityManager;

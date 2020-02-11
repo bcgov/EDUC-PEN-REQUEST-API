@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @SuppressWarnings("squid:S1700")
-public class DocumentTypeCode implements Serializable {
+public class PenReqDocTypeCode implements Serializable {
 
   private static final long serialVersionUID = 6118916290604876032L;
 
