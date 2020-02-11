@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.support;
+package ca.bc.gov.educ.api.penrequest.support;
 
 import java.util.Date;
 import java.util.UUID;

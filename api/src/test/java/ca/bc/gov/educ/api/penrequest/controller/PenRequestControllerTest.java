@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
-import ca.bc.gov.educ.api.support.WithMockOAuth2Scope;
+import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
