@@ -7,10 +7,12 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.struct.Document;
 import ca.bc.gov.educ.api.support.DocumentBuilder;
 import ca.bc.gov.educ.api.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.support.PenRequestBuilder;
 import ca.bc.gov.educ.api.support.WithMockOAuth2Scope;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,9 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@AutoConfigureMockMvc
-public class DocumentWebMvcTests {
-  //@Autowired
+public class DocumentControllerTest {
   private MockMvc mvc;
 
   @Autowired
@@ -98,7 +98,7 @@ public class DocumentWebMvcTests {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req.json", DocumentWebMvcTests.class).getFile().toPath()))
+                    "../model/document-req.json", DocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andDo(print())
@@ -110,11 +110,106 @@ public class DocumentWebMvcTests {
 
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenMandatoryFieldsNullValues_ShouldReturnStatusBadRequest() throws Exception {
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(geNullDocumentJsonAsString())
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.subErrors", hasSize(5)));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenDocumentIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(UUID.randomUUID().toString());
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", is(notNullValue())));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenInvalidFileExtension_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(null);
+    document.setFileExtension("exe");
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", containsStringIgnoringCase("fileExtension")));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenInvalidDocumentTypeCode_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(null);
+    document.setDocumentTypeCode("doc");
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenFileSizeIsMore_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(null);
+    document.setFileSize(99999999);
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", containsStringIgnoringCase("fileSize")));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenDocTypeNotEffective_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(null);
+    document.setDocumentTypeCode("BCeIdPHOTO");
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void testCreateDocument_GivenDocTypeExpired_ShouldReturnStatusBadRequest() throws Exception {
+    Document document = getDummyDocument(null);
+    document.setDocumentTypeCode("dl");
+    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getDummyDocJsonString(document))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print())
+            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
   public void createDocumentWithInvalidFileSizeTest() throws Exception {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-invalid-filesize.json", DocumentWebMvcTests.class).getFile().toPath()))
+                    "../model/document-req-invalid-filesize.json", DocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -127,7 +222,7 @@ public class DocumentWebMvcTests {
     this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-without-doc-data.json", DocumentWebMvcTests.class).getFile().toPath()))
+                    "../model/document-req-without-doc-data.json", DocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -181,7 +276,30 @@ public class DocumentWebMvcTests {
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print())
-            .andExpect(jsonPath("$.length()", is(2)));
+            .andExpect(jsonPath("$.length()", is(4)));
   }
+
+  private String geNullDocumentJsonAsString() {
+    return "{\n" +
+            "    \"documentTypeCode\":" + null + ",\n" +
+            "    \"fileName\":" + null + ",\n" +
+            "    \"fileExtension\":" + null + ",\n" +
+            "    \"fileSize\":" + null + ",\n" +
+            "    \"documentData\":" + null + "\n" +
+            "}";
+  }
+
+  private Document getDummyDocument(String documentId) {
+    return Document.builder().documentID(documentId).documentData("TXkgY2FyZCE=").documentTypeCode("BCSCPHOTO").fileName("card.jpg").fileExtension("jpg").fileSize(8).build();
+  }
+
+  protected String getDummyDocJsonString(Document document) {
+    try {
+      return new ObjectMapper().writeValueAsString(document);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 
 }
