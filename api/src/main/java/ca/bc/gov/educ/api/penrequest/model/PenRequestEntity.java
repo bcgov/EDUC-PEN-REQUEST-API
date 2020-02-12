@@ -62,6 +62,9 @@ public class PenRequestEntity {
   @Column(name = "email")
   String email;
 
+  @Column(name = "email_verified")
+  String emailVerified;
+  
   @Column(name = "maiden_name")
   String maidenName;
 

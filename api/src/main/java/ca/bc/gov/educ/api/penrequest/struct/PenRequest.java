@@ -59,4 +59,7 @@ public class PenRequest extends BaseRequest implements Serializable {
   private String failureReason;
   private Date initialSubmitDate;
   private Date statusUpdateDate;
+  @Size(max = 1)
+  @NotNull(message = "emailVerified cannot be null")
+  private String emailVerified;
 }

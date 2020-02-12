@@ -26,6 +26,8 @@ public class PenRequestBuilder {
     Date createDate = new Date();
 
     String updateUser = "API";
+    
+    String emailVerified = "N";
 
     Date updateDate = new Date();
 
@@ -84,6 +86,7 @@ public class PenRequestBuilder {
         penRequest.setPenRequestStatusCode(this.penRequestStatusCode);
         penRequest.setLegalFirstName(this.legalFirstName);
         penRequest.setLegalLastName(this.legalLastName);
+        penRequest.setEmailVerified(this.emailVerified);
         return penRequest;
     }
 
