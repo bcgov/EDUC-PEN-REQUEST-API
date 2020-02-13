@@ -20,16 +20,11 @@ public class PenRequestJpaTests {
     private PenRequestRepository repository;
 
     private PenRequestEntity penRequest;
-    
-    private PenRequestEntity penRequestEmailVerified;
 
     @Before
     public void setUp() {
         this.penRequest = new PenRequestBuilder()
                             .withoutPenRequestID().build();
- 
-        this.penRequestEmailVerified = new PenRequestBuilder()
-                .withIncorrectEmailVerified().build();
     }
 
     @Test
