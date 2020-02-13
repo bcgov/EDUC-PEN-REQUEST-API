@@ -101,6 +101,13 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     this.mockMvc.perform(post("/").contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
   }
+  
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
+  public void testCreatePenRequest_LowercaseEmailVerifiedFlag_ShouldReturnStatusBadRequest() throws Exception {
+    this.mockMvc.perform(post("/").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidEmailVerifiedFlag())).andDo(print()).andExpect(status().isBadRequest());
+  }
 
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
