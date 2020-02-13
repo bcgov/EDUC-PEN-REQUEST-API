@@ -65,6 +65,11 @@ public class PenRequestBuilder {
         this.legalLastName = legalLastName;
         return this;
     }
+    
+    public PenRequestBuilder withIncorrectEmailVerified() {
+        this.emailVerified = "j";
+        return this;
+    }
 
     public PenRequestBuilder withoutCreateAndUpdateUser() {
         this.createUser = null;
