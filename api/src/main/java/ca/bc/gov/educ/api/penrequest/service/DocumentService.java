@@ -14,8 +14,9 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public class DocumentService {
    * @return The Document {@link DocumentEntity} if found.
    * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
    */
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
   public DocumentEntity retrieveDocument(UUID penRequestId, UUID documentID, String includeDocData) {
     logger.info("retrieving Document, documentID: " + documentID.toString());
 
