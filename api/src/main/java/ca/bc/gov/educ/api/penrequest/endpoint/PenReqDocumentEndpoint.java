@@ -1,9 +1,9 @@
 package ca.bc.gov.educ.api.penrequest.endpoint;
 
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocTypeCode;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
-import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +23,7 @@ public interface PenReqDocumentEndpoint {
   @GetMapping("/{penRequestID}/documents/{documentID}")
   @PreAuthorize("#oauth2.hasScope('READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  PenReqDocument readDocument(@PathVariable String penRequestID, @PathVariable String documentID);
+  PenReqDocument readDocument(@PathVariable String penRequestID, @PathVariable String documentID, @RequestParam(value = "includeDocData", defaultValue = "Y") String includeDocData);
 
   @PostMapping("/{penRequestID}/documents")
   @PreAuthorize("#oauth2.hasAnyScope('WRITE_DOCUMENT')")

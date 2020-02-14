@@ -100,11 +100,29 @@ public class PenReqDocumentServiceTests {
 
   @Test
   public void retrieveDocumentDataTest() {
-    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID());
+    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"Y");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
     assertThat(retrievedDocument.getDocumentData()).isEqualTo(bcscPhoto.getDocumentData());
+  }
+
+  @Test
+  public void retrieveDocumentDataTest1() {
+    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"TRUE");
+    assertThat(retrievedDocument).isNotNull();
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+
+    assertThat(retrievedDocument.getDocumentData()).isEqualTo(bcscPhoto.getDocumentData());
+  }
+
+  @Test
+  public void retrieveDocumentDataTest2() {
+    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"N");
+    assertThat(retrievedDocument).isNotNull();
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+
+    assertThat(retrievedDocument.getDocumentData()).isEqualTo(null);
   }
 
   @Test

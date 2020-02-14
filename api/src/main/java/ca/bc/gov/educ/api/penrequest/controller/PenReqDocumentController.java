@@ -40,8 +40,8 @@ public class PenReqDocumentController extends BaseController implements PenReqDo
   }
 
   @Override
-  public PenReqDocument readDocument(String penRequestID, String documentID) {
-    return mapper.toStructure(getDocumentService().retrieveDocument(UUID.fromString(penRequestID), UUID.fromString(documentID)));
+  public PenReqDocument readDocument(String penRequestID, String documentID, String includeDocData) {
+    return mapper.toStructure(getDocumentService().retrieveDocument(UUID.fromString(penRequestID), UUID.fromString(documentID), includeDocData));
   }
 
   @Override
