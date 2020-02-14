@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationProperties {
   public static final String CLIENT_ID = "PEN-REQUEST-API";
+  public static final String YES = "Y";
+  public static final String TRUE = "TRUE";
 
   @Getter
   @Value("${file.maxsize}")

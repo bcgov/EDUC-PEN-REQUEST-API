@@ -74,13 +74,18 @@ public class DocumentService {
    * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
    */
   @Transactional
-  public DocumentEntity retrieveDocument(UUID penRequestId, UUID documentID) {
+  public DocumentEntity retrieveDocument(UUID penRequestId, UUID documentID, String includeDocData) {
     logger.info("retrieving Document, documentID: " + documentID.toString());
 
     DocumentEntity document = retrieveDocumentMetadata(penRequestId, documentID);
     // trigger lazy loading
-    if (document.getDocumentData().length == 0) {
-      document.setFileSize(0);
+    if (ApplicationProperties.YES.equalsIgnoreCase(includeDocData) || ApplicationProperties.TRUE.equalsIgnoreCase(includeDocData)) {
+      if (document.getDocumentData().length == 0) {
+        document.setFileSize(0);
+      }
+    } else {
+      // set it to null so that map struct would not trigger lazy loading.
+      document.setDocumentData(null);
     }
     return document;
   }
