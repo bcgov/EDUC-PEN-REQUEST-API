@@ -74,7 +74,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
     PenRequestEntity entity = penRequestRepository.save(getPenRequestEntityFromJsonString());
     String penReqId = entity.getPenRequestID().toString();
     this.mockMvc.perform(post("/" + penReqId + "/comments").contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId, "comment1"))).andDo(print()).andExpect(status().isCreated());
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
   }
 
   @Test
@@ -82,13 +82,13 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
   public void testCreatePenRequestComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
     String penReqId = UUID.randomUUID().toString();
     this.mockMvc.perform(post("/" + penReqId + "/comments").contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId, "comment1"))).andDo(print()).andExpect(status().isNotFound());
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isNotFound());
   }
 
-  private String dummyPenRequestCommentsJsonWithValidPenReqID(String penReqId, String comment) {
+  private String dummyPenRequestCommentsJsonWithValidPenReqID(String penReqId) {
     return "{\n" +
             "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
-            "  \"commentContent\": \"" + comment + "\",\n" +
+            "  \"commentContent\": \"" + "comment1" + "\",\n" +
             "  \"commentTimestamp\": \"2020-02-09\"\n" +
             "}";
   }

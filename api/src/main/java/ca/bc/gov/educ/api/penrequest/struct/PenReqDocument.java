@@ -5,12 +5,8 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class PenReqDocument extends BaseRequest implements Serializable {
 
   private static final long serialVersionUID = -7471585921119777006L;

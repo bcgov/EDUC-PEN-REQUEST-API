@@ -290,7 +290,14 @@ public class PenReqDocumentControllerTest {
   }
 
   private PenReqDocument getDummyDocument(String documentId) {
-    return PenReqDocument.builder().documentID(documentId).documentData("TXkgY2FyZCE=").documentTypeCode("BCSCPHOTO").fileName("card.jpg").fileExtension("jpg").fileSize(8).build();
+    PenReqDocument penReqDocument = new PenReqDocument();
+    penReqDocument.setDocumentID(documentId);
+    penReqDocument.setDocumentData("TXkgY2FyZCE=");
+    penReqDocument.setDocumentTypeCode("BCSCPHOTO");
+    penReqDocument.setFileName("card.jpg");
+    penReqDocument.setFileExtension("jpg");
+    penReqDocument.setFileSize(8);
+    return penReqDocument;
   }
 
   protected String getDummyDocJsonString(PenReqDocument penReqDocument) {
