@@ -15,7 +15,9 @@
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
         <!-- Enable language to disable other language analysis -->
         <sonar.language>java</sonar.language>
-        <sonar.exclusions>src/main/resources/**</sonar.exclusions>
+        <sonar.exclusions>src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/penrequest/mappers/**,src/main/java/ca/bc/gov/educ/api/penrequest/exception/**,src/main/java/ca/bc/gov/educ/api/penrequest/model/**,src/main/java/ca/bc/gov/educ/api/penrequest/struct/**
+        </sonar.exclusions>
         <java.version>1.8</java.version>
 
         <maven.compiler.version>3.8.0</maven.compiler.version>
@@ -109,16 +111,16 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>        
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -202,46 +204,46 @@
                 </executions>
             </plugin>
             <plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
-				<executions>
-				    <execution>
-					<id>default-prepare-agent</id>
-					<goals>
-					    <goal>prepare-agent</goal>
-					</goals>
-					<configuration>
-					    <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
-					</configuration>
-				    </execution>
-				    <execution>
-					<id>default-report</id>
-					<goals>
-					    <goal>report</goal>
-					</goals>
-					<configuration>
-					    <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
-					</configuration>
-				    </execution>
-				</executions>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.4</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
-				<groupId>org.hibernate.orm.tooling</groupId>
-				<artifactId>hibernate-enhance-maven-plugin</artifactId>
+                <groupId>org.hibernate.orm.tooling</groupId>
+                <artifactId>hibernate-enhance-maven-plugin</artifactId>
                 <version>5.4.10.Final</version>
-				<executions>
-					<execution>
-						<configuration>
-							<failOnError>true</failOnError>
-							<enableLazyInitialization>true</enableLazyInitialization>
-						</configuration>
-						<goals>
-							<goal>enhance</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <failOnError>true</failOnError>
+                            <enableLazyInitialization>true</enableLazyInitialization>
+                        </configuration>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
