@@ -73,9 +73,9 @@ objects:
           type: ImageChange
   - apiVersion: v1
     kind: Service
+    metadata:
       annotations:
         service.alpha.openshift.io/serving-cert-secret-name: "pen-request-api-cert"
-    metadata:
       labels:
         app: "${APP_NAME}-${JOB_NAME}"
       name: "${APP_NAME}-${JOB_NAME}"
