@@ -55,7 +55,7 @@ objects:
                 - containerPort: ${{CONTAINER_PORT}}
                   protocol: TCP
               resources: {}
-            volumes:
+          volumes:
             - name: tls-certs
               secret:
                 secretName: pen-request-api-cert
