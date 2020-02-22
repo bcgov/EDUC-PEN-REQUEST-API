@@ -1,12 +1,11 @@
 package ca.bc.gov.educ.api.penrequest.struct;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +24,7 @@ public class PenReqDocTypeCode implements Serializable {
 
   private Integer displayOrder;
 
-  private Date effectiveDate;
+  private String effectiveDate;
 
-  private Date expiryDate;
+  private String expiryDate;
 }

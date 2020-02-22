@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.support;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,13 +46,13 @@ public class DocumentBuilder {
         return this;
     }
 
-    public DocumentBuilder withFileName(String fileNmae) {
-        this.fileName = fileNmae;
+    public DocumentBuilder withFileName(String fileName) {
+        this.fileName = fileName;
         return this;
     }
 
-    public DocumentBuilder withFileExtension(String fileExtention) {
-        this.fileExtension = fileExtention;
+    public DocumentBuilder withFileExtension(String fileExtension) {
+        this.fileExtension = fileExtension;
         return this;
     }
 
@@ -94,9 +95,9 @@ public class DocumentBuilder {
         doc.setFileSize(this.fileSize);
         doc.setDocumentData(this.documentData);
         doc.setCreateUser(this.createUser);
-        doc.setCreateDate(this.createDate);
+        doc.setCreateDate(LocalDateTime.now());
         doc.setUpdateUser(this.updateUser);
-        doc.setUpdateDate(this.updateDate);
+        doc.setUpdateDate(LocalDateTime.now());
         doc.setPenRequest(this.penRequest);
         
         return doc;

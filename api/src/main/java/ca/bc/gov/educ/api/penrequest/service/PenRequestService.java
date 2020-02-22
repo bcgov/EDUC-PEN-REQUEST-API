@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,7 +48,7 @@ public class PenRequestService {
    */
   public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.DRAFT.toString());
-    penRequest.setStatusUpdateDate(new Date());
+    penRequest.setStatusUpdateDate(LocalDateTime.now());
     return getPenRequestRepository().save(penRequest);
   }
 
@@ -72,7 +72,7 @@ public class PenRequestService {
 
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
-      Date createDate = newPenRequest.getCreateDate();
+      LocalDateTime createDate = newPenRequest.getCreateDate();
       String createUser = newPenRequest.getCreateUser();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);

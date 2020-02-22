@@ -1,13 +1,15 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,7 +44,7 @@ public class PenRequestEntity {
   String legalLastName;
 
   @Column(name = "dob")
-  Date dob;
+  LocalDate dob;
 
   @Column(name = "gender_code")
   String genderCode;
@@ -88,25 +90,25 @@ public class PenRequestEntity {
 
   @PastOrPresent
   @Column(name = "INITIAL_SUBMIT_DATE")
-  Date initialSubmitDate;
+  LocalDateTime initialSubmitDate;
 
   @PastOrPresent
   @Column(name = "STATUS_UPDATE_DATE")
-  Date statusUpdateDate;
+  LocalDateTime statusUpdateDate;
 
   @Column(name = "create_user", updatable = false)
   String createUser;
 
   @PastOrPresent
   @Column(name = "create_date", updatable = false)
-  Date createDate;
+  LocalDateTime createDate;
 
   @Column(name = "update_user")
   String updateUser;
 
   @PastOrPresent
   @Column(name = "update_date")
-  Date updateDate;
+  LocalDateTime updateDate;
 
   @OneToMany(mappedBy = "penRequestEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = PenRequestCommentsEntity.class)
   private Set<PenRequestCommentsEntity> penRequestComments;

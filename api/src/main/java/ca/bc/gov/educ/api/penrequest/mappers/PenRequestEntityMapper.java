@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = UUIDMapper.class)
+@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface PenRequestEntityMapper {
 
@@ -16,5 +16,6 @@ public interface PenRequestEntityMapper {
   @Mapping(target = "updateDate", ignore = true)
   PenRequest toStructure(PenRequestEntity entity);
 
+  @Mapping(target = "penRequestComments", ignore = true)
   PenRequestEntity toModel(PenRequest struct);
 }

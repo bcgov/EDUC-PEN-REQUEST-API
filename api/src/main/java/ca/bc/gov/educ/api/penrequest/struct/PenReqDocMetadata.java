@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -34,5 +32,5 @@ public class PenReqDocMetadata implements Serializable {
   private Integer fileSize;
 
   @Null(message = "Create Date Should be null")
-  private Date createDate;
+  private String createDate;
 }

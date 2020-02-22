@@ -18,6 +18,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import ca.bc.gov.educ.api.penrequest.exception.errors.ApiError;
 
+import java.time.format.DateTimeParseException;
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -96,5 +98,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-
+    /**
+     * Handles handleDateTimeParseException
+     *
+     * @param ex the InvalidParameterException
+     * @return the ApiError object
+     */
+    @ExceptionHandler(DateTimeParseException.class)
+    protected ResponseEntity<Object> handleDateTimeParseException(DateTimeParseException ex) {
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage(ex.getMessage().concat(" , Expected pattern is yyyy-mm-ddTHH:MM:SS"));
+        return buildResponseEntity(apiError);
+    }
 }

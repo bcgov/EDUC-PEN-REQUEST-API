@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @Builder
@@ -31,8 +29,8 @@ public class PenRequestStatusCode implements Serializable {
   Integer displayOrder;
 
   @NotNull(message = "effectiveDate cannot be null")
-  Date effectiveDate;
+  String effectiveDate;
 
   @NotNull(message = "expiryDate cannot be null")
-  Date expiryDate;
+  String expiryDate;
 }

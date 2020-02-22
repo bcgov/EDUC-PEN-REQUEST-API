@@ -11,7 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -63,7 +63,7 @@ public class PenRequestDocumentsValidator {
   public boolean isDocumentTypeCodeValid(final String documentTypeCode) {
     for (DocumentTypeCodeEntity entity : loadDocumentType()) {
       if (entity.getDocumentTypeCode().equalsIgnoreCase(documentTypeCode)) {
-        return entity.getEffectiveDate().compareTo(new Date()) <= 0 && entity.getExpiryDate().compareTo(new Date()) >= 0;
+        return entity.getEffectiveDate().isBefore(LocalDateTime.now()) && entity.getExpiryDate().isAfter(LocalDateTime.now());
       }
     }
     return false;
