@@ -43,11 +43,11 @@ public class PenRequestCommentsEntity {
   @Column(name = "create_date", updatable = false)
   LocalDateTime createDate;
 
-  @Column(name = "update_user", updatable = false)
+  @Column(name = "update_user")
   String updateUser;
 
   @PastOrPresent
-  @Column(name = "update_date", updatable = false)
+  @Column(name = "update_date")
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = PenRequestEntity.class)
