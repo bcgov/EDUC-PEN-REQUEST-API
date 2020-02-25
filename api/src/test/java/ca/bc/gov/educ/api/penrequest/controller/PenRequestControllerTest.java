@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
+import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
@@ -20,8 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class PenRequestControllerTest extends BasePenReqControllerTest {
 
+  private static final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
   private MockMvc mockMvc;
   @Autowired
   PenRequestController controller;
@@ -71,7 +73,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenValidID_ShouldReturnOkStatus() throws Exception {
-    PenRequestEntity entity = repository.save(getPenRequestEntityFromJsonString());
+    PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     this.mockMvc.perform(get("/" + entity.getPenRequestID())).andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.penRequestID").value(entity.getPenRequestID().toString()));
   }
 
@@ -101,7 +103,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     this.mockMvc.perform(post("/").contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
   }
-  
+
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequest_LowercaseEmailVerifiedFlag_ShouldReturnStatusBadRequest() throws Exception {
@@ -119,7 +121,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testUpdatePenRequest_GivenValidPenReqIDInPayload_ShouldReturnStatusOk() throws Exception {
-    PenRequestEntity entity = repository.save(getPenRequestEntityFromJsonString());
+    PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
     this.mockMvc.perform(put("/").contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isOk());
@@ -144,13 +146,13 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     entity.setPenRequestStatusCode("INITREV");
     entity.setDescription("Initial Review");
     entity.setDisplayOrder(1);
-    entity.setEffectiveDate(new Date());
+    entity.setEffectiveDate(LocalDateTime.now());
     entity.setLabel("Initial Review");
-    entity.setCreateDate(new Date());
+    entity.setCreateDate(LocalDateTime.now());
     entity.setCreateUser("TEST");
     entity.setUpdateUser("TEST");
-    entity.setUpdateDate(new Date());
-    entity.setExpiryDate(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).getTime());
+    entity.setUpdateDate(LocalDateTime.now());
+    entity.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime()));
     return entity;
   }
 

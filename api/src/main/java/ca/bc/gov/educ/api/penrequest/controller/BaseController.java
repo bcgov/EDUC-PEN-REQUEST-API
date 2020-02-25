@@ -5,7 +5,7 @@ import ca.bc.gov.educ.api.penrequest.struct.BaseRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public abstract class BaseController {
   protected void setAuditColumns(@NotNull BaseRequest baseRequest) {
@@ -15,7 +15,7 @@ public abstract class BaseController {
     if (StringUtils.isBlank(baseRequest.getUpdateUser())) {
       baseRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
     }
-    baseRequest.setCreateDate(new Date());
-    baseRequest.setUpdateDate(new Date());
+    baseRequest.setCreateDate(LocalDateTime.now().toString());
+    baseRequest.setUpdateDate(LocalDateTime.now().toString());
   }
 }

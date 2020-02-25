@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
+import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
-
+  private static final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
   private MockMvc mockMvc;
   @Autowired
   PenRequestCommentsController controller;
@@ -63,7 +64,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequestComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
-    PenRequestEntity entity = penRequestRepository.save(getPenRequestEntityFromJsonString());
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
     this.mockMvc.perform(get("/" + penReqId + "/comments")).andDo(print()).andExpect(status().isOk());
   }
@@ -71,7 +72,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequestComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    PenRequestEntity entity = penRequestRepository.save(getPenRequestEntityFromJsonString());
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
     this.mockMvc.perform(post("/" + penReqId + "/comments").contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
@@ -89,7 +90,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
     return "{\n" +
             "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
             "  \"commentContent\": \"" + "comment1" + "\",\n" +
-            "  \"commentTimestamp\": \"2020-02-09\"\n" +
+            "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
             "}";
   }
 }

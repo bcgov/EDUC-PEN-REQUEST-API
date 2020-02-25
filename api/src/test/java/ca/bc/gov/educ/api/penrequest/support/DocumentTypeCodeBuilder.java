@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.support;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -9,75 +10,75 @@ import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 
 public class DocumentTypeCodeBuilder {
 
-    String documentTypeCode;
-    
-    String label = "label";
-    
-    String description = "description";
+  String documentTypeCode;
 
-    Integer displayOrder = 1;
+  String label = "label";
 
-    Date effectiveDate = new Date();
-    
-    Date expiryDate = new GregorianCalendar(2099, Calendar.FEBRUARY, 1).getTime();
+  String description = "description";
 
-    String createUser = "API";
+  Integer displayOrder = 1;
 
-    Date createDate = new Date();
+  LocalDateTime effectiveDate = LocalDateTime.now();
 
-    String updateUser = "API";
+  LocalDateTime expiryDate = LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime());
 
-    Date updateDate = new Date();
+  String createUser = "API";
 
-    public DocumentTypeCodeBuilder withDocumentTypeCode(String documentTypeCode) {
-        this.documentTypeCode = documentTypeCode;
-        return this;
-    }
+  LocalDateTime createDate = LocalDateTime.now();
 
-    public DocumentTypeCodeBuilder withLabel(String label) {
-        this.label = label;
-        return this;
-    }
+  String updateUser = "API";
 
-    public DocumentTypeCodeBuilder withoutCreateAndUpdateUser() {
-        this.createUser = null;
-        this.createDate = null;
-        this.updateUser = null;
-        this.updateDate = null;
-        return this;
-    }
+  LocalDateTime updateDate = LocalDateTime.now();
 
-    public DocumentTypeCodeEntity build() {
-        DocumentTypeCodeEntity typeCode = new DocumentTypeCodeEntity();
-        typeCode.setCreateUser(this.createUser);
-        typeCode.setCreateDate(this.createDate);
-        typeCode.setUpdateUser(this.updateUser);
-        typeCode.setUpdateDate(this.updateDate);
+  public DocumentTypeCodeBuilder withDocumentTypeCode(String documentTypeCode) {
+    this.documentTypeCode = documentTypeCode;
+    return this;
+  }
 
-        typeCode.setDocumentTypeCode(this.documentTypeCode);
-        typeCode.setLabel(this.label);
-        typeCode.setDescription(this.description);
-        typeCode.setDisplayOrder(this.displayOrder);
-        typeCode.setEffectiveDate(this.effectiveDate);
-        typeCode.setExpiryDate(this.expiryDate);
+  public DocumentTypeCodeBuilder withLabel(String label) {
+    this.label = label;
+    return this;
+  }
 
-        return typeCode;
-    }
+  public DocumentTypeCodeBuilder withoutCreateAndUpdateUser() {
+    this.createUser = null;
+    this.createDate = null;
+    this.updateUser = null;
+    this.updateDate = null;
+    return this;
+  }
 
-    public static void setUpDocumentTypeCodes(DocumentTypeCodeTableRepository documentTypeCodeRepository) {
-        DocumentTypeCodeEntity passport = new DocumentTypeCodeBuilder()
-                                            .withDocumentTypeCode("CAPASSPORT").build();
-        DocumentTypeCodeEntity bcsc = new DocumentTypeCodeBuilder()
-                                        .withDocumentTypeCode("BCSCPHOTO").build();
-        DocumentTypeCodeEntity bCeIdPHOTONotEffective = new DocumentTypeCodeBuilder()
-                .withDocumentTypeCode("BCeIdPHOTO").build();
-        bCeIdPHOTONotEffective.setEffectiveDate(new GregorianCalendar(2199, Calendar.FEBRUARY, 1).getTime());
-        DocumentTypeCodeEntity dlExpired = new DocumentTypeCodeBuilder()
-                .withDocumentTypeCode("dl").build();
-        dlExpired.setExpiryDate(new GregorianCalendar(2020, Calendar.FEBRUARY, 1).getTime());
-        documentTypeCodeRepository.save(passport);
-        documentTypeCodeRepository.save(bcsc);
-        documentTypeCodeRepository.save(bCeIdPHOTONotEffective);
-        documentTypeCodeRepository.save(dlExpired);
-    }
+  public DocumentTypeCodeEntity build() {
+    DocumentTypeCodeEntity typeCode = new DocumentTypeCodeEntity();
+    typeCode.setCreateUser(this.createUser);
+    typeCode.setCreateDate(this.createDate);
+    typeCode.setUpdateUser(this.updateUser);
+    typeCode.setUpdateDate(this.updateDate);
+
+    typeCode.setDocumentTypeCode(this.documentTypeCode);
+    typeCode.setLabel(this.label);
+    typeCode.setDescription(this.description);
+    typeCode.setDisplayOrder(this.displayOrder);
+    typeCode.setEffectiveDate(this.effectiveDate);
+    typeCode.setExpiryDate(this.expiryDate);
+
+    return typeCode;
+  }
+
+  public static void setUpDocumentTypeCodes(DocumentTypeCodeTableRepository documentTypeCodeRepository) {
+    DocumentTypeCodeEntity passport = new DocumentTypeCodeBuilder()
+            .withDocumentTypeCode("CAPASSPORT").build();
+    DocumentTypeCodeEntity bcsc = new DocumentTypeCodeBuilder()
+            .withDocumentTypeCode("BCSCPHOTO").build();
+    DocumentTypeCodeEntity bCeIdPHOTONotEffective = new DocumentTypeCodeBuilder()
+            .withDocumentTypeCode("BCeIdPHOTO").build();
+    bCeIdPHOTONotEffective.setEffectiveDate(LocalDateTime.from(new GregorianCalendar(2199, Calendar.FEBRUARY, 1).toZonedDateTime()));
+    DocumentTypeCodeEntity dlExpired = new DocumentTypeCodeBuilder()
+            .withDocumentTypeCode("dl").build();
+    dlExpired.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2020, Calendar.FEBRUARY, 1).toZonedDateTime()));
+    documentTypeCodeRepository.save(passport);
+    documentTypeCodeRepository.save(bcsc);
+    documentTypeCodeRepository.save(bCeIdPHOTONotEffective);
+    documentTypeCodeRepository.save(dlExpired);
+  }
 }

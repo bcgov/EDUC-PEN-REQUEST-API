@@ -1,11 +1,12 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -32,23 +33,23 @@ public class PenRequestStatusCodeEntity {
 
   @NotNull(message = "effectiveDate cannot be null")
   @Column(name = "effective_date")
-  Date effectiveDate;
+  LocalDateTime effectiveDate;
 
   @NotNull(message = "expiryDate cannot be null")
   @Column(name = "expiry_date")
-  Date expiryDate;
+  LocalDateTime expiryDate;
 
   @Column(name = "create_user", updatable = false)
   String createUser;
 
   @PastOrPresent
   @Column(name = "create_date", updatable = false)
-  Date createDate;
+  LocalDateTime createDate;
 
-  @Column(name = "update_user", updatable = false)
+  @Column(name = "update_user")
   String updateUser;
 
   @PastOrPresent
-  @Column(name = "update_date", updatable = false)
-  Date updateDate;
+  @Column(name = "update_date")
+  LocalDateTime updateDate;
 }

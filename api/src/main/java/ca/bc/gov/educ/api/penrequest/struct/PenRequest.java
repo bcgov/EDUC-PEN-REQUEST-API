@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -27,7 +26,7 @@ public class PenRequest extends BaseRequest implements Serializable {
   @Size(max = 40)
   private String legalLastName;
   @NotNull(message = "dob cannot be null")
-  private Date dob;
+  private String dob;
   @NotNull(message = "genderCode cannot be null")
   @Size(max = 1)
   private String genderCode;
@@ -56,10 +55,10 @@ public class PenRequest extends BaseRequest implements Serializable {
   @Size(max = 255)
   private String reviewer;
   private String failureReason;
-  private Date initialSubmitDate;
-  private Date statusUpdateDate;
+  private String initialSubmitDate;
+  private String statusUpdateDate;
   @Size(max = 1)
-  @Pattern(regexp = "Y|N")
+  @Pattern(regexp = "[YN]")
   @NotNull(message = "emailVerified cannot be null")
   private String emailVerified;
 }

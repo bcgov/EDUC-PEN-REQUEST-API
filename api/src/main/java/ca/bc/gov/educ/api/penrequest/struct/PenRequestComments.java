@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -21,5 +20,5 @@ public class PenRequestComments extends BaseRequest implements Serializable {
   String staffMemberName;
   @NotNull(message = "Comment content can not be null")
   String commentContent;
-  Date commentTimestamp;
+  String commentTimestamp;
 }
