@@ -49,9 +49,6 @@ public class PenRequestEntity {
   @Column(name = "gender_code")
   String genderCode;
 
-  @Column(name = "data_source_code")
-  String dataSourceCode;
-
   @Column(name = "usual_first_name")
   String usualFirstName;
 
