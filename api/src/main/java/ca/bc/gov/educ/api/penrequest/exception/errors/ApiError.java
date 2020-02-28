@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.exception.errors;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,124 +14,134 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class ApiError {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-	private HttpStatus status;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-	private LocalDateTime timestamp;
-	private String message;
-	private String debugMessage;
-	private List<ApiSubError> subErrors;
+@AllArgsConstructor
+@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@SuppressWarnings("squid:S1948")
+public class ApiError implements Serializable {
 
-	private ApiError() {
-		timestamp = LocalDateTime.now();
-	}
+  private HttpStatus status;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+  private LocalDateTime timestamp;
+  private String message;
+  private String debugMessage;
+  private List<ApiSubError> subErrors;
 
-	public ApiError(HttpStatus status) {
-		this();
-		this.status = status;
-	}
+  private ApiError() {
+    timestamp = LocalDateTime.now();
+  }
 
-	ApiError(HttpStatus status, Throwable ex) {
-		this();
-		this.status = status;
-		this.message = "Unexpected error";
-		this.debugMessage = ex.getLocalizedMessage();
-	}
+  public ApiError(HttpStatus status) {
+    this();
+    this.status = status;
+  }
 
-	public ApiError(HttpStatus status, String message, Throwable ex) {
-		this();
-		this.status = status;
-		this.message = message;
-		this.debugMessage = ex.getLocalizedMessage();
-	}
+  ApiError(HttpStatus status, Throwable ex) {
+    this();
+    this.status = status;
+    this.message = "Unexpected error";
+    this.debugMessage = ex.getLocalizedMessage();
+  }
 
-	private void addSubError(ApiSubError subError) {
-		if (subErrors == null) {
-			subErrors = new ArrayList<>();
-		}
-		subErrors.add(subError);
-	}
+  public ApiError(HttpStatus status, String message, Throwable ex) {
+    this();
+    this.status = status;
+    this.message = message;
+    this.debugMessage = ex.getLocalizedMessage();
+  }
 
-	private void addValidationError(String object, String field, Object rejectedValue, String message) {
-		addSubError(new ApiValidationError(object, field, rejectedValue, message));
-	}
+  private void addSubError(ApiSubError subError) {
+    if (subErrors == null) {
+      subErrors = new ArrayList<>();
+    }
+    subErrors.add(subError);
+  }
 
-	private void addValidationError(String object, String message) {
-		addSubError(new ApiValidationError(object, message));
-	}
+  private void addValidationError(String object, String field, Object rejectedValue, String message) {
+    addSubError(new ApiValidationError(object, field, rejectedValue, message));
+  }
 
-	private void addValidationError(FieldError fieldError) {
-		this.addValidationError(fieldError.getObjectName(), fieldError.getField(), fieldError.getRejectedValue(),
-				fieldError.getDefaultMessage());
-	}
+  private void addValidationError(String object, String message) {
+    addSubError(new ApiValidationError(object, message));
+  }
 
-	public void addValidationErrors(List<FieldError> fieldErrors) {
-		fieldErrors.forEach(this::addValidationError);
-	}
+  private void addValidationError(FieldError fieldError) {
+    this.addValidationError(fieldError.getObjectName(), fieldError.getField(), fieldError.getRejectedValue(),
+            fieldError.getDefaultMessage());
+  }
 
-	private void addValidationError(ObjectError objectError) {
-		this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
-	}
+  public void addValidationErrors(List<FieldError> fieldErrors) {
+    fieldErrors.forEach(this::addValidationError);
+  }
 
-	public void addValidationError(List<ObjectError> globalErrors) {
-		globalErrors.forEach(this::addValidationError);
-	}
+  private void addValidationError(ObjectError objectError) {
+    this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
+  }
 
-	/**
-	 * Utility method for adding error of ConstraintViolation. Usually when
-	 * a @Validated validation fails.
-	 *
-	 * @param cv the ConstraintViolation
-	 */
-	private void addValidationError(ConstraintViolation<?> cv) {
-		this.addValidationError(cv.getRootBeanClass().getSimpleName(),
-				((PathImpl) cv.getPropertyPath()).getLeafNode().asString(), cv.getInvalidValue(), cv.getMessage());
-	}
+  public void addValidationError(List<ObjectError> globalErrors) {
+    globalErrors.forEach(this::addValidationError);
+  }
 
-	public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
-		constraintViolations.forEach(this::addValidationError);
-	}
+  /**
+   * Utility method for adding error of ConstraintViolation. Usually when
+   * a @Validated validation fails.
+   *
+   * @param cv the ConstraintViolation
+   */
+  private void addValidationError(ConstraintViolation<?> cv) {
+    this.addValidationError(cv.getRootBeanClass().getSimpleName(),
+            ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(), cv.getInvalidValue(), cv.getMessage());
+  }
 
-	public HttpStatus getStatus() {
-		return status;
-	}
+  public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
+    constraintViolations.forEach(this::addValidationError);
+  }
 
-	public void setStatus(HttpStatus status) {
-		this.status = status;
-	}
+  public HttpStatus getStatus() {
+    return status;
+  }
 
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
+  public void setStatus(HttpStatus status) {
+    this.status = status;
+  }
 
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
+  public LocalDateTime getTimestamp() {
+    return timestamp;
+  }
 
-	public String getMessage() {
-		return message;
-	}
+  public void setTimestamp(LocalDateTime timestamp) {
+    this.timestamp = timestamp;
+  }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+  public String getMessage() {
+    return message;
+  }
 
-	public String getDebugMessage() {
-		return debugMessage;
-	}
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-	public void setDebugMessage(String debugMessage) {
-		this.debugMessage = debugMessage;
-	}
+  public String getDebugMessage() {
+    return debugMessage;
+  }
 
-	public List<ApiSubError> getSubErrors() {
-		return subErrors;
-	}
+  public void setDebugMessage(String debugMessage) {
+    this.debugMessage = debugMessage;
+  }
 
-	public void setSubErrors(List<ApiSubError> subErrors) {
-		this.subErrors = subErrors;
-	}
+  public List<ApiSubError> getSubErrors() {
+    return subErrors;
+  }
+
+  public void setSubErrors(List<ApiSubError> subErrors) {
+    this.subErrors = subErrors;
+  }
 
 }

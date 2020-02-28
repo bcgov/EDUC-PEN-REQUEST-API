@@ -1,21 +1,27 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
 import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class PenRequestService {
@@ -25,10 +31,14 @@ public class PenRequestService {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
+  
+  @Getter(AccessLevel.PRIVATE)
+  private final GenderCodeTableRepository genderCodeTableRepo;
 
-  PenRequestService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo) {
+  PenRequestService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, @Autowired final GenderCodeTableRepository genderCodeTableRepo) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
+    this.genderCodeTableRepo = genderCodeTableRepo;
   }
 
   public PenRequestEntity retrievePenRequest(UUID id) {
@@ -59,6 +69,24 @@ public class PenRequestService {
 
   public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
     return getPenRequestRepository().findPenRequests(digitalID, statusCode);
+  }
+  
+  /**
+   * Returns the full list of access channel codes
+   *
+   * @return {@link List<IdentityTypeCodeEntity>}
+   */
+  @Cacheable("genderCodes")
+  public List<GenderCodeEntity> getGenderCodesList() {
+    return genderCodeTableRepo.findAll();
+  }
+  
+  private Map<String, GenderCodeEntity> loadGenderCodes() {
+    return getGenderCodesList().stream().collect(Collectors.toMap(GenderCodeEntity::getGenderCode, genderCodeEntity -> genderCodeEntity));
+  }
+  
+  public Optional<GenderCodeEntity> findGenderCode(String genderCode) {
+    return Optional.ofNullable(loadGenderCodes().get(genderCode));
   }
 
   /**
