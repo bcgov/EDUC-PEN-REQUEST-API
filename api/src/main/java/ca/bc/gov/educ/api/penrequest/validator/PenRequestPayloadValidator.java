@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
+import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
@@ -31,6 +32,10 @@ public class PenRequestPayloadValidator {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (isCreateOperation && penRequest.getPenRequestID() != null) {
       apiValidationErrors.add(createFieldError("penRequestID", penRequest.getPenRequestID(), "penRequestID should be null for post operation."));
+    }
+    
+    if (isCreateOperation && penRequest.getInitialSubmitDate() != null) {
+        apiValidationErrors.add(createFieldError("initialSubmitDate", penRequest.getPenRequestID(), "initialSubmitDate should be null for post operation."));
     }
     validateGenderCode(penRequest, apiValidationErrors);
     return apiValidationErrors;

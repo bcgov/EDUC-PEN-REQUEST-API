@@ -59,12 +59,6 @@ public class PenRequestController extends BaseController implements PenRequestEn
   }
 
   public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
-    if (penRequest.getPenRequestID() != null) {
-      throw new InvalidParameterException("penRequest");
-    }
-    if (penRequest.getInitialSubmitDate() != null) {
-      throw new InvalidParameterException("initialSubmitDate");
-    }
     validatePayload(penRequest, true);
     setAuditColumns(penRequest);
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
