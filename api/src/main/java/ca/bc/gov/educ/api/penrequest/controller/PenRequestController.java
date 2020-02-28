@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.penrequest.endpoint.PenRequestEndpoint;
-import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.penrequest.exception.errors.ApiError;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
@@ -29,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
@@ -44,7 +44,8 @@ public class PenRequestController extends BaseController implements PenRequestEn
   private static final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
   private static final PenRequestGenderCodeMapper genderCodeMapper = PenRequestGenderCodeMapper.mapper;
 
-  PenRequestController(@Autowired final PenRequestService penRequest, @Autowired PenRequestPayloadValidator payloadValidator) {
+  @Autowired
+  PenRequestController(final PenRequestService penRequest, final PenRequestPayloadValidator payloadValidator) {
     this.service = penRequest;
     this.payloadValidator = payloadValidator;
   }
@@ -65,7 +66,7 @@ public class PenRequestController extends BaseController implements PenRequestEn
   }
 
   public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
-	validatePayload(penRequest, false);
+    validatePayload(penRequest, false);
     setAuditColumns(penRequest);
     return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
   }
@@ -79,12 +80,12 @@ public class PenRequestController extends BaseController implements PenRequestEn
   public List<GenderCode> getGenderCodes() {
     return getService().getGenderCodesList().stream().map(genderCodeMapper::toStructure).collect(Collectors.toList());
   }
-  
+
   @Override
   public String health() {
     return "OK";
   }
-  
+
   private void validatePayload(PenRequest penRequest, boolean isCreateOperation) {
     val validationResult = getPayloadValidator().validatePayload(penRequest, isCreateOperation);
     if (!validationResult.isEmpty()) {

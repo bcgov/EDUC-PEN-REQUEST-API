@@ -109,4 +109,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setMessage(ex.getMessage().concat(" , Expected pattern is 'yyyy-mm-ddTHH:MM:SS' for date time field or 'yyyy-mm-dd' for date field."));
         return buildResponseEntity(apiError);
     }
+
+    @ExceptionHandler(InvalidPayloadException.class)
+    protected ResponseEntity<Object> handleInvalidPayload(
+            InvalidPayloadException ex) {
+        return buildResponseEntity(ex.getError());
+    }
 }
