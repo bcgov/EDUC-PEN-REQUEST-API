@@ -1,13 +1,20 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
-import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,23 +23,23 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.UUID;
+import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
+import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
+import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
+import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class PenRequestControllerTest extends BasePenReqControllerTest {
 
@@ -41,6 +48,9 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   @Autowired
   PenRequestController controller;
 
+  @Autowired
+  GenderCodeTableRepository genderRepo;
+  
   @Autowired
   PenRequestRepository repository;
 
@@ -55,14 +65,22 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     MockitoAnnotations.initMocks(this);
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
             .setControllerAdvice(new RestExceptionHandler()).build();
+    genderRepo.save(createGenderCodeData());
   }
 
   @After
   public void after() {
     documentRepository.deleteAll();
     repository.deleteAll();
+    genderRepo.deleteAll();
   }
 
+  private GenderCodeEntity createGenderCodeData() {
+    return GenderCodeEntity.builder().genderCode("M").description("Male")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("label").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+  
 
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
