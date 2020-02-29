@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
-import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;

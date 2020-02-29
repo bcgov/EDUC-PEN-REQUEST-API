@@ -34,9 +34,4 @@ public abstract class BasePenReqControllerTest {
       throw new RuntimeException(e);
     }
   }
-
-  public static void main(String[] args) {
-    LocalDate date = LocalDate.now();
-    System.out.println(date.toString());
-  }
 }

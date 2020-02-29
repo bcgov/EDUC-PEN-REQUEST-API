@@ -35,7 +35,8 @@ public class PenRequestService {
   @Getter(AccessLevel.PRIVATE)
   private final GenderCodeTableRepository genderCodeTableRepo;
 
-  PenRequestService(@Autowired final PenRequestRepository penRequestRepository, @Autowired final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, @Autowired final GenderCodeTableRepository genderCodeTableRepo) {
+  @Autowired
+  public PenRequestService(final PenRequestRepository penRequestRepository, final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, final GenderCodeTableRepository genderCodeTableRepo) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
     this.genderCodeTableRepo = genderCodeTableRepo;
@@ -74,7 +75,7 @@ public class PenRequestService {
   /**
    * Returns the full list of access channel codes
    *
-   * @return {@link List<IdentityTypeCodeEntity>}
+   * @return {@link List<GenderCodeEntity>}
    */
   @Cacheable("genderCodes")
   public List<GenderCodeEntity> getGenderCodesList() {
