@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.penrequest.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "pen_retrieval_request")
+@DynamicUpdate
 public class PenRequestEntity {
   @Id
   @GeneratedValue(generator = "UUID")
@@ -27,7 +29,7 @@ public class PenRequestEntity {
   UUID penRequestID;
 
   @NotNull(message = "digitalID cannot be null")
-  @Column(name = "digital_identity_id", columnDefinition = "BINARY(16)")
+  @Column(name = "digital_identity_id", updatable = false, columnDefinition = "BINARY(16)")
   UUID digitalID;
 
   @Column(name = "pen_retrieval_request_status_code")
@@ -106,6 +108,12 @@ public class PenRequestEntity {
   @PastOrPresent
   @Column(name = "update_date")
   LocalDateTime updateDate;
+
+  @Column(name = "BCSC_AUTO_MATCH_OUTCOME")
+  String bcscAutoMatchOutcome;
+
+  @Column(name = "BCSC_AUTO_MATCH_DETAIL")
+  String bcscAutoMatchDetails;
 
   @OneToMany(mappedBy = "penRequestEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = PenRequestCommentsEntity.class)
   private Set<PenRequestCommentsEntity> penRequestComments;
