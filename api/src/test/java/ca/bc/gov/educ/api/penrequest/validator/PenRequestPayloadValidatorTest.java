@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
+import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
@@ -13,6 +14,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
@@ -23,7 +27,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class PenRequestPayloadValidatorTest {
   private boolean isCreateOperation = false;
   @Mock
@@ -34,14 +39,15 @@ public class PenRequestPayloadValidatorTest {
   GenderCodeTableRepository genderCodeTableRepo;
   @Mock
   PenRequestService service;
-
+  @Autowired
+  ApplicationProperties properties;
   @InjectMocks
   PenRequestPayloadValidator penRequestPayloadValidator;
 
   @Before
   public void before() {
     service = new PenRequestService(repository, penRequestStatusCodeTableRepo, genderCodeTableRepo);
-    penRequestPayloadValidator = new PenRequestPayloadValidator(service);
+    penRequestPayloadValidator = new PenRequestPayloadValidator(service,properties);
   }
 
   @Test
@@ -109,6 +115,18 @@ public class PenRequestPayloadValidatorTest {
     List<FieldError> errorList = penRequestPayloadValidator.validatePayload(penRequest,true);
     assertEquals(1, errorList.size());
     assertEquals("initialSubmitDate should be null for post operation.",errorList.get(0).getDefaultMessage());
+  }
+  @Test
+  public void testValidatePayload_WhenBCSCAutoMatchIsInvalid_ShouldAddAnErrorTOTheReturnedList() {
+    isCreateOperation = true;
+    List<GenderCodeEntity> genderCodeEntities = new ArrayList<>();
+    genderCodeEntities.add(createGenderCodeData());
+    when(service.getGenderCodesList()).thenReturn(genderCodeEntities);
+    PenRequest penRequest = getPenRequestEntityFromJsonString();
+    penRequest.setBcscAutoMatchOutcome("junk");
+    List<FieldError> errorList = penRequestPayloadValidator.validatePayload(penRequest,true);
+    assertEquals(1, errorList.size());
+    assertEquals("Invalid bcscAutoMatchOutcome. It should be one of :: [RIGHTPEN, WRONGPEN, NOMATCH, MANYMATCHES, ONEMATCH]",errorList.get(0).getDefaultMessage());
   }
   private GenderCodeEntity createGenderCodeData() {
     return GenderCodeEntity.builder().genderCode("M").description("Male")

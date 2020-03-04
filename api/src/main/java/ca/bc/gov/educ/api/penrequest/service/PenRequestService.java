@@ -1,17 +1,5 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-
 import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
@@ -22,6 +10,17 @@ import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PenRequestService {
@@ -31,7 +30,7 @@ public class PenRequestService {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
-  
+
   @Getter(AccessLevel.PRIVATE)
   private final GenderCodeTableRepository genderCodeTableRepo;
 
@@ -71,7 +70,7 @@ public class PenRequestService {
   public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
     return getPenRequestRepository().findPenRequests(digitalID, statusCode);
   }
-  
+
   /**
    * Returns the full list of access channel codes
    *
@@ -81,11 +80,11 @@ public class PenRequestService {
   public List<GenderCodeEntity> getGenderCodesList() {
     return genderCodeTableRepo.findAll();
   }
-  
+
   private Map<String, GenderCodeEntity> loadGenderCodes() {
     return getGenderCodesList().stream().collect(Collectors.toMap(GenderCodeEntity::getGenderCode, genderCodeEntity -> genderCodeEntity));
   }
-  
+
   public Optional<GenderCodeEntity> findGenderCode(String genderCode) {
     return Optional.ofNullable(loadGenderCodes().get(genderCode));
   }
@@ -101,18 +100,12 @@ public class PenRequestService {
 
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
-      LocalDateTime createDate = newPenRequest.getCreateDate();
-      String createUser = newPenRequest.getCreateUser();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
-      newPenRequest.setCreateDate(createDate);
-      newPenRequest.setCreateUser(createUser);
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
   }
-
-
 }

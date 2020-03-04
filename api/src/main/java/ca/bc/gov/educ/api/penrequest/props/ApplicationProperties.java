@@ -19,4 +19,8 @@ public class ApplicationProperties {
   @Getter
   private List<String> fileExtensions;
 
+  @Value("${bcsc.auto.match.outcomes}")
+  @Getter
+  private List<String> bcscAutoMatchOutcomes;
+
 }
