@@ -114,6 +114,9 @@ public class PenRequestEntity {
 
   @Column(name = "BCSC_AUTO_MATCH_DETAIL")
   String bcscAutoMatchDetails;
+  
+  @Column(name = "PEN")
+  String pen;
 
   @OneToMany(mappedBy = "penRequestEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = PenRequestCommentsEntity.class)
   private Set<PenRequestCommentsEntity> penRequestComments;
