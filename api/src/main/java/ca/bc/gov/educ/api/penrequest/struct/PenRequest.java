@@ -58,6 +58,10 @@ public class PenRequest extends BaseRequest implements Serializable {
   @Pattern(regexp = "[YN]")
   @NotNull(message = "emailVerified cannot be null")
   private String emailVerified;
+  @Size(max = 255)
   private String bcscAutoMatchOutcome;
+  @Size(max = 255)
   private String bcscAutoMatchDetails;
+  @Size(max = 9)
+  private String pen;
 }
