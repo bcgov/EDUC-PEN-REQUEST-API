@@ -33,7 +33,7 @@ public class PenRequestCommentsEntity {
   @Column(name = "COMMENT_CONTENT")
   String commentContent;
 
-  @Column(name = "COMMENT_TIMESTAMP")
+  @Column(name = "COMMENT_TIMESTAMP", columnDefinition = "TIMESTAMP")
   LocalDateTime commentTimestamp;
 
   @Column(name = "create_user", updatable = false)
