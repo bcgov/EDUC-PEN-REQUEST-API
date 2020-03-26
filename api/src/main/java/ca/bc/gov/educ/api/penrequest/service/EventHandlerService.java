@@ -33,9 +33,11 @@ import static lombok.AccessLevel.PRIVATE;
 @Service
 @Slf4j
 public class EventHandlerService {
-  public static final String NO_RECORD_SAGA_ID_EVENT_TYPE = "no record found for the saga id and event type combination, processing. {}";
+  public static final String NO_RECORD_SAGA_ID_EVENT_TYPE = "no record found for the saga id and event type combination, processing";
   public static final String RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE = "record found for the saga id and event type combination, might be a duplicate or replay," +
-          " just updating the db status so that it will be polled and sent back again. {}";
+          " just updating the db status so that it will be polled and sent back again.";
+  public static final String PAYLOAD_LOG = "payload is :: {}";
+  public static final String EVENT_PAYLOAD = "event is :: {}";
   @Getter(PRIVATE)
   private final PenRequestRepository penRequestRepository;
   private static final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
@@ -57,19 +59,23 @@ public class EventHandlerService {
     try {
       switch (event.getEventType()) {
         case PEN_REQUEST_EVENT_OUTBOX_PROCESSED:
-          log.info("received outbox processed event :: " + event.getEventPayload());
+          log.info("received outbox processed event :: ");
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
           handlePenReqEventOutboxProcessed(event.getEventPayload());
           break;
         case UPDATE_PEN_REQUEST:
-          log.info("received UPDATE_PEN_REQUEST event :: " + event.getEventPayload());
+          log.info("received UPDATE_PEN_REQUEST event :: ");
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
           handleUpdatePenRequest(event);
           break;
         case GET_PEN_REQUEST:
-          log.info("received GET_PEN_REQUEST event :: " + event.getEventPayload());
+          log.info("received GET_PEN_REQUEST event :: ");
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
           handleGetPenRequest(event);
           break;
         case ADD_PEN_REQUEST_COMMENT:
-          log.info("received ADD_PEN_REQUEST_COMMENT event :: " + event.getEventPayload());
+          log.info("received ADD_PEN_REQUEST_COMMENT event :: ");
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
           handleAddPenRequestComment(event);
           break;
         default:
@@ -80,11 +86,13 @@ public class EventHandlerService {
       log.error("Exception", e);
     }
   }
+
   private void handleAddPenRequestComment(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (!penRequestEventOptional.isPresent()) {
-      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE, event);
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       PenRequestCommentsEntity entity = prcMapper.toModel(JsonUtil.getJsonObjectFromString(PenRequestComments.class, event.getEventPayload()));
       val penReqComment = getPenRequestCommentRepository().findByCommentContentAndCommentTimestamp(entity.getCommentContent(), entity.getCommentTimestamp());
       if (penReqComment.isPresent()) {
@@ -103,7 +111,8 @@ public class EventHandlerService {
       }
       penRequestEvent = createPenRequestEvent(event);
     } else {
-      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE, event);
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
       penRequestEvent.setEventStatus(DB_COMMITTED.toString());
     }
@@ -114,7 +123,8 @@ public class EventHandlerService {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (!penRequestEventOptional.isPresent()) {
-      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE, event);
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       val optionalPenRequestEntity = getPenRequestRepository().findById(UUID.fromString(event.getEventPayload())); // expect the payload contains the pen request id.
       if (optionalPenRequestEntity.isPresent()) {
         val attachedEntity = optionalPenRequestEntity.get();
@@ -125,7 +135,8 @@ public class EventHandlerService {
       }
       penRequestEvent = createPenRequestEvent(event);
     } else {
-      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE, event);
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
       penRequestEvent.setEventStatus(DB_COMMITTED.toString());
     }
@@ -136,7 +147,8 @@ public class EventHandlerService {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (!penRequestEventOptional.isPresent()) {
-      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE, event);
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       PenRequestEntity entity = mapper.toModel(JsonUtil.getJsonObjectFromString(PenRequest.class, event.getEventPayload()));
       val optionalPenRequestEntity = getPenRequestRepository().findById(entity.getPenRequestID());
       if (optionalPenRequestEntity.isPresent()) {
@@ -152,7 +164,8 @@ public class EventHandlerService {
       }
       penRequestEvent = createPenRequestEvent(event);
     } else {
-      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE, event);
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
       penRequestEvent.setEventStatus(DB_COMMITTED.toString());
     }
