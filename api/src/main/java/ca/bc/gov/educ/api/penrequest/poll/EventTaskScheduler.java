@@ -56,8 +56,6 @@ public class EventTaskScheduler {
           throw e;
         }
       }
-    } else {
-      log.trace("no unprocessed records.");
     }
   }
 
