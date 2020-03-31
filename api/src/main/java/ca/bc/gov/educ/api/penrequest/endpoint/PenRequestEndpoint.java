@@ -1,21 +1,5 @@
 package ca.bc.gov.educ.api.penrequest.endpoint;
 
-import static org.springframework.http.HttpStatus.CREATED;
-
-import java.util.List;
-
-import org.springframework.data.repository.query.Param;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import ca.bc.gov.educ.api.penrequest.struct.GenderCode;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequestStatusCode;
@@ -24,6 +8,15 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping("/")
 @OpenAPIDefinition(info = @Info(title = "API for Pen Requests.", description = "This CRUD API is for Pen Requests tied to a Digital ID for a particular student in BC.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_PEN_REQUEST", "WRITE_PEN_REQUEST"})})
@@ -37,7 +30,8 @@ public interface PenRequestEndpoint {
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
   @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  Iterable<PenRequest> findPenRequests(@Param("digitalID") String digitalID, @Param("status") String status);
+  @Tag(name = "findPenRequests", description = "This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.")
+  Iterable<PenRequest> findPenRequests(@RequestParam(name = "digitalID", required = false) String digitalID, @RequestParam(name = "status", required = false) String status, @RequestParam(name = "pen", required = false) String pen);
 
   @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
   @PostMapping
@@ -56,7 +50,7 @@ public interface PenRequestEndpoint {
   @GetMapping("/statuses")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<PenRequestStatusCode> getPenRequestStatusCodes();
-  
+
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST_CODES')")
   @GetMapping("/gender-codes")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
