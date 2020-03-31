@@ -97,6 +97,13 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
+  public void testFindPenRequest_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
+    PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+    this.mockMvc.perform(get("?pen" + entity.getPen())).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getPen()));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenRandomDigitalIdAndStatusCode_ShouldReturnOkStatus() throws Exception {
     this.mockMvc.perform(get("?digitalID=" + UUID.randomUUID() + "&status=" + "INT")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }

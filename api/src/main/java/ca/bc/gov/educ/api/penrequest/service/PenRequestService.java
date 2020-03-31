@@ -67,8 +67,8 @@ public class PenRequestService {
     return getPenRequestStatusCodeTableRepo().findAll();
   }
 
-  public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode) {
-    return getPenRequestRepository().findPenRequests(digitalID, statusCode);
+  public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode, String pen) {
+    return getPenRequestRepository().findPenRequests(digitalID, statusCode, pen);
   }
 
   /**
