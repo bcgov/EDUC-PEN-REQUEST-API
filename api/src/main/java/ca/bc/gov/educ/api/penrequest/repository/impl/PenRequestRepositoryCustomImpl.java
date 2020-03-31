@@ -29,7 +29,7 @@ public class PenRequestRepositoryCustomImpl implements PenRequestRepositoryCusto
   }
 
   @Override
-  public List<PenRequestEntity> findPenRequests(UUID digitalID, String status) {
+  public List<PenRequestEntity> findPenRequests(UUID digitalID, String status, String pen) {
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<PenRequestEntity> criteriaQuery = criteriaBuilder.createQuery(PenRequestEntity.class);
@@ -39,6 +39,9 @@ public class PenRequestRepositoryCustomImpl implements PenRequestRepositoryCusto
     }
     if (digitalID != null) {
       predicates.add(criteriaBuilder.equal(penRequestEntityRoot.get("digitalID"), digitalID));
+    }
+    if (StringUtils.isNotBlank(pen)) {
+      predicates.add(criteriaBuilder.equal(penRequestEntityRoot.get("pen"), pen));
     }
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
 
