@@ -47,6 +47,6 @@ public class PenRequestMacroPayloadValidator {
   }
 
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
-    return new FieldError("penRequest", fieldName, rejectedValue, false, null, null, message);
+    return new FieldError(PenRequestMacro.class.getName(), fieldName, rejectedValue, false, null, null, message);
   }
 }
