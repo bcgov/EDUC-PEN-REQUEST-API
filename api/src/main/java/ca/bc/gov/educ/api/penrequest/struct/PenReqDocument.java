@@ -28,7 +28,6 @@ public class PenReqDocument extends BaseRequest implements Serializable {
   @NotNull(message = "fileSize cannot be null")
   private Integer fileSize;
 
-  @NotNull(message = "documentData cannot be null")
   @ToString.Exclude
   private String documentData;
 }
