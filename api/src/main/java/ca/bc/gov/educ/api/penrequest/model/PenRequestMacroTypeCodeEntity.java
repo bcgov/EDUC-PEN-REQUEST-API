@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +15,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "pen_retrieval_request_macro_type_code")
 public class PenRequestMacroTypeCodeEntity {
