@@ -36,9 +36,12 @@ public class PenRequestDocumentsValidator {
     return documentTypeCodeRepository.findAll();
   }
 
-  public void validateDocumentPayload(final DocumentEntity document) {
-    if (document.getDocumentID() != null) {
+  public void validateDocumentPayload(final DocumentEntity document, boolean isCreateOperation) {
+    if (isCreateOperation && document.getDocumentID() != null) {
       throw new InvalidParameterException("documentID");
+    }
+    if (isCreateOperation && (document.getDocumentData() == null || document.getDocumentData().length == 0)) {
+      throw new InvalidValueException("documentData", null);
     }
 
     if (!properties.getFileExtensions().contains(document.getFileExtension())) {
@@ -50,7 +53,7 @@ public class PenRequestDocumentsValidator {
               String.valueOf(properties.getMaxFileSize()));
     }
 
-    if (document.getFileSize() != document.getDocumentData().length) {
+    if (isCreateOperation && document.getFileSize() != document.getDocumentData().length) {
       throw new InvalidValueException("fileSize", document.getFileSize().toString(), "documentData length",
               String.valueOf(document.getDocumentData().length));
     }

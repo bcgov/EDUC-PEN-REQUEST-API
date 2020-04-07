@@ -117,7 +117,7 @@ public class PenReqDocumentControllerTest {
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.subErrors", hasSize(5)));
+            .andExpect(jsonPath("$.subErrors", hasSize(4)));
   }
 
   @Test
@@ -225,8 +225,7 @@ public class PenReqDocumentControllerTest {
                     "../model/document-req-without-doc-data.json", PenReqDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
-            .andDo(print())
-            .andExpect(jsonPath("$.subErrors[0].field", is("documentData")));
+            .andDo(print());
   }
 
   @Test

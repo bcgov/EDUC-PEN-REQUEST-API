@@ -13,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping("/")
@@ -30,6 +32,11 @@ public interface PenReqDocumentEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
   PenReqDocMetadata createDocument(@PathVariable String penRequestID, @Validated @RequestBody PenReqDocument penReqDocument);
+
+  @PutMapping("/{penRequestID}/documents/{documentID}")
+  @PreAuthorize("#oauth2.hasScope('WRITE_DOCUMENT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  PenReqDocMetadata updateDocument(@PathVariable UUID penRequestID, @PathVariable UUID documentID, @Validated @RequestBody PenReqDocument penReqDocument);
 
   @DeleteMapping("/{penRequestID}/documents/{documentID}")
   @PreAuthorize("#oauth2.hasScope('DELETE_DOCUMENT')")
