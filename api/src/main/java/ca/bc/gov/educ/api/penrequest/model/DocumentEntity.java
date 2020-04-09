@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.penrequest.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "pen_retrieval_request_document")
+@DynamicUpdate
 public class DocumentEntity {
 
   @Id
@@ -64,6 +66,6 @@ public class DocumentEntity {
 
   @Basic(fetch = FetchType.LAZY)
   @Lob
-  @Column(name = "document_data")
+  @Column(name = "document_data", updatable = false)
   byte[] documentData;
 }
