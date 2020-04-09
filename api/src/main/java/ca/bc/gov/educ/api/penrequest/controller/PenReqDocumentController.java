@@ -48,8 +48,16 @@ public class PenReqDocumentController extends BaseController implements PenReqDo
   public PenReqDocMetadata createDocument(String penRequestID, PenReqDocument penReqDocument) {
     setAuditColumns(penReqDocument);
     val model = mapper.toModel(penReqDocument);
-    getValidator().validateDocumentPayload(model);
+    getValidator().validateDocumentPayload(model, true);
     return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(penRequestID), model));
+  }
+
+  @Override
+  public PenReqDocMetadata updateDocument(UUID penRequestID, UUID documentID, PenReqDocument penReqDocument) {
+    setAuditColumns(penReqDocument);
+    val model = mapper.toModel(penReqDocument);
+    getValidator().validateDocumentPayload(model, false);
+    return mapper.toMetadataStructure(getDocumentService().updateDocument(penRequestID, documentID, model));
   }
 
   public PenReqDocMetadata deleteDocument(String penRequestID, String documentID) {

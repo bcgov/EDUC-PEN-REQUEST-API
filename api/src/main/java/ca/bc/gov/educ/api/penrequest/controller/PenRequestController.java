@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.penrequest.endpoint.PenRequestEndpoint;
@@ -50,22 +47,22 @@ public class PenRequestController extends BaseController implements PenRequestEn
     this.payloadValidator = payloadValidator;
   }
 
-  public PenRequest retrievePenRequest(@PathVariable String id) {
+  public PenRequest retrievePenRequest(String id) {
     return mapper.toStructure(getService().retrievePenRequest(UUIDUtil.fromString(id)));
   }
 
   @Override
-  public Iterable<PenRequest> findPenRequests(final String digitalID, final String status) {
-    return getService().findPenRequests(UUIDUtil.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public Iterable<PenRequest> findPenRequests(final String digitalID, final String status, final String pen) {
+    return getService().findPenRequests(UUIDUtil.fromString(digitalID), status, pen).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
-  public PenRequest createPenRequest(@Validated @RequestBody PenRequest penRequest) {
+  public PenRequest createPenRequest(PenRequest penRequest) {
     validatePayload(penRequest, true);
     setAuditColumns(penRequest);
     return mapper.toStructure(getService().createPenRequest(mapper.toModel(penRequest)));
   }
 
-  public PenRequest updatePenRequest(@Validated @RequestBody PenRequest penRequest) {
+  public PenRequest updatePenRequest(PenRequest penRequest) {
     validatePayload(penRequest, false);
     setAuditColumns(penRequest);
     return mapper.toStructure(getService().updatePenRequest(mapper.toModel(penRequest)));
