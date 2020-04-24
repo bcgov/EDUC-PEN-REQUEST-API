@@ -72,7 +72,7 @@ pipeline{
       steps {
         script {
           try{
-            sh( script: "oc describe configmaps ${APP_NAME}-config", returnStdout: true)
+            sh( script: "oc describe configmaps ${APP_NAME}-dev-config", returnStdout: true)
             echo 'Config map already exists. Moving to next stage...'
           } catch(e){
             configProperties = input(
