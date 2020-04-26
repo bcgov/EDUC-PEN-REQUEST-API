@@ -17,10 +17,10 @@ pipeline{
             alwaysPullImage: false
             workingDir: /tmp
             ttyEnabled: false
-            resourceRequestCpu: 8
-            resourceRequestMemory: 4Gi
-            resourceLimitCpu: 12
-            resourceLimitMemory: 4Gi
+            resourceRequestCpu: 3
+            resourceRequestMemory: 2Gi
+            resourceLimitCpu: 3
+            resourceLimitMemory: 2Gi
             env:
             - name: SONARQUBE_HOSTNAME
               valueFrom:
