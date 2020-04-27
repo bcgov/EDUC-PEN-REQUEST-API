@@ -1,20 +1,15 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.UUID;
-
+import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
+import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
+import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
+import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,16 +23,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
-import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
-import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -99,13 +94,13 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testFindPenRequest_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
-    this.mockMvc.perform(get("?pen" + entity.getPen())).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getPen()));
+    this.mockMvc.perform(get("/?pen" + entity.getPen())).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getPen()));
   }
 
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenRandomDigitalIdAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get("?digitalID=" + UUID.randomUUID() + "&status=" + "INT")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
+    this.mockMvc.perform(get("/?digitalID=" + UUID.randomUUID() + "&status=" + "INT")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test

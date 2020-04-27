@@ -5,15 +5,16 @@ import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
-import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.repository.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,10 @@ public class PenRequestService {
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestRepository penRequestRepository;
+  @Getter(AccessLevel.PRIVATE)
+  private final PenRequestCommentRepository penRequestCommentRepository;
+  @Getter(AccessLevel.PRIVATE)
+  private final DocumentRepository documentRepository;
 
   @Getter(AccessLevel.PRIVATE)
   private final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
@@ -35,8 +40,10 @@ public class PenRequestService {
   private final GenderCodeTableRepository genderCodeTableRepo;
 
   @Autowired
-  public PenRequestService(final PenRequestRepository penRequestRepository, final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, final GenderCodeTableRepository genderCodeTableRepo) {
+  public PenRequestService(final PenRequestRepository penRequestRepository, PenRequestCommentRepository penRequestCommentRepository, DocumentRepository documentRepository, final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, final GenderCodeTableRepository genderCodeTableRepo) {
     this.penRequestRepository = penRequestRepository;
+    this.penRequestCommentRepository = penRequestCommentRepository;
+    this.documentRepository = documentRepository;
     this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
     this.genderCodeTableRepo = genderCodeTableRepo;
   }
@@ -106,6 +113,36 @@ public class PenRequestService {
       return newPenRequest;
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
+    }
+  }
+
+  @Transactional(propagation = Propagation.MANDATORY)
+  public void deleteAll() {
+    List<PenRequestEntity> penRequests = getPenRequestRepository().findAll();
+    for (val entity : penRequests) {
+      deleteAssociatedDocumentsAndComments(entity);
+    }
+    getPenRequestRepository().deleteAll();
+  }
+
+  private void deleteAssociatedDocumentsAndComments(PenRequestEntity entity) {
+    val documents = getDocumentRepository().findByPenRequestPenRequestID(entity.getPenRequestID());
+    if (documents != null && !documents.isEmpty()) {
+      getDocumentRepository().deleteAll(documents);
+    }
+    if (entity.getPenRequestComments() != null && !entity.getPenRequestComments().isEmpty()) {
+      getPenRequestCommentRepository().deleteAll(entity.getPenRequestComments());
+    }
+  }
+
+  @Transactional(propagation = Propagation.MANDATORY)
+  public void deleteById(UUID id) {
+    val entity = getPenRequestRepository().findById(id);
+    if (entity.isPresent()) {
+      deleteAssociatedDocumentsAndComments(entity.get());
+      getPenRequestRepository().delete(entity.get());
+    } else {
+      throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", id.toString());
     }
   }
 }
