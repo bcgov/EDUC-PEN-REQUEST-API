@@ -142,7 +142,7 @@ public class PenRequestService {
       deleteAssociatedDocumentsAndComments(entity.get());
       getPenRequestRepository().delete(entity.get());
     } else {
-      throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", id.toString());
+      throw new EntityNotFoundException(PenRequestEntity.class, "PenRequestID", id.toString());
     }
   }
 }
