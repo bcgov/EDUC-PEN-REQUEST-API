@@ -66,4 +66,8 @@ public class PenRequest extends BaseRequest implements Serializable {
   private String bcscAutoMatchDetails;
   @Size(max = 9)
   private String pen;
+  @Size(max = 1)
+  @Pattern(regexp = "[YN]")
+  private String demogChanged;
+  private String completeComment;
 }

@@ -153,6 +153,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
+  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
+  public void testUpdatePenRequest_GivenInvalidDemogChangedInPayload_ShouldReturnBadRequest() throws Exception {
+    PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+    String penReqId = entity.getPenRequestID().toString();
+    this.mockMvc.perform(put("/").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidDemogChanged(penReqId))).andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST_STATUSES")
   public void testReadPenRequestStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
     penRequestStatusCodeTableRepo.save(createPenReqStatus());
