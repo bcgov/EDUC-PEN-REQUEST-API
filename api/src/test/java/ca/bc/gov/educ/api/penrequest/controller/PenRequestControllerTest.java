@@ -2,13 +2,12 @@ package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.*;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 import org.junit.After;
 import org.junit.Before;
@@ -24,9 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -45,7 +42,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Autowired
   GenderCodeTableRepository genderRepo;
-  
+
   @Autowired
   PenRequestRepository repository;
 
@@ -75,7 +72,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
             .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("label").createDate(LocalDateTime.now())
             .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
-  
+
 
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
@@ -157,6 +154,50 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
+  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
+  public void testDeletePenRequest_GivenInvalidId_ShouldReturn404() throws Exception {
+    this.mockMvc.perform(delete("/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
+  public void testDeletePenRequest_GivenValidId_ShouldReturn204() throws Exception {
+    PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+    String penReqId = entity.getPenRequestID().toString();
+    this.mockMvc.perform(delete("/" + penReqId).contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
+  public void testDeletePenRequest_GivenValidIdWithAssociations_ShouldReturn204() throws Exception {
+    PenRequestEntity penRequestEntity = mapper.toModel(getPenRequestEntityFromJsonString());
+    penRequestEntity.setPenRequestComments(createPenRequestComments(penRequestEntity));
+    PenRequestEntity entity = repository.save(penRequestEntity);
+    DocumentEntity document = new DocumentBuilder()
+            .withoutDocumentID()
+            //.withoutCreateAndUpdateUser()
+            .withPenRequest(entity)
+            .withTypeCode("CAPASSPORT")
+            .build();
+    this.documentRepository.save(document);
+    String penReqId = entity.getPenRequestID().toString();
+    this.mockMvc.perform(delete("/" + penReqId).contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+  }
+
+  private Set<PenRequestCommentsEntity> createPenRequestComments(PenRequestEntity penRequestEntity) {
+    Set<PenRequestCommentsEntity> commentsEntitySet = new HashSet<>();
+    PenRequestCommentsEntity penRequestCommentsEntity = new PenRequestCommentsEntity();
+    penRequestCommentsEntity.setPenRequestEntity(penRequestEntity);
+    penRequestCommentsEntity.setCommentContent("hi");
+    penRequestCommentsEntity.setCommentTimestamp(LocalDateTime.now());
+    commentsEntitySet.add(penRequestCommentsEntity);
+    return commentsEntitySet;
+  }
+
+  @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST_STATUSES")
   public void testReadPenRequestStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
     penRequestStatusCodeTableRepo.save(createPenReqStatus());
@@ -185,5 +226,12 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     return entity;
   }
 
+  private String dummyPenRequestCommentsJsonWithValidPenReqID(String penReqId) {
+    return "{\n" +
+            "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
+            "  \"commentContent\": \"" + "comment1" + "\",\n" +
+            "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+            "}";
+  }
 
 }
