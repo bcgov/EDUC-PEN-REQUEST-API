@@ -3,10 +3,13 @@ package ca.bc.gov.educ.api.penrequest.controller;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.penrequest.endpoint.PenRequestEndpoint;
@@ -91,6 +94,18 @@ public class PenRequestController extends BaseController implements PenRequestEn
       throw new InvalidPayloadException(error);
     }
   }
+  @Override
+  @Transactional
+  public ResponseEntity<Void> deleteAll() {
+    getService().deleteAll();
+    return ResponseEntity.noContent().build();
+  }
 
+  @Override
+  @Transactional
+  public ResponseEntity<Void> deleteById(final UUID id) {
+    getService().deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
 }
 

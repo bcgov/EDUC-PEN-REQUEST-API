@@ -2,9 +2,7 @@ package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
-import ca.bc.gov.educ.api.penrequest.repository.GenderCodeTableRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestStatusCodeTableRepository;
+import ca.bc.gov.educ.api.penrequest.repository.*;
 import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -43,10 +40,14 @@ public class PenRequestPayloadValidatorTest {
   ApplicationProperties properties;
   @InjectMocks
   PenRequestPayloadValidator penRequestPayloadValidator;
+  @Mock
+  private PenRequestCommentRepository penRequestCommentRepository;
+  @Mock
+  private DocumentRepository documentRepository;
 
   @Before
   public void before() {
-    service = new PenRequestService(repository, penRequestStatusCodeTableRepo, genderCodeTableRepo);
+    service = new PenRequestService(repository, penRequestCommentRepository, documentRepository, penRequestStatusCodeTableRepo, genderCodeTableRepo);
     penRequestPayloadValidator = new PenRequestPayloadValidator(service,properties);
   }
 
