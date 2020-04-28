@@ -19,7 +19,6 @@ public class PenRequestApiResourceApplication {
 
   /**
    * Add security exceptions for swagger UI and prometheus.
-   *
    */
   @Configuration
   static
