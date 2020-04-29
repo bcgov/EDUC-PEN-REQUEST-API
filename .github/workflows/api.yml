@@ -31,4 +31,5 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - run: mvn -f pom.xml test
+      - run: mvn -f pom.xml clean package
+      
