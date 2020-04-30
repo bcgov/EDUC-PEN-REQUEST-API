@@ -1,17 +1,5 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
-
 import ca.bc.gov.educ.api.penrequest.endpoint.PenRequestEndpoint;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.penrequest.exception.errors.ApiError;
@@ -26,8 +14,19 @@ import ca.bc.gov.educ.api.penrequest.utils.UUIDUtil;
 import ca.bc.gov.educ.api.penrequest.validator.PenRequestPayloadValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -81,10 +80,6 @@ public class PenRequestController extends BaseController implements PenRequestEn
     return getService().getGenderCodesList().stream().map(genderCodeMapper::toStructure).collect(Collectors.toList());
   }
 
-  @Override
-  public String health() {
-    return "OK";
-  }
 
   private void validatePayload(PenRequest penRequest, boolean isCreateOperation) {
     val validationResult = getPayloadValidator().validatePayload(penRequest, isCreateOperation);

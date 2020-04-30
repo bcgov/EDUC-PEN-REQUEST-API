@@ -58,10 +58,6 @@ public interface PenRequestEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<GenderCode> getGenderCodes();
 
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  @GetMapping("/health")
-  String health();
-
   @DeleteMapping
   @PreAuthorize("#oauth2.hasScope('DELETE_PEN_REQUEST')")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
