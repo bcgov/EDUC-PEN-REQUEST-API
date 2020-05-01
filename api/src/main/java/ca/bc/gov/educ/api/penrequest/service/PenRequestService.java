@@ -12,6 +12,11 @@ import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -143,6 +150,17 @@ public class PenRequestService {
       getPenRequestRepository().delete(entity.get());
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequestID", id.toString());
+    }
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public CompletableFuture<Page<PenRequestEntity>> findAll(Specification<PenRequestEntity> penRequestSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
+    Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
+    try {
+      val result = getPenRequestRepository().findAll(penRequestSpecs, paging);
+      return CompletableFuture.completedFuture(result);
+    } catch (final Exception ex) {
+      throw new CompletionException(ex);
     }
   }
 }
