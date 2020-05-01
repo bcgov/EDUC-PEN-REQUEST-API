@@ -224,10 +224,10 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     });
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated?pageSize=100")
+            .perform(get("/paginated?pageSize=2")
                     .contentType(APPLICATION_JSON))
             .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(100)));
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
   @Test
@@ -253,10 +253,10 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     sortMap.put("legalFirstName", "DESC");
     String sort = new ObjectMapper().writeValueAsString(sortMap);
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("pageNumber","2").param("pageSize", "100").param("sort", sort)
+            .perform(get("/paginated").param("pageNumber","1").param("pageSize", "5").param("sort", sort)
                     .contentType(APPLICATION_JSON))
             .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(100)));
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(5)));
   }
 
   @Test
@@ -267,7 +267,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     );
     List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
     });
-    SearchCriteria criteria = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.EQUAL).value("Homer").valueType(ValueType.STRING).build();
+    SearchCriteria criteria = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.EQUAL).value("Katina").valueType(ValueType.STRING).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -289,7 +289,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     );
     List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
     });
-    SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.EQUAL).value("Vell").valueType(ValueType.STRING).build();
+    SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.EQUAL).value("Medling").valueType(ValueType.STRING).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -324,7 +324,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
             .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(3)));
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
 
