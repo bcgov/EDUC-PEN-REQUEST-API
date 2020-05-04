@@ -118,6 +118,12 @@ public class PenRequestEntity {
   @Column(name = "PEN")
   String pen;
 
+  @Column(name = "demog_changed")
+  String demogChanged;
+
+  @Column(name = "complete_comment")
+  String completeComment;
+
   @OneToMany(mappedBy = "penRequestEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = PenRequestCommentsEntity.class)
   private Set<PenRequestCommentsEntity> penRequestComments;
 
