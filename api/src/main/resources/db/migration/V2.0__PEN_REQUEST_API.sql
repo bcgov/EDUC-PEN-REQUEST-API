@@ -1,8 +1,0 @@
-drop table PEN_RETRIEVAL_REQUEST_GENDER_CODE cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_MACRO_TYPE_CODE cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_STATUS_CODE cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_MACRO cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_DOCUMENT_TYPE_CODE cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_DOCUMENT cascade constraints;
-drop table PEN_RETRIEVAL_REQUEST_COMMENT cascade constraints;
