@@ -163,7 +163,8 @@ public class PenRequestController extends BaseController implements PenRequestEn
           if (i == 0) {
             penRequestSpecs = Specification.where(typeSpecification);
           } else {
-            penRequestSpecs.and(typeSpecification);
+            assert penRequestSpecs != null;
+            penRequestSpecs = penRequestSpecs.and(typeSpecification);
           }
           i++;
         } else {
