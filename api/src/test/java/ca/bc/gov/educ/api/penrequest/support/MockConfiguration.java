@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.penrequest.support;
 
 import ca.bc.gov.educ.api.penrequest.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.penrequest.messaging.MessageSubscriber;
+import ca.bc.gov.educ.api.penrequest.poll.EventTaskScheduler;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +24,10 @@ public class MockConfiguration {
     return Mockito.mock(MessageSubscriber.class);
   }
 
+  @Bean
+  @Primary
+  public EventTaskScheduler eventTaskScheduler() {
+    return Mockito.mock(EventTaskScheduler.class);
+  }
 
 }
