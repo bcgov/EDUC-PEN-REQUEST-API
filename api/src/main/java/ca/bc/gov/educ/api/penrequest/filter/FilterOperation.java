@@ -15,7 +15,8 @@ public enum FilterOperation {
   IN("in"),
   NOT_IN("nin"),
   BETWEEN("btn"),
-  CONTAINS("like");
+  CONTAINS("like"),
+  CONTAINS_IGNORE_CASE("like_ignore_case");
 
   private final String value;
 
