@@ -327,6 +327,55 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
+  @Test
+  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
+  public void testReadPenRequestPaginated_GivenFirstAndLast_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+            Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    });
+    String fromDate = "2020-04-01T00:00:01";
+    String toDate = "2020-04-15T00:00:01";
+    SearchCriteria criteria = SearchCriteria.builder().key("initialSubmitDate").operation(FilterOperation.BETWEEN).value(fromDate + "," + toDate).valueType(ValueType.DATE_TIME).build();
+    SearchCriteria criteriaFirstName = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.CONTAINS).value("a").valueType(ValueType.STRING).build();
+    SearchCriteria criteriaLastName = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.CONTAINS).value("o").valueType(ValueType.STRING).build();
+    List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    criteriaList.add(criteriaFirstName);
+    criteriaList.add(criteriaLastName);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
+    System.out.println(criteriaJSON);
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+    MvcResult result = mockMvc
+            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+                    .contentType(APPLICATION_JSON))
+            .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
+  public void testReadPenRequestPaginated_LegalLastNameFilterIgnoreCase_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+            Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    });
+    SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.CONTAINS_IGNORE_CASE).value("j").valueType(ValueType.STRING).build();
+    List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
+    System.out.println(criteriaJSON);
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+    MvcResult result = mockMvc
+            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+                    .contentType(APPLICATION_JSON))
+            .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
 
   private PenRequestStatusCodeEntity createPenReqStatus() {
     PenRequestStatusCodeEntity entity = new PenRequestStatusCodeEntity();
