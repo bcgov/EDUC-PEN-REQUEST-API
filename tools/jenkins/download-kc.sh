@@ -1,4 +1,5 @@
 namespace=$1
+echo Reached
 
 if [ ! -f /tmp/keycloak-9.0.3.zip ]
 then
