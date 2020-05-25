@@ -29,9 +29,9 @@ pipeline{
       agent any
       steps{
           script{
-              echo 'Reached1'
-              sh "bash ./download-kc.sh \"${NAMESPACE}\""
-              echo 'Reached2'
+              dir('tools/jenkins'){
+              	sh "bash ./download-kc.sh \"${NAMESPACE}\""
+              }
           }
       }
     }
