@@ -42,7 +42,6 @@ pipeline{
       """
     }
   }
-
     environment{
       NAMESPACE='c2mvws'
       TOOLS = "${NAMESPACE}-tools"
@@ -68,31 +67,6 @@ pipeline{
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
   stages{
-    stage('Create Missing Config Maps'){
-      steps {
-        script {
-          try{
-            sh( script: "oc describe configmaps ${APP_NAME}-dev-config", returnStdout: true)
-            echo 'Config map already exists. Moving to next stage...'
-          } catch(e){
-            configProperties = input(
-              id: 'configProperties', message: "Please enter the required credentials to allow ${APP_NAME} to run:",
-              parameters: [
-                  string(defaultValue: "",
-                          description: 'JDBC connect string for database',
-                          name: 'DB_JDBC_CONNECT_STRING'),
-                  string(defaultValue: "",
-                          description: "Username for ${APP_NAME} to connect to the database",
-                          name: "DB_USER_${APP_NAME}"),
-                  string(defaultValue: "",
-                          description: "Password for ${APP_NAME} to connect to the database",
-                          name: "DB_PWD_${APP_NAME}"),
-              ])
-            sh "oc create -n ${NAMESPACE}-tools configmap ${APP_NAME}-dev-config --from-literal=DB_JDBC_CONNECT_STRING=${configProperties.DB_JDBC_CONNECT_STRING} --from-literal=DB_USER_API_DIGITALID=${configProperties.DB_USER_${APP_NAME}} --from-literal=DB_PWD_API_DIGITALID=${configProperties.DB_PWD_${APP_NAME}} --dry-run -o yaml | oc apply -f -"
-          }
-        }
-      }
-    }
     stage('Download setup files'){
       steps{
           script{
@@ -100,21 +74,6 @@ pipeline{
                   sh "bash ./download-kc.sh \"${NAMESPACE}\""
               }
           }
-      }
-    }
-    stage('Unit Tests') {
-      steps {
-        script {
-          def pom = readMavenPom file: 'api/pom.xml'
-          VERSION = pom.version
-
-          //Env variable is to fix issue where special characters in password were not being escaped properly
-          def command = $//bin/bash -c "mvn -f ./api/pom.xml test"/$
-          sh """
-            set +x
-            $command
-          """
-        }
       }
     }
     stage('Build App') {
@@ -181,7 +140,11 @@ pipeline{
       }
     }
     stage('Create/Update Config Maps'){
+      environment {
+	     APP_NAME = "pen-request-api"
+      }
       steps{
+        configMapSetup("${APP_NAME}","${APP_NAME}".toUpperCase(), NAMESPACE);
         script{
           dir('tools/jenkins'){
             def configVars
@@ -190,17 +153,41 @@ pipeline{
         }
       }
     }
-    stage('Report to SonarQube') {
-        steps {
-            script{
-                dir('api'){
-                    sh '/bin/bash -c "mvn sonar:sonar -Dsonar.host.url=${SONARQUBE_HOSTNAME} -Dsonar.login=${SONARQUBE_TOKEN}"'
-                }
-            }
-        }
-    }
   }
 }
+
+def configMapSetup(String appName,String appNameUpper, String namespace){
+    script {
+	  
+      try{
+        sh( script: "oc project ${namespace}-dev", returnStdout: true)
+        sh( script: "oc describe configmaps ${appName}-dev-setup-config", returnStdout: true)
+        sh( script: "oc project ${namespace}-tools", returnStdout: true)
+        echo 'Config map already exists. Moving to next stage...'
+      } catch(e){
+          configProperties = input(
+          id: 'configProperties', message: "Please enter the required credentials to allow ${appName} to run:",
+          parameters: [
+              string(defaultValue: "",
+                      description: 'JDBC connect string for database',
+                      name: 'DB_JDBC_CONNECT_STRING'),
+              string(defaultValue: "",
+                      description: "Username for ${appName} to connect to the database",
+                      name: "DB_USER"),
+              password(defaultValue: "",
+                      description: "Password for ${appName} to connect to the database",
+                      name: "DB_PWD"),
+          ])
+		sh """
+		  set +x
+		  echo Running curl command...
+		  oc create -n ${namespace}-dev configmap ${appName}-dev-setup-config --from-literal=DB_JDBC_CONNECT_STRING=${configProperties.DB_JDBC_CONNECT_STRING} --from-literal=DB_USER_${appNameUpper}=${configProperties.DB_USER} --from-literal=DB_PWD_${appNameUpper}=${configProperties.DB_PWD} --dry-run -o yaml | oc apply -f -
+		  oc project ${namespace}-tools
+		"""
+      }
+    }
+}
+
 
 def deployStage(String stageEnv, String projectEnv, String hostRouteEnv, String tag) {
 
