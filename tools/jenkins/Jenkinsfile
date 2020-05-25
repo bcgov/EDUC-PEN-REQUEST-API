@@ -71,9 +71,7 @@ pipeline{
       agent any
       steps{
           script{
-              dir('./'){
-                  sh "bash ./download-kc.sh \"${NAMESPACE}\""
-              }
+              sh "bash ./download-kc.sh \"${NAMESPACE}\""
           }
       }
     }
