@@ -71,7 +71,7 @@ pipeline{
       agent any
       steps{
           script{
-              dir('/tmp'){
+              dir('tools/jenkins'){
                   sh "bash ./download-kc.sh \"${NAMESPACE}\""
               }
           }
@@ -146,6 +146,11 @@ pipeline{
 	     APP_NAME = "pen-request-api"
       }
       steps{
+        script{
+            dir('/tmp'){
+                sh "bash ./download-kc.sh \"${NAMESPACE}\""
+            }
+        }
         configMapSetup("${APP_NAME}","${APP_NAME}".toUpperCase(), NAMESPACE);
         script{
           dir('tools/jenkins'){
