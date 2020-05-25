@@ -70,6 +70,10 @@ pipeline{
           }
         }
       steps {
+        script {
+          def pom = readMavenPom file: './api/pom.xml'
+          VERSION = pom.version
+        }
         sh '/bin/bash -c "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"'
         script {
           openshift.withCluster() {
