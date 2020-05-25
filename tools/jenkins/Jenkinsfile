@@ -71,7 +71,7 @@ pipeline{
       agent any
       steps{
           script{
-              dir('tools/jenkins'){
+              dir('/tmp'){
                   sh "bash ./download-kc.sh \"${NAMESPACE}\""
               }
           }
