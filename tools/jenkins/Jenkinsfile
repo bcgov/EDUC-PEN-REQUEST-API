@@ -25,16 +25,6 @@ pipeline{
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
   stages{
-    stage('Download setup files'){
-      agent any
-      steps{
-          script{
-              dir('tools/jenkins'){
-              	sh "bash ./download-kc.sh \"${NAMESPACE}\""
-              }
-          }
-      }
-    }
     stage('Build App') {
       agent {
           kubernetes {
@@ -83,7 +73,9 @@ pipeline{
         sh '/bin/bash -c "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"'
         script {
           openshift.withCluster() {
-            openshift.newBuild("--name=${REPO_NAME}-${JOB_NAME}", "--image-stream=redhat-openjdk18-openshift:1.1", "--binary")
+            if (!openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").exists()){
+              openshift.newBuild("--name=${REPO_NAME}-${JOB_NAME}", "--image-stream=redhat-openjdk18-openshift:1.1", "--binary")
+            }
             openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").startBuild("--from-file=./api/target/penrequest-api-${VERSION}.jar", "--wait")
           }
         }
@@ -128,7 +120,7 @@ pipeline{
       }
       steps{
         script{
-            dir('/tmp'){
+            dir('tools/jenkins'){
                 sh "bash ./download-kc.sh \"${NAMESPACE}\""
             }
         }
