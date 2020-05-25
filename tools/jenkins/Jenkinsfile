@@ -71,7 +71,9 @@ pipeline{
       agent any
       steps{
           script{
+              echo 'Reached1'
               sh "bash ./download-kc.sh \"${NAMESPACE}\""
+              echo 'Reached2'
           }
       }
     }
