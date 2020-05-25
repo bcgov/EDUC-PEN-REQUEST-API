@@ -68,6 +68,7 @@ pipeline{
   }
   stages{
     stage('Download setup files'){
+      agent any
       steps{
           script{
               dir('tools/jenkins'){
@@ -89,6 +90,7 @@ pipeline{
           }
         }
       }
+      agent any
       steps {
         script {
           openshift.withCluster() {
@@ -98,6 +100,7 @@ pipeline{
       }
     }
     stage('Build Image') {
+      agent any
       steps {
         script {
           openshift.withCluster() {
@@ -140,6 +143,7 @@ pipeline{
       }
     }
     stage('Create/Update Config Maps'){
+      agent any
       environment {
 	     APP_NAME = "pen-request-api"
       }
