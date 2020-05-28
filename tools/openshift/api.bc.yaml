@@ -27,7 +27,6 @@ objects:
       labels:
         build: "${REPO_NAME}"
       name: "${REPO_NAME}"
-      namespace: mvubjx-tools
     spec:
       completionDeadlineSeconds: 1200
       successfulBuildsHistoryLimit: 3
