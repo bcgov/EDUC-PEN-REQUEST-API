@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: 'educ-pen-request-api-template'
+  template: '${REPO_NAME}-template'
 metadata:
-  name: 'educ-pen-request-api-template'
+  name: '${REPO_NAME}-bc'
 objects:
   - apiVersion: v1
     kind: ImageStream
@@ -13,8 +13,8 @@ objects:
         openshift.io/generated-by: OpenShiftNewBuild
       creationTimestamp:
       labels:
-        build: "educ-pen-request-api-master"
-      name: "educ-pen-request-api-master"
+        build: "${REPO_NAME}"
+      name: "${REPO_NAME}"
     spec:
       lookupPolicy:
         local: false
@@ -25,8 +25,8 @@ objects:
         openshift.io/generated-by: OpenShiftNewBuild
       creationTimestamp:
       labels:
-        build: "educ-pen-request-api"
-      name: "educ-pen-request-api-master"
+        build: "${REPO_NAME}"
+      name: "${REPO_NAME}"
       namespace: mvubjx-tools
     spec:
       completionDeadlineSeconds: 1200
@@ -36,7 +36,7 @@ objects:
       output:
         to:
           kind: ImageStreamTag
-          name: "educ-pen-request-api-master:latest"
+          name: "${REPO_NAME}:latest"
       postCommit: {}
       resources:
         requests:
@@ -48,8 +48,8 @@ objects:
         runPolicy: SerialLatestOnly
       source:
         git:
-          ref: feature/docker
-          uri: 'https://github.com/bcgov/EDUC-PEN-REQUEST-API'
+          ref: "${SOURCE_REPO_REF}"
+          uri: "${SOURCE_REPO_URL}"
         type: Git
       strategy:
         dockerStrategy:
@@ -57,3 +57,16 @@ objects:
             - name: BUILD_LOGLEVEL
               value: '2'
         type: Docker
+parameters:
+  - name: REPO_NAME
+    description: Application repository name
+    required: true
+  - name: JOB_NAME
+    description: Job identifier (i.e. 'pr-5' OR 'master')
+    required: true
+  - name: SOURCE_REPO_REF
+    description: Git Pull Request Reference (i.e. 'pull/CHANGE_ID/head')
+    required: true
+  - name: SOURCE_REPO_URL
+    description: Git Repository URL
+    required: true
