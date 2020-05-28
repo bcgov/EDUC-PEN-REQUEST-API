@@ -1,7 +1,7 @@
 pipeline{
    agent any
    environment{
-      NAMESPACE='c2mvws'
+      NAMESPACE='mvubjx'
       TOOLS = "${NAMESPACE}-tools"
       DEV = "${NAMESPACE}-dev"
       TEST = "${NAMESPACE}-test"
@@ -16,7 +16,7 @@ pipeline{
       APP_DOMAIN = 'pathfinder.gov.bc.ca'
 
       SOURCE_REPO_RAW = 'https://github.com/${OWNER}/${REPO_NAME}/master'
-      SOURCE_REPO_REF = 'master'
+      SOURCE_REPO_REF = 'feature/docker'
       SOURCE_REPO_URL = 'https://github.com/${OWNER}/${REPO_NAME}.git'
 
       TOOLS_HOST_ROUTE = "${APP_NAME}-${TOOLS}.${APP_DOMAIN}"
@@ -25,9 +25,23 @@ pipeline{
       PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
   }
   stages{
+    stage('Initialize') {
+        steps {
+            script {
+                if(DEBUG_OUTPUT.equalsIgnoreCase('true')) {
+                    // Force OpenShift Plugin directives to be verbose
+                    openshift.logLevel(1)
+
+                    // Print all environment variables
+                    echo 'DEBUG - All pipeline environment variables:'
+                    echo sh(returnStdout: true, script: 'env')
+                }
+            }
+        }
+    }
     stage('Build App') {
        steps {
-        script {
+        /*script {
           def pom = readMavenPom file: './api/pom.xml'
           VERSION = pom.version
         }
@@ -39,7 +53,21 @@ pipeline{
             }
             openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").startBuild("--from-file=./api/target/penrequest-api-${VERSION}.jar", "--wait")
           }
-        }
+        }*/
+       openshift.withCluster() {
+         openshift.withProject(TOOLS) {
+           try{
+             echo "Building API..."
+             def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+             openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
+
+             openshift.tag("${REPO_NAME}:latest", "${REPO_NAME}:${JOB_NAME}")
+           } catch(e) {
+             echo "API build failed"
+             throw e
+           }
+         }
+       }
       }
       post {
         success {

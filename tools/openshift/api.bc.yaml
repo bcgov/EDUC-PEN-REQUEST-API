@@ -7,11 +7,26 @@ metadata:
   name: 'educ-pen-request-api-template'
 objects:
   - apiVersion: v1
+    kind: ImageStream
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewBuild
+      creationTimestamp:
+      labels:
+        build: "educ-pen-request-api-master"
+      name: "educ-pen-request-api-master"
+    spec:
+      lookupPolicy:
+        local: false
+  - apiVersion: v1
     kind: BuildConfig
     metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewBuild
+      creationTimestamp:
       labels:
-        build: educ-pen-request-pipeline
-      name: educ-pen-request-pipeline
+        build: "educ-pen-request-api"
+      name: "educ-pen-request-api-master"
       namespace: mvubjx-tools
     spec:
       completionDeadlineSeconds: 1200
@@ -21,14 +36,14 @@ objects:
       output:
         to:
           kind: ImageStreamTag
-          name: "educ-pen-request-api:latest"
+          name: "educ-pen-request-api-master:latest"
       postCommit: {}
       resources:
         requests:
-          cpu: 2000m
+          cpu: 4000m
           memory: 2Gi
         limits:
-          cpu: 4000m
+          cpu: 8000m
           memory: 4Gi
         runPolicy: SerialLatestOnly
       source:
