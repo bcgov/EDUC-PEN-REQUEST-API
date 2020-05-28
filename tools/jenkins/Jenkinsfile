@@ -40,7 +40,7 @@ pipeline{
         }
     }
     stage('Build App') {
-       steps {
+      steps {
         /*script {
           def pom = readMavenPom file: './api/pom.xml'
           VERSION = pom.version
@@ -54,20 +54,22 @@ pipeline{
             openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").startBuild("--from-file=./api/target/penrequest-api-${VERSION}.jar", "--wait")
           }
         }*/
-       openshift.withCluster() {
-         openshift.withProject(TOOLS) {
-           try{
-             echo "Building API..."
-             def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
-             openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
+        script {
+          openshift.withCluster() {
+            openshift.withProject(TOOLS) {
+              try {
+                echo "Building API..."
+                def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+                openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
 
-             openshift.tag("${REPO_NAME}:latest", "${REPO_NAME}:${JOB_NAME}")
-           } catch(e) {
-             echo "API build failed"
-             throw e
-           }
-         }
-       }
+                openshift.tag("${REPO_NAME}:latest", "${REPO_NAME}:${JOB_NAME}")
+              } catch (e) {
+                echo "API build failed"
+                throw e
+              }
+            }
+          }
+        }
       }
       post {
         success {
