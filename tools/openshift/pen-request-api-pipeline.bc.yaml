@@ -4,12 +4,12 @@ kind: Template
 labels: 
   template: pen-request-api-pipeline
 metadata: 
-  name: en-request-api-pipeline
+  name: pen-request-api-pipeline
 objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata: 
-    name: "en-request-api-pipeline"
+    name: "pen-request-api-pipeline"
   spec:
     source:
       git:
