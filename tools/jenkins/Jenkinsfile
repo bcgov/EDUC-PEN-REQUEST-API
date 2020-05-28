@@ -42,19 +42,6 @@ pipeline{
     }
     stage('Build App') {
       steps {
-        /*script {
-          def pom = readMavenPom file: './api/pom.xml'
-          VERSION = pom.version
-        }
-        sh '/bin/bash -c "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"'
-        script {
-          openshift.withCluster() {
-            if (!openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").exists()){
-              openshift.newBuild("--name=${REPO_NAME}-${JOB_NAME}", "--image-stream=redhat-openjdk18-openshift:1.1", "--binary")
-            }
-            openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").startBuild("--from-file=./api/target/penrequest-api-${VERSION}.jar", "--wait")
-          }
-        }*/
         script {
           openshift.withCluster() {
             openshift.withProject(TOOLS) {
