@@ -18,7 +18,7 @@
         <sonar.exclusions>src/main/resources/**,
             src/main/java/ca/bc/gov/educ/api/penrequest/mappers/**,src/main/java/ca/bc/gov/educ/api/penrequest/exception/**,src/main/java/ca/bc/gov/educ/api/penrequest/model/**,src/main/java/ca/bc/gov/educ/api/penrequest/struct/**
         </sonar.exclusions>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
 
         <maven.compiler.version>3.8.0</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -67,6 +67,11 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
@@ -156,6 +161,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context-indexer</artifactId>
+                            <version>${spring-framework.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
