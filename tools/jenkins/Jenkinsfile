@@ -40,16 +40,6 @@ pipeline{
             }
         }
     }
-    stage('Build Jar') {
-      steps {
-        sh '/bin/bash -c "mvn -f ./api/pom.xml clean package -DskipTests"'
-      }
-    }
-    stage('Explode Jar') {
-      steps {
-        sh '/bin/bash -c "mkdir -p ./api/target/dependency && (cd ./api/target/dependency; jar -xf ../*.jar)"'
-      }
-    }
     stage('Build App') {
       steps {
         script {
