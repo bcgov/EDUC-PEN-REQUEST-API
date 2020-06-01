@@ -45,6 +45,6 @@ public class PenRequestApiResourceApplication {
   }
   @Bean
   public LockProvider lockProvider(@Autowired JdbcTemplate jdbcTemplate, @Autowired PlatformTransactionManager transactionManager) {
-    return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "pen_retrieval_request_shedlock");
+    return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "PEN_RETRIEVAL_REQUEST_SHEDLOCK");
   }
 }
