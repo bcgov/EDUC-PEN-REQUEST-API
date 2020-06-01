@@ -9,7 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "pen_retrieval_request_event")
+@Table(name = "PEN_RETRIEVAL_REQUEST_EVENT")
 @Data
 @DynamicUpdate
 public class PenRequestEvent {
@@ -26,34 +25,38 @@ public class PenRequestEvent {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "event_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "EVENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID eventId;
 
-  @NotNull(message = "eventPayload cannot be null")
-  @Column(name = "event_payload")
+  @Column(name = "EVENT_PAYLOAD", length = 4000)
   private String eventPayload;
 
-  @NotNull(message = "eventStatus cannot be null")
-  @Column(name = "event_status")
+  @Column(name = "EVENT_STATUS")
   private String eventStatus;
-  @NotNull(message = "eventType cannot be null")
-  @Column(name = "event_type")
+
+  @Column(name = "EVENT_TYPE")
   private String eventType;
-  @Column(name = "create_user", updatable = false)
+
+  @Column(name = "CREATE_USER", updatable = false)
   String createUser;
-  @Column(name = "create_date", updatable = false)
+
+  @Column(name = "CREATE_DATE", updatable = false)
   @PastOrPresent
   LocalDateTime createDate;
-  @Column(name = "update_user")
+
+  @Column(name = "UPDATE_USER")
   String updateUser;
-  @Column(name = "update_date")
+
+  @Column(name = "UPDATE_DATE")
   @PastOrPresent
   LocalDateTime updateDate;
-  @Column(name = "saga_id", updatable = false)
+
+  @Column(name = "SAGA_ID", updatable = false)
   private UUID sagaId;
-  @NotNull(message = "eventOutcome cannot be null.")
-  @Column(name = "event_outcome")
+
+  @Column(name = "EVENT_OUTCOME")
   private String eventOutcome;
-  @Column(name = "reply_channel")
+
+  @Column(name = "REPLY_CHANNEL")
   private String replyChannel;
 }

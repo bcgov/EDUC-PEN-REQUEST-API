@@ -22,8 +22,10 @@ public class PenRequestCommentsEntity {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "PEN_RETRIEVAL_REQUEST_COMMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID penRetrievalReqCommentID;
+
   @Column(name = "PEN_RETRIEVAL_REQUEST_ID")
   UUID penRetrievalRequestID;
+
   @Column(name = "STAFF_MEMBER_IDIR_GUID")
   String staffMemberIDIRGUID;
 
@@ -51,7 +53,7 @@ public class PenRequestCommentsEntity {
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = PenRequestEntity.class)
-  @JoinColumn(name = "pen_retrieval_request_id", referencedColumnName = "pen_retrieval_request_id", updatable = false, insertable = false)
+  @JoinColumn(name = "PEN_RETRIEVAL_REQUEST_ID", referencedColumnName = "PEN_RETRIEVAL_REQUEST_ID", updatable = false, insertable = false)
   private PenRequestEntity penRequestEntity;
 
 }

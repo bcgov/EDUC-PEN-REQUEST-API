@@ -90,7 +90,7 @@ public class EventHandlerService {
   private void handleAddPenRequestComment(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
-    if (!penRequestEventOptional.isPresent()) {
+    if (penRequestEventOptional.isEmpty()) {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       PenRequestCommentsEntity entity = prcMapper.toModel(JsonUtil.getJsonObjectFromString(PenRequestComments.class, event.getEventPayload()));

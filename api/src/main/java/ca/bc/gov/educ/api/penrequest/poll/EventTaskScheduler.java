@@ -48,7 +48,7 @@ public class EventTaskScheduler {
       for (PenRequestEvent event : events) {
         try {
           if (event.getReplyChannel() != null) {
-            getMessagePubSub().dispatchMessage(event.getReplyChannel(), digitalIdEventProcessed(event));
+            getMessagePubSub().dispatchMessage(event.getReplyChannel(), penRequestEventProcessed(event));
           }
           getMessagePubSub().dispatchMessage(PEN_REQUEST_API_TOPIC.toString(), createOutboxEvent(event));
         } catch (InterruptedException | TimeoutException | IOException e) {
@@ -59,7 +59,7 @@ public class EventTaskScheduler {
     }
   }
 
-  private byte[] digitalIdEventProcessed(PenRequestEvent penRequestEvent) throws JsonProcessingException {
+  private byte[] penRequestEventProcessed(PenRequestEvent penRequestEvent) throws JsonProcessingException {
     Event event = Event.builder()
             .sagaId(penRequestEvent.getSagaId())
             .eventType(EventType.valueOf(penRequestEvent.getEventType()))

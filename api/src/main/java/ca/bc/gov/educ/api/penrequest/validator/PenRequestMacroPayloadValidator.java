@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.service.PenRequestMacroService;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequestMacro;
 import lombok.Getter;
 import lombok.val;
@@ -16,6 +15,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Component
 public class PenRequestMacroPayloadValidator {
+  public static final String MACRO_TYPE_CODE = "macroTypeCode";
   @Getter(PRIVATE)
   private final PenRequestMacroService penRequestMacroService;
 
@@ -37,12 +37,12 @@ public class PenRequestMacroPayloadValidator {
     if (result.isPresent()) {
       val entity = result.get();
       if (entity.getEffectiveDate().isAfter(LocalDate.now())) {
-        apiValidationErrors.add(createFieldError("macroTypeCode", macroTypeCode, "macroTypeCode is not yet effective."));
+        apiValidationErrors.add(createFieldError(MACRO_TYPE_CODE, macroTypeCode, "macroTypeCode is not yet effective."));
       } else if (entity.getExpiryDate().isBefore(LocalDate.now())) {
-        apiValidationErrors.add(createFieldError("macroTypeCode", macroTypeCode, "macroTypeCode is expired."));
+        apiValidationErrors.add(createFieldError(MACRO_TYPE_CODE, macroTypeCode, "macroTypeCode is expired."));
       }
     } else {
-      apiValidationErrors.add(createFieldError("macroTypeCode", macroTypeCode, "macroTypeCode Invalid."));
+      apiValidationErrors.add(createFieldError(MACRO_TYPE_CODE, macroTypeCode, "macroTypeCode Invalid."));
     }
   }
 
