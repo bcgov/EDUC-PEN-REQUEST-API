@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface PenRequestRepository extends CrudRepository<PenRequestEntity, UUID>, PenRequestRepositoryCustom, JpaSpecificationExecutor<PenRequestEntity> {
   List<PenRequestEntity> findAll();
+  List<PenRequestEntity> findByPenRequestStatusCode(String penRequestStatusCode);
 }

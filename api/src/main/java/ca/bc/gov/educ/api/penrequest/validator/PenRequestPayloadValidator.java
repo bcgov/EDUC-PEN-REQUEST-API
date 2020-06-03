@@ -55,7 +55,7 @@ public class PenRequestPayloadValidator {
   protected void validateGenderCode(PenRequest penRequest, List<FieldError> apiValidationErrors) {
     if (penRequest.getGenderCode() != null) {
       Optional<GenderCodeEntity> genderCodeEntity = penRequestService.findGenderCode(penRequest.getGenderCode());
-      if (!genderCodeEntity.isPresent()) {
+      if (genderCodeEntity.isEmpty()) {
         apiValidationErrors.add(createFieldError(GENDER_CODE, penRequest.getGenderCode(), "Invalid Gender Code."));
       } else if (genderCodeEntity.get().getEffectiveDate() != null && genderCodeEntity.get().getEffectiveDate().isAfter(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(GENDER_CODE, penRequest.getGenderCode(), "Gender Code provided is not yet effective."));
