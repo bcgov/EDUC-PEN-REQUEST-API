@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.schedulers;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,11 +37,15 @@ public class PenRequestSchedulerTest {
   @Autowired
   PenRequestRepository penRequestRepository;
   @Autowired
+  DocumentRepository documentRepository;
+  @Autowired
   PenRequestScheduler penRequestScheduler;
   @Autowired
   ApplicationProperties applicationProperties;
+
   @After
   public void after() {
+    documentRepository.deleteAll();
     penRequestRepository.deleteAll();
   }
 
@@ -78,6 +83,6 @@ public class PenRequestSchedulerTest {
     penRequestRepository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     penRequestScheduler.findAndUpdateDraftPenRequests();
     var penRequest = penRequestRepository.findByPenRequestStatusCode(STALE.toString());
-    assertThat(penRequest.size() == 0 ).isTrue();
+    assertThat(penRequest.size() == 0).isTrue();
   }
 }
