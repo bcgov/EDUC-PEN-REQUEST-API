@@ -10,8 +10,6 @@
 
     <properties>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
-        <sonar.jacoco.reportPaths>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
         <!-- Enable language to disable other language analysis -->
         <sonar.language>java</sonar.language>
