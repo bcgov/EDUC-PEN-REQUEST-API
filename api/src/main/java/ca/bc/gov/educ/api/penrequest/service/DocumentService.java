@@ -11,8 +11,6 @@ import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import lombok.extern.slf4j.Slf4j;
-import org.jboss.logging.Logger;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,7 @@ import java.util.UUID;
 @Slf4j
 public class DocumentService {
 
+  public static final String PEN_REQUEST_ID = "penRequestId";
   private final DocumentRepository documentRepository;
 
   private final PenRequestRepository penRequestRepository;
@@ -55,14 +54,14 @@ public class DocumentService {
     log.info("retrieving Document Metadata, documentID: " + documentID.toString());
 
     Optional<DocumentEntity> result = documentRepository.findById(documentID);
-    if (!result.isPresent()) {
+    if (result.isEmpty()) {
       throw new EntityNotFoundException(DocumentEntity.class, "documentID", documentID.toString());
     }
 
     DocumentEntity document = result.get();
 
     if (!document.getPenRequest().getPenRequestID().equals(penRequestId)) {
-      throw new EntityNotFoundException(DocumentEntity.class, "penRequestId", penRequestId.toString());
+      throw new EntityNotFoundException(DocumentEntity.class, PEN_REQUEST_ID, penRequestId.toString());
     }
 
     return document;
@@ -117,7 +116,7 @@ public class DocumentService {
       document.setPenRequest(penRequest);
       return documentRepository.save(document);
     } else {
-      throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", penRequestId.toString());
+      throw new EntityNotFoundException(PenRequestEntity.class, PEN_REQUEST_ID, penRequestId.toString());
     }
   }
 
@@ -165,7 +164,7 @@ public class DocumentService {
       DocumentEntity documentEntity = documentEntityOptional.get();
       PenRequestEntity penRequestEntity = documentEntity.getPenRequest();
       if (!penRequestEntity.getPenRequestID().equals(penRequestId)) {
-        throw new EntityNotFoundException(PenRequestEntity.class, "penRequestId", penRequestId.toString());
+        throw new EntityNotFoundException(PenRequestEntity.class, PEN_REQUEST_ID, penRequestId.toString());
       }
       documentEntity.setFileExtension(document.getFileExtension());
       documentEntity.setDocumentTypeCode(document.getDocumentTypeCode());

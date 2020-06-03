@@ -128,7 +128,7 @@ public class PenRequestController extends BaseController implements PenRequestEn
     try {
       getSortCriteria(sortCriteriaJson, objectMapper, sorts);
       if (StringUtils.isNotBlank(searchCriteriaListJson)) {
-        List<SearchCriteria> criteriaList = objectMapper.readValue(searchCriteriaListJson, new TypeReference<List<SearchCriteria>>() {
+        List<SearchCriteria> criteriaList = objectMapper.readValue(searchCriteriaListJson, new TypeReference<>() {
         });
         penRequestSpecs = getPenRequestEntitySpecification(criteriaList);
       }
@@ -141,7 +141,7 @@ public class PenRequestController extends BaseController implements PenRequestEn
 
   private void getSortCriteria(String sortCriteriaJson, ObjectMapper objectMapper, List<Sort.Order> sorts) throws JsonProcessingException {
     if (StringUtils.isNotBlank(sortCriteriaJson)) {
-      Map<String, String> sortMap = objectMapper.readValue(sortCriteriaJson, new TypeReference<Map<String, String>>() {
+      Map<String, String> sortMap = objectMapper.readValue(sortCriteriaJson, new TypeReference<>() {
       });
       sortMap.forEach((k, v) -> {
         if ("ASC".equalsIgnoreCase(v)) {
