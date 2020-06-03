@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.penrequest.constants;
 
 public enum PenRequestStatusCode {
   DRAFT,
-  STALE,
+  ABANDONED,
   INITREV,
   RETURNED,
   SUBSREV,

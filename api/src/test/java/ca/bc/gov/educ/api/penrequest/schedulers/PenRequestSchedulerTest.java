@@ -1,16 +1,13 @@
 package ca.bc.gov.educ.api.penrequest.schedulers;
 
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.val;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.DRAFT;
-import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.STALE;
+import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.ABANDONED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -70,7 +67,7 @@ public class PenRequestSchedulerTest {
     assert penRequestId != null;
     var penRequest = penRequestRepository.findById(penRequestId);
     assertThat(penRequest.isPresent()).isTrue();
-    assertThat(penRequest.get().getPenRequestStatusCode()).isEqualTo(STALE.toString());
+    assertThat(penRequest.get().getPenRequestStatusCode()).isEqualTo(ABANDONED.toString());
   }
 
   @Test
@@ -82,7 +79,7 @@ public class PenRequestSchedulerTest {
     });
     penRequestRepository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     penRequestScheduler.findAndUpdateDraftPenRequests();
-    var penRequest = penRequestRepository.findByPenRequestStatusCode(STALE.toString());
+    var penRequest = penRequestRepository.findByPenRequestStatusCode(ABANDONED.toString());
     assertThat(penRequest.size() == 0).isTrue();
   }
 }

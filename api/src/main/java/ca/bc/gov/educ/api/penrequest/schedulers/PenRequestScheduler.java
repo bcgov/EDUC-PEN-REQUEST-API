@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.DRAFT;
-import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.STALE;
+import static ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode.ABANDONED;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -54,7 +54,7 @@ public class PenRequestScheduler {
     if (!penRequests.isEmpty()) {
       for (var penRequest : penRequests) {
         if (penRequest.getUpdateDate().isBefore(LocalDateTime.now().minusDays(daysBeforeStale))) {
-          penRequest.setPenRequestStatusCode(STALE.toString());
+          penRequest.setPenRequestStatusCode(ABANDONED.toString());
           penRequest.setUpdateDate(LocalDateTime.now());
           updatedPenRequests.add(penRequest);
         }
