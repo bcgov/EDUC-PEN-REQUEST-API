@@ -23,12 +23,4 @@ public class ApplicationProperties {
   @Getter
   private List<String> bcscAutoMatchOutcomes;
 
-  /**
-   * This property value will indicate how many days a pen request can be in DRAFT status before eligible to move to STALE state.
-   */
-
-  @Value("${days.status.draft.penrequest}")
-  @Getter
-  private Long numOfDaysInDraftStatusForStale;
-
 }
