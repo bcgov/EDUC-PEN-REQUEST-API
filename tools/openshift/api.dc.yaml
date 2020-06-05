@@ -76,34 +76,34 @@ objects:
                   mountPath: /mnt/log
                 - name: flb-sc-config-volume
                   mountPath: /fluent-bit/etc/
-                readinessProbe:
-                  tcpSocket:
-                    port: 2020
-                  initialDelaySeconds: 10
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-                  successThreshold: 1
-                livenessProbe:
-                  httpGet:
-                    path: /
-                    port: 2020
-                  initialDelaySeconds: 10
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-                  successThreshold: 1
-                ports:
-                  - containerPort: 2020
-                    protocol: TCP
-                    name: metrics
-                resources:
-                  requests:
-                    cpu: "10m"
-                    memory: "64Mi"
-                  limits:
-                    cpu: "30m"
-                    memory: "256Mi"
+              readinessProbe:
+                tcpSocket:
+                  port: 2020
+                initialDelaySeconds: 10
+                periodSeconds: 30
+                timeoutSeconds: 5
+                failureThreshold: 5
+                successThreshold: 1
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 2020
+                initialDelaySeconds: 10
+                periodSeconds: 30
+                timeoutSeconds: 5
+                failureThreshold: 5
+                successThreshold: 1
+              ports:
+                - containerPort: 2020
+                  protocol: TCP
+                  name: metrics
+              resources:
+                requests:
+                  cpu: "10m"
+                  memory: "64Mi"
+                limits:
+                  cpu: "30m"
+                  memory: "256Mi"
           volumes:
             - name: log-storage
               emptyDir: {}
