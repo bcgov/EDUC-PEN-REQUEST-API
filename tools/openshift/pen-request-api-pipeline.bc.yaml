@@ -13,7 +13,7 @@ objects:
   spec:
     source:
       git:
-        ref: feature/docker
+        ref: master
         uri: 'https://github.com/bcgov/EDUC-PEN-REQUEST-API'
     strategy:
       jenkinsPipelineStrategy:
