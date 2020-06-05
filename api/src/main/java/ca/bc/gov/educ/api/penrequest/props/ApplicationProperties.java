@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.penrequest.props;
 
-import java.util.List;
-
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ApplicationProperties {

@@ -54,7 +54,7 @@ public class DocumentService {
     log.info("retrieving Document Metadata, documentID: " + documentID.toString());
 
     Optional<DocumentEntity> result = documentRepository.findById(documentID);
-    if (!result.isPresent()) {
+    if (result.isEmpty()) {
       throw new EntityNotFoundException(DocumentEntity.class, "documentID", documentID.toString());
     }
 
