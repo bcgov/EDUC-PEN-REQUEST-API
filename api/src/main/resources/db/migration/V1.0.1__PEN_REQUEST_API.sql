@@ -28,3 +28,9 @@ CREATE TABLE PEN_RETRIEVAL_REQUEST_SHEDLOCK
 );
 COMMENT ON TABLE PEN_RETRIEVAL_REQUEST_SHEDLOCK IS 'This table is used to achieve distributed lock between pods, for schedulers.';
 
+INSERT INTO PEN_RETRIEVAL_REQUEST_STATUS_CODE (PEN_RETRIEVAL_REQUEST_STATUS_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
+                                               EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
+                                               UPDATE_DATE)
+VALUES ('ABANDONED', 'Abandoned', 'email not verified within 1 week.', 8,
+        to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/GRCHWELO',
+        to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/GRCHWELO', to_date('2019-11-07', 'YYYY-MM-DD'));

@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.penrequest.support;
 
 import ca.bc.gov.educ.api.penrequest.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.penrequest.messaging.MessageSubscriber;
-import ca.bc.gov.educ.api.penrequest.poll.EventTaskScheduler;
+import ca.bc.gov.educ.api.penrequest.schedulers.EventTaskScheduler;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

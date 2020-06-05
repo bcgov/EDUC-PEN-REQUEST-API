@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.penrequest.poll;
+package ca.bc.gov.educ.api.penrequest.schedulers;
 
 import ca.bc.gov.educ.api.penrequest.constants.EventOutcome;
 import ca.bc.gov.educ.api.penrequest.constants.EventType;
