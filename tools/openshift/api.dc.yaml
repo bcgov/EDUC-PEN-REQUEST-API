@@ -111,8 +111,8 @@ objects:
               secret:
                 secretName: pen-request-api-cert
             - name: flb-sc-config-volume
-                configMap:
-                  name: flb-sc-config-map
+              configMap:
+                name: flb-sc-config-map
       test: false
       triggers:
         - type: ConfigChange
