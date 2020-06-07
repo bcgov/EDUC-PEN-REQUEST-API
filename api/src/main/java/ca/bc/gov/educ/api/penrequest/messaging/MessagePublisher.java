@@ -34,11 +34,11 @@ public class MessagePublisher implements Closeable {
   @Autowired
   public MessagePublisher(final ApplicationProperties applicationProperties, final EventHandlerService eventHandlerService) throws IOException, InterruptedException {
     this.eventHandlerService = eventHandlerService;
-    Options options = new Options.Builder().maxPingsOut(100)
-            .natsUrl(applicationProperties.getNatsUrl())
-            .clusterId(applicationProperties.getNatsClusterId())
-            .connectionLostHandler(this::connectionLostHandler)
-            .clientId("pen-request-api-publisher" + UUID.randomUUID().toString()).build();
+    Options options = new Options.Builder()
+        .natsUrl(applicationProperties.getNatsUrl())
+        .clusterId(applicationProperties.getNatsClusterId())
+        .connectionLostHandler(this::connectionLostHandler)
+        .clientId("pen-request-api-publisher" + UUID.randomUUID().toString()).build();
     connectionFactory = new StreamingConnectionFactory(options);
     connection = connectionFactory.createConnection();
   }
@@ -91,6 +91,7 @@ public class MessagePublisher implements Closeable {
         try {
           log.trace("retrying connection as connection was lost :: retrying ::" + numOfRetries++);
           connection = connectionFactory.createConnection();
+          log.info("successfully reconnected after {} attempts", numOfRetries);
           break;
         } catch (IOException | InterruptedException ex) {
           log.error("exception occurred", ex);

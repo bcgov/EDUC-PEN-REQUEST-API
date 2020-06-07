@@ -37,12 +37,12 @@ public class MessageSubscriber {
   @Getter(PRIVATE)
   private final EventHandlerService eventHandlerService;
   private StreamingConnection connection;
-  private StreamingConnectionFactory connectionFactory;
+  private final StreamingConnectionFactory connectionFactory;
 
   @Autowired
   public MessageSubscriber(final ApplicationProperties applicationProperties, final EventHandlerService eventHandlerService) throws IOException, InterruptedException {
     this.eventHandlerService = eventHandlerService;
-    Options options = new Options.Builder().maxPingsOut(100)
+    Options options = new Options.Builder()
             .natsUrl(applicationProperties.getNatsUrl())
             .clusterId(applicationProperties.getNatsClusterId())
             .clientId("pen-request-api-subscriber" + UUID.randomUUID().toString())
@@ -86,6 +86,7 @@ public class MessageSubscriber {
         try {
           log.trace("retrying connection as connection was lost :: retrying ::" + numOfRetries++);
           connection = connectionFactory.createConnection();
+          log.info("successfully reconnected after {} attempts", numOfRetries);
           this.subscribe();
           break;
         } catch (IOException | InterruptedException | TimeoutException ex) {
