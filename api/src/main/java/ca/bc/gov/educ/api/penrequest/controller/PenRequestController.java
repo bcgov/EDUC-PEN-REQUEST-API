@@ -107,13 +107,6 @@ public class PenRequestController extends BaseController implements PenRequestEn
 
   @Override
   @Transactional
-  public ResponseEntity<Void> deleteAll() {
-    getService().deleteAll();
-    return ResponseEntity.noContent().build();
-  }
-
-  @Override
-  @Transactional
   public ResponseEntity<Void> deleteById(final UUID id) {
     getService().deleteById(id);
     return ResponseEntity.noContent().build();
