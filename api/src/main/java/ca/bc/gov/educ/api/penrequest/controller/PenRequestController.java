@@ -186,6 +186,9 @@ public class PenRequestController extends BaseController implements PenRequestEn
       case DATE:
         penRequestSpecs = penRequestFilterSpecs.getDateTypeSpecification(key, value, filterOperation);
         break;
+      case UUID:
+        penRequestSpecs = penRequestFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
+        break;
       default:
         break;
     }
