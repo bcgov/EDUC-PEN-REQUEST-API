@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -18,14 +19,16 @@ public class PenRequestFilterSpecs {
   private final FilterSpecifications<PenRequestEntity, Integer> integerFilterSpecifications;
   private final FilterSpecifications<PenRequestEntity, String> stringFilterSpecifications;
   private final FilterSpecifications<PenRequestEntity, Long> longFilterSpecifications;
+  private final FilterSpecifications<PenRequestEntity, UUID> uuidFilterSpecifications;
   private final Converters converters;
 
-  public PenRequestFilterSpecs(FilterSpecifications<PenRequestEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<PenRequestEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<PenRequestEntity, Integer> integerFilterSpecifications, FilterSpecifications<PenRequestEntity, String> stringFilterSpecifications, FilterSpecifications<PenRequestEntity, Long> longFilterSpecifications, Converters converters) {
+  public PenRequestFilterSpecs(FilterSpecifications<PenRequestEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<PenRequestEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<PenRequestEntity, Integer> integerFilterSpecifications, FilterSpecifications<PenRequestEntity, String> stringFilterSpecifications, FilterSpecifications<PenRequestEntity, Long> longFilterSpecifications, FilterSpecifications<PenRequestEntity, UUID> uuidFilterSpecifications, Converters converters) {
     this.dateFilterSpecifications = dateFilterSpecifications;
     this.dateTimeFilterSpecifications = dateTimeFilterSpecifications;
     this.integerFilterSpecifications = integerFilterSpecifications;
     this.stringFilterSpecifications = stringFilterSpecifications;
     this.longFilterSpecifications = longFilterSpecifications;
+    this.uuidFilterSpecifications = uuidFilterSpecifications;
     this.converters = converters;
   }
 
@@ -48,7 +51,9 @@ public class PenRequestFilterSpecs {
   public Specification<PenRequestEntity> getStringTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
     return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(String.class), stringFilterSpecifications);
   }
-
+  public Specification<PenRequestEntity> getUUIDTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
+    return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(UUID.class), uuidFilterSpecifications);
+  }
   private <T extends Comparable<T>> Specification<PenRequestEntity> getSpecification(String fieldName,
                                                                                      String filterValue,
                                                                                      FilterOperation filterOperation,
