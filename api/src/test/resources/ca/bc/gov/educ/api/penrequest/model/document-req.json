@@ -1,7 +1,7 @@
 {
     "documentTypeCode": "BCSCPHOTO",
     "fileName": "card.jpg",
-    "fileExtension": "jpg",
+    "fileExtension": "image/jpeg",
     "fileSize": "8",
     "documentData": "TXkgY2FyZCE="
 }
