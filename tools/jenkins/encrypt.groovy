@@ -1,7 +1,7 @@
 @GrabResolver(name='bintray', root='https://dl.bintray.com/terl/lazysodium-maven')
+@GrabConfig(systemClassLoader = true) 
 @Grab('com.goterl.lazycode:lazysodium-java:4.3.0')
 @Grab('info.picocli:picocli:2.0.3')
-@GrabConfig(systemClassLoader = true) 
 @picocli.groovy.PicocliScript
 
 import com.goterl.lazycode.lazysodium.LazySodiumJava;
