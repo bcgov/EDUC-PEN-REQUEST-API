@@ -145,8 +145,8 @@ def saveSecret(String token, String name, String publicKeyId, String secret) {
   echo "saved a secret in Github Actions!"
 }
 
-
-@Grab('com.goterl.lazycode:lazysodium-java:4.3.0')
+@GrabConfig(systemClassLoader=true)
+@Grab('com.goterl.lazycode:lazysodium-java:4.2.6')
 
 import com.goterl.lazycode.lazysodium.LazySodiumJava;
 import com.goterl.lazycode.lazysodium.SodiumJava;
