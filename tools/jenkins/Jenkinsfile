@@ -108,14 +108,18 @@ pipeline{
           dir('tools/jenkins'){
             withCredentials([string(credentialsId: "${TOOLS}-github-actions-token", variable: 'TOKEN')]) {
               def clientSecret = sh( script: "bash ./get-clientsecret.sh", returnStdout: true).trim()
+              nodejs(nodeJSInstallationName: 'node12') {
+                sh 'node -v'
+              }
+
               // def encryptHelper = evaluate readFile('encrypt.groovy')
-              def (publicKeyId, publicKey) = getRepoPublicKey(TOKEN)
-              saveSecret(TOKEN, 'SOAM_DISCOVERY_URL', publicKeyId, encrypt("https://${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca/auth/realms/master/.well-known/openid-configuration", publicKey))
-              saveSecret(TOKEN, 'SOAM_CLIENT_ID', publicKeyId, encrypt("${APP_NAME}-it", publicKey))
-              saveSecret(TOKEN, 'SOAM_CLIENT_SECRET', publicKeyId, encrypt(clientSecret, publicKey))
-              saveSecret(TOKEN, 'API_URL', publicKeyId, encrypt("https://${APP_NAME}-${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca", publicKey))
-              extJSHelper.triggerWorkflow(TOKEN, 'integration-test')
-              extJSHelper.waitForWorkflowRunComplete(TOKEN)
+              // def (publicKeyId, publicKey) = getRepoPublicKey(TOKEN)
+              // saveSecret(TOKEN, 'SOAM_DISCOVERY_URL', publicKeyId, encrypt("https://${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca/auth/realms/master/.well-known/openid-configuration", publicKey))
+              // saveSecret(TOKEN, 'SOAM_CLIENT_ID', publicKeyId, encrypt("${APP_NAME}-it", publicKey))
+              // saveSecret(TOKEN, 'SOAM_CLIENT_SECRET', publicKeyId, encrypt(clientSecret, publicKey))
+              // saveSecret(TOKEN, 'API_URL', publicKeyId, encrypt("https://${APP_NAME}-${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca", publicKey))
+              // extJSHelper.triggerWorkflow(TOKEN, 'integration-test')
+              // extJSHelper.waitForWorkflowRunComplete(TOKEN)
             }
           }
         }
@@ -143,34 +147,4 @@ def saveSecret(String token, String name, String publicKeyId, String secret) {
   def response = httpRequest customHeaders: [[name: 'Authorization', value: "token ${token}"], [name: 'Accept', value: "application/vnd.github.ant-man-preview+json"]], contentType: 'APPLICATION_JSON', httpMode: 'PUT', requestBody: dispatchRequest, url: "https://api.github.com/repos/${OWNER}/${TESTS_REPO_NAME}/actions/secrets/${name}"
   echo "saveSecret Status: ${response.status}"
   echo "saved a secret in Github Actions!"
-}
-
-// @GrabConfig(systemClassLoader=true)
-// @Grab('com.goterl.lazycode:lazysodium-java:4.2.6')
-loadGrapes()
-
-import com.goterl.lazycode.lazysodium.LazySodiumJava;
-import com.goterl.lazycode.lazysodium.SodiumJava;
-import com.goterl.lazycode.lazysodium.exceptions.SodiumException;
-import com.goterl.lazycode.lazysodium.interfaces.SecretBox;
-import com.goterl.lazycode.lazysodium.utils.Key;
-
-import javax.xml.bind.DatatypeConverter;
-import java.nio.charset.StandardCharsets;
-
-def encrypt(String textToEncrypt, String key) {
-    def lazySodium = new LazySodiumJava(new SodiumJava(), StandardCharsets.UTF_8);
-    def secretBoxLazy = (SecretBox.Lazy) lazySodium;
-
-    byte[] nonceBytes = lazySodium.nonce(SecretBox.NONCEBYTES);
-    String nonceHexString = DatatypeConverter.printHexBinary(nonceBytes);
-    
-    def encryptedMessage = secretBoxLazy.cryptoSecretBoxEasy(textToEncrypt, nonceBytes, Key.fromBase64String(key));
-    return DatatypeConverter.parseHexBinary(encryptedMessage).encodeBase64().toString();
-}
-
-def loadGrapes(){
-    ClassLoader classLoader = new groovy.lang.GroovyClassLoader()
-    Map[] grapez = [[group : 'com.goterl.lazycode', module : 'lazysodium-java', version : '4.2.6']]
-    Grape.grab(classLoader: classLoader, grapez)
 }
