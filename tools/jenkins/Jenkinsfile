@@ -145,8 +145,9 @@ def saveSecret(String token, String name, String publicKeyId, String secret) {
   echo "saved a secret in Github Actions!"
 }
 
-@GrabConfig(systemClassLoader=true)
-@Grab('com.goterl.lazycode:lazysodium-java:4.2.6')
+// @GrabConfig(systemClassLoader=true)
+// @Grab('com.goterl.lazycode:lazysodium-java:4.2.6')
+loadGrapes()
 
 import com.goterl.lazycode.lazysodium.LazySodiumJava;
 import com.goterl.lazycode.lazysodium.SodiumJava;
@@ -166,4 +167,10 @@ def encrypt(String textToEncrypt, String key) {
     
     def encryptedMessage = secretBoxLazy.cryptoSecretBoxEasy(textToEncrypt, nonceBytes, Key.fromBase64String(key));
     return DatatypeConverter.parseHexBinary(encryptedMessage).encodeBase64().toString();
+}
+
+def loadGrapes(){
+    ClassLoader classLoader = new groovy.lang.GroovyClassLoader()
+    Map[] grapez = [[group : 'com.goterl.lazycode', module : 'lazysodium-java', version : '4.2.6']]
+    Grape.grab(classLoader: classLoader, grapez)
 }
