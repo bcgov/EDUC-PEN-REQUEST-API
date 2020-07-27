@@ -1,5 +1,6 @@
 pipeline{
    agent any
+   tools {nodejs "node12"}
    environment{
       extJSHelper = '';
       DEBUG_OUTPUT = 'false'
@@ -108,9 +109,7 @@ pipeline{
           dir('tools/jenkins'){
             withCredentials([string(credentialsId: "${TOOLS}-github-actions-token", variable: 'TOKEN')]) {
               def clientSecret = sh( script: "bash ./get-clientsecret.sh", returnStdout: true).trim()
-              nodejs(nodeJSInstallationName: 'node12') {
-                sh 'node -v'
-              }
+              sh 'node -v'
 
               // def encryptHelper = evaluate readFile('encrypt.groovy')
               // def (publicKeyId, publicKey) = getRepoPublicKey(TOKEN)
