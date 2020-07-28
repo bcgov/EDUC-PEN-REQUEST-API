@@ -109,7 +109,7 @@ pipeline{
             withCredentials([string(credentialsId: "${TOOLS}-github-actions-token", variable: 'TOKEN')]) {
               def clientSecret = sh( script: "bash ./get-clientsecret.sh", returnStdout: true).trim()
               sh "bash ./download-github-tools.sh"
-              sh "/tmp/github-tools/bin/github-tools createSecret --help"
+              sh "/tmp/github-tools/bin/github-tools createSecret \"${TOKEN}\" \"${TOKEN}\" \"${TOKEN}\" SOAM_DISCOVERY_URL \"https://${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca/auth/realms/master/.well-known/openid-configuration\""
 
               // def encryptHelper = evaluate readFile('encrypt.groovy')
               // def (publicKeyId, publicKey) = getRepoPublicKey(TOKEN)
