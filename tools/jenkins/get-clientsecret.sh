@@ -21,4 +21,4 @@ getPenRequestItClientSecret(){
     executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients/$penRequestItClientID/client-secret -r $SOAM_KC_REALM_ID | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
 }
 penRequestItClientSecret=$(getPenRequestItClientSecret)
-echo penRequestItClientSecret
+echo "$penRequestItClientSecret"
