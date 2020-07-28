@@ -47,61 +47,61 @@ pipeline{
         }
       }
     }
-    // stage('Build App') {
-    //   steps {
-    //     script {
-    //       openshift.withCluster() {
-    //         openshift.withProject(TOOLS) {
-    //           try {
-    //             echo "Building API..."
-    //             def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}-${JOB_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
-    //             openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
+    stage('Build App') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(TOOLS) {
+              try {
+                echo "Building API..."
+                def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}-${JOB_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+                openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
 
-    //             openshift.tag("${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${JOB_NAME}")
-    //           } catch (e) {
-    //             echo "API build failed"
-    //             throw e
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    //   post {
-    //     success {
-    //       echo 'Cleanup BuildConfigs'
-    //       script {
-    //           openshift.withCluster() {
-    //             openshift.withProject(TOOLS) {
-    //               def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
+                openshift.tag("${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${JOB_NAME}")
+              } catch (e) {
+                echo "API build failed"
+                throw e
+              }
+            }
+          }
+        }
+      }
+      post {
+        success {
+          echo 'Cleanup BuildConfigs'
+          script {
+              openshift.withCluster() {
+                openshift.withProject(TOOLS) {
+                  def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
 
-    //               if(bcApi.exists()) {
-    //                   echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
-    //                   bcApi.delete()
-    //               }
-    //             }
-    //           }
-    //         }
-    //     }
-    //     failure {
-    //       echo 'Build stage failed'
-    //     }
-    //   }
-    // }
-	  // stage('Promote and configure DEV') {
-    //   steps{
-    //     script{
-    //         extJSHelper.performApiDeploy(STAGING_ENV, TARGET_ENVIRONMENT, REPO_NAME, APP_NAME, JOB_NAME, TAG, TOOLS, TARGET_ENVIRONMENT, APP_DOMAIN, DC_URL, MIN_REPLICAS, MAX_REPLICAS, MIN_CPU, MAX_CPU, MIN_MEM, MAX_MEM, TARGET_ENV, NAMESPACE)
-    //     }
-    //   }
-    //   post{
-    //     success{
-    //       echo 'Deployment to Dev was successful'
-    //     }
-    //     failure{
-    //       echo 'Deployment to Dev failed'
-    //     }
-    //   }
-    // }
+                  if(bcApi.exists()) {
+                      echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
+                      bcApi.delete()
+                  }
+                }
+              }
+            }
+        }
+        failure {
+          echo 'Build stage failed'
+        }
+      }
+    }
+	  stage('Promote and configure DEV') {
+      steps{
+        script{
+            extJSHelper.performApiDeploy(STAGING_ENV, TARGET_ENVIRONMENT, REPO_NAME, APP_NAME, JOB_NAME, TAG, TOOLS, TARGET_ENVIRONMENT, APP_DOMAIN, DC_URL, MIN_REPLICAS, MAX_REPLICAS, MIN_CPU, MAX_CPU, MIN_MEM, MAX_MEM, TARGET_ENV, NAMESPACE)
+        }
+      }
+      post{
+        success{
+          echo 'Deployment to Dev was successful'
+        }
+        failure{
+          echo 'Deployment to Dev failed'
+        }
+      }
+    }
     stage('Integration Test') {
       steps {
         script {
@@ -124,25 +124,4 @@ pipeline{
       }
     }
   }
-}
-
-def getRepoPublicKey(String token) {
-  def response = httpRequest customHeaders: [[name: 'Authorization', value: "token ${token}"], [name: 'Accept', value: "application/vnd.github.ant-man-preview+json"]], url: "https://api.github.com/repos/${OWNER}/${TESTS_REPO_NAME}/actions/secrets/public-key"
-  echo "getRepoPublicKey Status: ${response.status}"
-  //echo "Content: ${response.content}"
-  def jsonObj = readJSON text: response.content
-  [jsonObj.key_id ,jsonObj.key]
-}
-
-
-def saveSecret(String token, String name, String publicKeyId, String secret) {
-  def dispatchRequest = """
-    {
-      "key_id": "${publicKeyId}",
-      "encrypted_value": "${secret}"
-    }
-  """
-  def response = httpRequest customHeaders: [[name: 'Authorization', value: "token ${token}"], [name: 'Accept', value: "application/vnd.github.ant-man-preview+json"]], contentType: 'APPLICATION_JSON', httpMode: 'PUT', requestBody: dispatchRequest, url: "https://api.github.com/repos/${OWNER}/${TESTS_REPO_NAME}/actions/secrets/${name}"
-  echo "saveSecret Status: ${response.status}"
-  echo "saved a secret in Github Actions!"
 }
