@@ -4,7 +4,7 @@ OPENSHIFT_NAMESPACE=$2
 SOAM_KC_REALM_ID="master"
 KCADM_FILE_BIN_FOLDER="/tmp/keycloak-9.0.3/bin"
 
-oc project "$OPENSHIFT_NAMESPACE"-"$envValue"
+oc project "$OPENSHIFT_NAMESPACE"-"$envValue" > /dev/null 2>&1
 
 SOAM_KC_LOAD_USER_ADMIN=$(oc -o json get secret sso-admin-"${envValue}" | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
 SOAM_KC_LOAD_USER_PASS=$(oc -o json get secret sso-admin-"${envValue}" | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
