@@ -47,74 +47,67 @@ pipeline{
         }
       }
     }
-    stage('Build App') {
-      steps {
-        script {
-          openshift.withCluster() {
-            openshift.withProject(TOOLS) {
-              try {
-                echo "Building API..."
-                def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}-${JOB_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
-                openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
+    // stage('Build App') {
+    //   steps {
+    //     script {
+    //       openshift.withCluster() {
+    //         openshift.withProject(TOOLS) {
+    //           try {
+    //             echo "Building API..."
+    //             def bcBackend = openshift.process('-f', 'tools/openshift/api.bc.yaml', "REPO_NAME=${REPO_NAME}-${JOB_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+    //             openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
 
-                openshift.tag("${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${JOB_NAME}")
-              } catch (e) {
-                echo "API build failed"
-                throw e
-              }
-            }
-          }
-        }
-      }
-      post {
-        success {
-          echo 'Cleanup BuildConfigs'
-          script {
-              openshift.withCluster() {
-                openshift.withProject(TOOLS) {
-                  def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
+    //             openshift.tag("${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${JOB_NAME}")
+    //           } catch (e) {
+    //             echo "API build failed"
+    //             throw e
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    //   post {
+    //     success {
+    //       echo 'Cleanup BuildConfigs'
+    //       script {
+    //           openshift.withCluster() {
+    //             openshift.withProject(TOOLS) {
+    //               def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
 
-                  if(bcApi.exists()) {
-                      echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
-                      bcApi.delete()
-                  }
-                }
-              }
-            }
-        }
-        failure {
-          echo 'Build stage failed'
-        }
-      }
-    }
-	  stage('Promote and configure DEV') {
-      steps{
-        script{
-            extJSHelper.performApiDeploy(STAGING_ENV, TARGET_ENVIRONMENT, REPO_NAME, APP_NAME, JOB_NAME, TAG, TOOLS, TARGET_ENVIRONMENT, APP_DOMAIN, DC_URL, MIN_REPLICAS, MAX_REPLICAS, MIN_CPU, MAX_CPU, MIN_MEM, MAX_MEM, TARGET_ENV, NAMESPACE)
-        }
-      }
-      post{
-        success{
-          echo 'Deployment to Dev was successful'
-        }
-        failure{
-          echo 'Deployment to Dev failed'
-        }
-      }
-    }
+    //               if(bcApi.exists()) {
+    //                   echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
+    //                   bcApi.delete()
+    //               }
+    //             }
+    //           }
+    //         }
+    //     }
+    //     failure {
+    //       echo 'Build stage failed'
+    //     }
+    //   }
+    // }
+	  // stage('Promote and configure DEV') {
+    //   steps{
+    //     script{
+    //         extJSHelper.performApiDeploy(STAGING_ENV, TARGET_ENVIRONMENT, REPO_NAME, APP_NAME, JOB_NAME, TAG, TOOLS, TARGET_ENVIRONMENT, APP_DOMAIN, DC_URL, MIN_REPLICAS, MAX_REPLICAS, MIN_CPU, MAX_CPU, MIN_MEM, MAX_MEM, TARGET_ENV, NAMESPACE)
+    //     }
+    //   }
+    //   post{
+    //     success{
+    //       echo 'Deployment to Dev was successful'
+    //     }
+    //     failure{
+    //       echo 'Deployment to Dev failed'
+    //     }
+    //   }
+    // }
     stage('Integration Test') {
       steps {
         script {
           dir('tools/jenkins'){
             withCredentials([string(credentialsId: "${TOOLS}-github-actions-token", variable: 'TOKEN')]) {
-              sh "curl https://raw.githubusercontent.com/bcgov/EDUC-INFRA-COMMON/master/openshift/common-deployment/download-kc.sh | bash /dev/stdin \"${NAMESPACE}\""
-              def clientSecret = sh( script: "bash ./get-clientsecret.sh \"${TARGET_ENV}\" \"${NAMESPACE}\"", returnStdout: true).trim()
-              sh "echo \"${clientSecret}\""
-              sh "bash ./download-github-tools.sh"
-              sh "/tmp/github-tools/bin/github-tools createSecret \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" SOAM_DISCOVERY_URL \"https://${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca/auth/realms/master/.well-known/openid-configuration\""
-              sh "/tmp/github-tools/bin/github-tools createSecret \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" SOAM_CLIENT_ID \"${APP_NAME}-it\""
-              sh "/tmp/github-tools/bin/github-tools createSecret \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" SOAM_CLIENT_SECRET \"${clientSecret}\""
-              sh "/tmp/github-tools/bin/github-tools createSecret \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" API_URL \"https://${APP_NAME}-${TARGET_ENVIRONMENT}.pathfinder.gov.bc.ca\""
+              sh "bash ./save-integration-test-secrets.sh \"${TARGET_ENV}\" \"${NAMESPACE}\" \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" \"${TARGET_ENVIRONMENT}\" \"${APP_NAME}\""
 
               extJSHelper.triggerWorkflow(TOKEN, 'integration-test')
               extJSHelper.waitForWorkflowRunComplete(TOKEN)
