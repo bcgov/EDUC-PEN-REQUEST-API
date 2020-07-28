@@ -107,8 +107,7 @@ pipeline{
         script {
           dir('tools/jenkins'){
             withCredentials([string(credentialsId: "${TOOLS}-github-actions-token", variable: 'TOKEN')]) {
-              sh "bash ./save-integration-test-secrets.sh \"${TARGET_ENV}\" \"${NAMESPACE}\" \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" \"${TARGET_ENVIRONMENT}\" \"${APP_NAME}\" pen-request-api-it"
-
+              sh "curl https://raw.githubusercontent.com/bcgov/EDUC-INFRA-COMMON/master/openshift/common-deployment/save-integration-test-secrets.sh | bash /dev/stdin \"${TARGET_ENV}\" \"${NAMESPACE}\" \"${TOKEN}\" \"${OWNER}\" \"${REPO_NAME}\" \"${TARGET_ENVIRONMENT}\" \"${APP_NAME}\" pen-request-api-it"
               extJSHelper.triggerWorkflow(TOKEN, 'integration-test')
               extJSHelper.waitForWorkflowRunComplete(TOKEN)
             }
