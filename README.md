@@ -8,8 +8,7 @@ The backend API logic for the PEN Request application
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=bugs)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
 ## Documentation
-* [Online PEN Request API Spec](https://penrequest.docs.apiary.io/)
-* [PEN Registry Wiki](https://github.com/bcgov/EDUC-PEN/wiki)
+* https://pen-request-api-mvubjx-dev.pathfinder.gov.bc.ca/swagger-ui/index.html?url=/v3/api-docs
 
 ## Before deployment
 In order to deploy this project into OpenShift, you must create a config-map by running the following command (be sure to replace the values in curly brackets with actual values):
