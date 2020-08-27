@@ -2,7 +2,11 @@
 The backend API logic for the PEN Request application
 
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=bcgov_EDUC-PEN-REQUEST-API)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
-
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=coverage)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=ncloc)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=bugs)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
 ## Documentation
 * [Online PEN Request API Spec](https://penrequest.docs.apiary.io/)
 * [PEN Registry Wiki](https://github.com/bcgov/EDUC-PEN/wiki)
