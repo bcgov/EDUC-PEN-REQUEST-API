@@ -1,7 +1,7 @@
 # EDUC-PEN-REQUEST-API
 The backend API logic for the PEN Request application
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-PEN-REQUEST-API&metric=alert_status)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=bcgov_EDUC-PEN-REQUEST-API)](https://sonarcloud.io/dashboard?id=bcgov_EDUC-PEN-REQUEST-API)
 
 ## Documentation
 * [Online PEN Request API Spec](https://penrequest.docs.apiary.io/)
