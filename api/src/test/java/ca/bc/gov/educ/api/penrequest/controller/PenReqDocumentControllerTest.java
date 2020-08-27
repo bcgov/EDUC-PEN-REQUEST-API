@@ -7,11 +7,13 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
+import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,6 +111,40 @@ public class PenReqDocumentControllerTest {
             .andExpect(jsonPath("$.documentData").doesNotExist())
             .andExpect(jsonPath("$.penRequestID").doesNotExist());
   }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
+  public void updateDocumentTest() throws Exception {
+    var result = this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(Files.readAllBytes(new ClassPathResource(
+            "../model/document-req.json", PenReqDocumentControllerTest.class).getFile().toPath()))
+        .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andDo(print())
+        .andExpect(jsonPath("$.documentID", not(is(this.documentID.toString()))))
+        .andExpect(jsonPath("$.documentTypeCode", is("BCSCPHOTO")))
+        .andExpect(jsonPath("$.documentData").doesNotExist())
+        .andExpect(jsonPath("$.penRequestID").doesNotExist()).andReturn();
+    assertThat(result).isNotNull();
+    assertThat(result.getResponse().getContentAsString()).isNotBlank();
+    assertThat(result.getResponse().getContentType()).isEqualTo("application/json");
+    PenReqDocMetadata penReqDocMetadata = JsonUtil.getJsonObjectFromString(PenReqDocMetadata.class,result.getResponse().getContentAsString());
+    penReqDocMetadata.setCreateDate(null);
+    penReqDocMetadata.setFileExtension("pdf");
+    this.mvc.perform(put("/" + this.penReqID.toString() + "/documents/"+penReqDocMetadata.getDocumentID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(JsonUtil.getJsonStringFromObject(penReqDocMetadata))
+        .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(jsonPath("$.documentID", not(is(this.documentID.toString()))))
+        .andExpect(jsonPath("$.documentTypeCode", is("BCSCPHOTO")))
+        .andExpect(jsonPath("$.fileExtension", is("pdf")))
+        .andExpect(jsonPath("$.documentData").doesNotExist())
+        .andExpect(jsonPath("$.penRequestID").doesNotExist());
+  }
+
 
   @Test
   @WithMockOAuth2Scope(scope = "WRITE_DOCUMENT")
@@ -242,7 +278,7 @@ public class PenReqDocumentControllerTest {
             .andExpect(jsonPath("$.documentData").doesNotExist());
 
 
-    assertThat(repository.findById(this.documentID).isPresent()).isFalse();
+    assertThat(repository.findById(this.documentID)).isEmpty();
   }
 
   @Test

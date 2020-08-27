@@ -1,4 +1,5 @@
 package ca.bc.gov.educ.api.penrequest.messaging;
+
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.service.EventHandlerService;
 import ca.bc.gov.educ.api.penrequest.struct.Event;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -34,12 +34,10 @@ import static lombok.AccessLevel.PRIVATE;
 @Component
 @Slf4j
 @SuppressWarnings("java:S2142")
-public class MessageSubscriber  implements Closeable {
+public class MessageSubscriber extends MessagePubSub {
 
   @Getter(PRIVATE)
   private final EventHandlerService eventHandlerService;
-  private StreamingConnection connection;
-  private final StreamingConnectionFactory connectionFactory;
 
   @Autowired
   public MessageSubscriber(final ApplicationProperties applicationProperties, final EventHandlerService eventHandlerService) throws IOException, InterruptedException {
@@ -77,17 +75,17 @@ public class MessageSubscriber  implements Closeable {
     }
   }
 
-
   /**
    * This method will keep retrying for a connection.
    */
 
-  private void connectionLostHandler(StreamingConnection streamingConnection, Exception e) {
+  protected int connectionLostHandler(StreamingConnection streamingConnection, Exception e) {
+    int numOfRetries = 1;
     if (e != null) {
-      int numOfRetries = 1;
-      numOfRetries = retryConnection(numOfRetries);
+      numOfRetries = super.connectionLostHandler(streamingConnection,e);
       retrySubscription(numOfRetries);
     }
+    return numOfRetries;
   }
 
   private void retrySubscription(int numOfRetries) {
@@ -106,39 +104,6 @@ public class MessageSubscriber  implements Closeable {
           log.error("InterruptedException occurred while retrying subscription", exc);
         }
       }
-    }
-  }
-
-  private int retryConnection(int numOfRetries) {
-    while (true) {
-      try {
-        log.trace("retrying connection as connection was lost :: retrying ::" + numOfRetries++);
-        connection = connectionFactory.createConnection();
-        log.info("successfully reconnected after {} attempts", numOfRetries);
-        break;
-      } catch (IOException | InterruptedException ex) {
-        log.error("exception occurred", ex);
-        try {
-          double sleepTime = (2 * numOfRetries);
-          TimeUnit.SECONDS.sleep((long) sleepTime);
-        } catch (InterruptedException exc) {
-          log.error("exception occurred", exc);
-        }
-      }
-    }
-    return numOfRetries;
-  }
-
-  @Override
-  public void close() {
-    if(connection != null){
-      log.info("closing nats connection in the subscriber...");
-      try {
-        connection.close();
-      } catch (IOException | TimeoutException | InterruptedException e) {
-        log.error("error while closing nats connection in the subscriber...", e);
-      }
-      log.info("nats connection closed in the subscriber...");
     }
   }
 }

@@ -65,7 +65,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo;
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
             .setControllerAdvice(new RestExceptionHandler()).build();
@@ -222,7 +222,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
@@ -247,7 +247,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     Map<String, String> sortMap = new HashMap<>();
@@ -267,7 +267,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     SearchCriteria criteria = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.EQUAL).value("Katina").valueType(ValueType.STRING).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
@@ -289,7 +289,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.EQUAL).value("Medling").valueType(ValueType.STRING).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
@@ -311,7 +311,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     String fromDate = "2020-04-01T00:00:01";
     String toDate = "2020-04-15T00:00:01";
@@ -335,7 +335,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     String fromDate = "2020-04-01T00:00:01";
     String toDate = "2020-04-15T00:00:01";
@@ -363,7 +363,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
-    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<List<PenRequest>>() {
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.CONTAINS_IGNORE_CASE).value("j").valueType(ValueType.STRING).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
