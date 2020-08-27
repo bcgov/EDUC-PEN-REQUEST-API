@@ -4,11 +4,9 @@ import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocTypeCode;
 import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +16,7 @@ import java.util.UUID;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping("/")
-@OpenAPIDefinition(info = @Info(title = "API for Pen Request Documents.", description = "This API is for Pen Request Documents.", version = "1"), 
-                  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_DOCUMENT", "WRITE_DOCUMENT", "DELETE_DOCUMENT", "READ_DOCUMENT_REQUIREMENTS", "READ_DOCUMENT_TYPES"})})
+@Tag(name = "API for Pen Request Documents.", description = "This API is for Pen Request Documents.")
 public interface PenReqDocumentEndpoint {
 
   @GetMapping("/{penRequestID}/documents/{documentID}")
