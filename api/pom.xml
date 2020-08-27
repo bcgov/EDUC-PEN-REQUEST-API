@@ -14,7 +14,8 @@
     <sonar.exclusions>src/main/resources/**,
       src/main/java/ca/bc/gov/educ/api/penrequest/mappers/**,src/main/java/ca/bc/gov/educ/api/penrequest/exception/**,src/main/java/ca/bc/gov/educ/api/penrequest/model/**,src/main/java/ca/bc/gov/educ/api/penrequest/struct/**
     </sonar.exclusions>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco.exec</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <jacoco.dataFile>${project.build.directory}/site/jacoco/jacoco.xml</jacoco.dataFile>
     <java.version>11</java.version>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.version>3.8.0</maven.compiler.version>
