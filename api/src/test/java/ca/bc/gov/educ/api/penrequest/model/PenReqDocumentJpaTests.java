@@ -1,9 +1,8 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Optional;
-
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
+import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +11,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
-import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
-import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -48,7 +47,7 @@ public class PenReqDocumentJpaTests {
     @Test
     public void findDocumentTest() {
         Optional<DocumentEntity> myDocument = this.repository.findById(this.document.getDocumentID());
-        assertThat(myDocument.isPresent()).isTrue();
+        assertThat(myDocument).isPresent();
         assertThat(myDocument.get().getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
     }
 
@@ -61,7 +60,7 @@ public class PenReqDocumentJpaTests {
         assertThat(savedDocument.getDocumentID()).isNotEqualTo(this.document.getDocumentID());
         assertThat(savedDocument.getPenRequest()).isNotNull();
 
-        assertThat(this.repository.findById(savedDocument.getDocumentID()).isPresent()).isTrue();
+        assertThat(this.repository.findById(savedDocument.getDocumentID())).isPresent();
     }
 
     @Test
@@ -78,6 +77,6 @@ public class PenReqDocumentJpaTests {
     @Test
     public void deleteDocumentTest() {
         this.repository.deleteById(this.document.getDocumentID());
-        assertThat(this.repository.findById(this.document.getDocumentID()).isPresent()).isFalse();
+        assertThat(this.repository.findById(this.document.getDocumentID())).isEmpty();
     }
 }

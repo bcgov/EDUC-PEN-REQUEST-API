@@ -79,6 +79,7 @@ public class MessageSubscriber extends MessagePubSub {
    * This method will keep retrying for a connection.
    */
 
+  @Override
   protected int connectionLostHandler(StreamingConnection streamingConnection, Exception e) {
     int numOfRetries = 1;
     if (e != null) {

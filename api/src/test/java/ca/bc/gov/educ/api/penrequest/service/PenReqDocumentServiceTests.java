@@ -88,16 +88,18 @@ public class PenReqDocumentServiceTests {
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidDocumentIdGivenTest() {
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, UUID.randomUUID()))
+    UUID randomGuid =  UUID.randomUUID();
+    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, randomGuid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidPenRequestIdGivenTest() {
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(UUID.randomUUID(), bcscPhoto.getDocumentID()))
-            .isInstanceOf(EntityNotFoundException.class)
-            .hasMessageContaining("DocumentEntity");
+    UUID randomGuid = UUID.randomUUID();
+    assertThatThrownBy(() -> service.retrieveDocumentMetadata(randomGuid, randomGuid))
+        .isInstanceOf(EntityNotFoundException.class)
+        .hasMessageContaining("DocumentEntity");
   }
 
   @Test
@@ -124,7 +126,7 @@ public class PenReqDocumentServiceTests {
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
-    assertThat(retrievedDocument.getDocumentData()).isEqualTo(null);
+    assertThat(retrievedDocument.getDocumentData()).isNull();
   }
 
   @Test
@@ -145,14 +147,15 @@ public class PenReqDocumentServiceTests {
   public void deleteDocumentTest() {
     DocumentEntity deletedDocument = service.deleteDocument(this.penRequestID, this.bcscPhoto.getDocumentID());
     assertThat(deletedDocument).isNotNull();
-
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, this.bcscPhoto.getDocumentID()))
+    UUID guid =  this.bcscPhoto.getDocumentID();
+    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, guid))
             .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
   public void deleteDocumentThrowsExceptionWhenInvalidIdGivenTest() {
-    assertThatThrownBy(() -> service.deleteDocument(this.penRequestID, UUID.randomUUID()))
+    UUID guid =  UUID.randomUUID();
+    assertThatThrownBy(() -> service.deleteDocument(this.penRequestID, guid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }

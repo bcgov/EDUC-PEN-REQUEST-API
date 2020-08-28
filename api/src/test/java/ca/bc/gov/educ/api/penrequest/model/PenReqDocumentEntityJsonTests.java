@@ -59,9 +59,8 @@ public class PenReqDocumentEntityJsonTests {
         assertThat(json).hasJsonPathStringValue("@.documentID");
         assertThat(json).extractingJsonPathStringValue("@.documentTypeCode")
             .isEqualToIgnoringCase("BCSCPHOTO");
-        assertThat(json).doesNotHaveJsonPathValue("@.documentData");
+        assertThat(json).doesNotHaveJsonPathValue("@.documentData").doesNotHaveJsonPathValue("@.penRequest");
         
-        assertThat(json).doesNotHaveJsonPathValue("@.penRequest");
     }
 
     @Test

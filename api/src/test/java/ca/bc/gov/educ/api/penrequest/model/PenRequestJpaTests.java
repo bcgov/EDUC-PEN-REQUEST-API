@@ -33,7 +33,7 @@ public class PenRequestJpaTests {
         assertThat(savedPenRequest.getPenRequestID()).isNotNull();
         assertThat(savedPenRequest.getInitialSubmitDate()).isNull();
 
-        assertThat(this.repository.findById(savedPenRequest.getPenRequestID()).isPresent()).isTrue();
+        assertThat(this.repository.findById(savedPenRequest.getPenRequestID())).isPresent();
     }
    
 }
