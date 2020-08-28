@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,8 +38,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -398,6 +397,25 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
         .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
+
+  @Test
+  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
+  public void testReadPenRequestPaginated_givenOperationTypeNull_ShouldReturnStatusOk() throws Exception {
+    var file = new File(
+        Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    SearchCriteria criteria = SearchCriteria.builder().key("digitalID").operation(null).value("fdf94a22-51e3-4816-8665-9f8571af1be4").valueType(ValueType.UUID).build();
+    List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    var objectMapper = new ObjectMapper();
+    String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+    this.mockMvc.perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+  }
+
   private PenRequestStatusCodeEntity createPenReqStatus() {
     PenRequestStatusCodeEntity entity = new PenRequestStatusCodeEntity();
     entity.setPenRequestStatusCode("INITREV");
