@@ -77,7 +77,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
   @Test
   @WithMockOAuth2Scope(scope = "READ_PEN_REQ_MACRO")
   public void testRetrievePenRequestMacros_GivenInvalidMacroID_ShouldReturnStatusNotFound() throws Exception {
-    this.mockMvc.perform(get("/pen-request-macro" + UUID.randomUUID().toString())).andDo(print()).andExpect(status().isNotFound());
+    this.mockMvc.perform(get("/pen-request-macro/" + UUID.randomUUID().toString())).andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
