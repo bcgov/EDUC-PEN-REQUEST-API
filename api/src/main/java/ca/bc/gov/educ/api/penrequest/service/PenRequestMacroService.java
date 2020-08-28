@@ -58,7 +58,7 @@ public class PenRequestMacroService {
     if (result.isPresent()) {
       return getPenRequestMacroRepository().save(entity);
     } else {
-      throw new EntityNotFoundException(entity.getClass(), macroId.toString());
+      throw new EntityNotFoundException(entity.getClass(),"macroId", macroId.toString());
     }
   }
 }
