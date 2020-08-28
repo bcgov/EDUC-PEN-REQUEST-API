@@ -101,6 +101,21 @@ public class EventHandlerServiceTest {
     assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(DB_COMMITTED.toString());
     assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_FOUND.toString());
   }
+  @Test
+  public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenPenRequestExistAndDuplicateSagaMessage_shouldHaveEventOutcomePEN__REQUEST__FOUND() {
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+
+    var sagaId = UUID.randomUUID();
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(GET_PEN_REQUEST.toString()).eventOutcome(PEN_REQUEST_FOUND.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    penRequestEventRepository.save(penRequestEvent);
+
+    final Event event = Event.builder().eventType(GET_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(entity.getPenRequestID().toString()).build();
+    eventHandlerServiceUnderTest.handleEvent(event);
+    var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, GET_PEN_REQUEST.toString());
+    assertThat(penReqEventUpdated).isPresent();
+    assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(DB_COMMITTED.toString());
+    assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_FOUND.toString());
+  }
 
   @Test
   public void testHandleEvent_givenEventTypeUPDATE__PENREQUEST__whenPenRequestDoNotExist_shouldHaveEventOutcomePEN__REQUEST__NOT__FOUND() throws JsonProcessingException {
@@ -121,6 +136,22 @@ public class EventHandlerServiceTest {
     entity.setCompleteComment("Manual");
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder().eventType(UPDATE_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(entity))).build();
+    eventHandlerServiceUnderTest.handleEvent(event);
+    var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, UPDATE_PEN_REQUEST.toString());
+    assertThat(penReqEventUpdated).isPresent();
+    assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(DB_COMMITTED.toString());
+    assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_UPDATED.toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeUPDATE__PENREQUEST__whenPenRequestExistAndDuplicateSagaMessage_shouldHaveEventOutcomePEN__REQUEST__FOUND() {
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+
+    var sagaId = UUID.randomUUID();
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(UPDATE_PEN_REQUEST.toString()).eventOutcome(PEN_REQUEST_UPDATED.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    penRequestEventRepository.save(penRequestEvent);
+
+    final Event event = Event.builder().eventType(UPDATE_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(entity.getPenRequestID().toString()).build();
     eventHandlerServiceUnderTest.handleEvent(event);
     var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, UPDATE_PEN_REQUEST.toString());
     assertThat(penReqEventUpdated).isPresent();
@@ -165,6 +196,48 @@ public class EventHandlerServiceTest {
     assertThat(penReqEventUpdated).isPresent();
     assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(DB_COMMITTED.toString());
     assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_COMMENT_ALREADY_EXIST.toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeADD__PENREQUEST__COMMENT_whenDuplicateSagaMessage_shouldHaveEventOutcomePEN__REQUEST__COMMENT__ADDED() throws JsonProcessingException {
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+    PenRequestCommentsEntity penRequestCommentsEntity = new PenRequestCommentsEntity();
+    penRequestCommentsEntity.setPenRetrievalRequestID(entity.getPenRequestID());
+    penRequestCommentsEntity.setCommentContent("Please provide other ID..");
+    penRequestCommentsEntity.setCommentTimestamp(LocalDateTime.now());
+    penRequestCommentsEntity.setCreateUser("API");
+    penRequestCommentsEntity.setUpdateUser("API");
+
+    var sagaId = UUID.randomUUID();
+
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(ADD_PEN_REQUEST_COMMENT.toString()).eventOutcome(PEN_REQUEST_COMMENT_ADDED.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    penRequestEventRepository.save(penRequestEvent);
+
+    final Event event = Event.builder().eventType(ADD_PEN_REQUEST_COMMENT).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(prcMapper.toStructure(penRequestCommentsEntity))).build();
+    eventHandlerServiceUnderTest.handleEvent(event);
+    var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, ADD_PEN_REQUEST_COMMENT.toString());
+    assertThat(penReqEventUpdated).isPresent();
+    assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(DB_COMMITTED.toString()); // the db status is updated from  MESSAGE_PUBLISHED
+    assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_COMMENT_ADDED.toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeNULL_shouldIgnoreEvent() throws JsonProcessingException {
+    PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
+    PenRequestCommentsEntity penRequestCommentsEntity = new PenRequestCommentsEntity();
+    penRequestCommentsEntity.setPenRetrievalRequestID(entity.getPenRequestID());
+    penRequestCommentsEntity.setCommentContent("Please provide other ID..");
+    penRequestCommentsEntity.setCommentTimestamp(LocalDateTime.now());
+    penRequestCommentsEntity.setCreateUser("API");
+    penRequestCommentsEntity.setUpdateUser("API");
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(null).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(prcMapper.toStructure(penRequestCommentsEntity))).build();
+    eventHandlerServiceUnderTest.handleEvent(event);
+    sagaId = UUID.randomUUID();
+    event.setSagaId(sagaId);
+    eventHandlerServiceUnderTest.handleEvent(event);
+    var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, ADD_PEN_REQUEST_COMMENT.toString());
+    assertThat(penReqEventUpdated).isEmpty();
   }
 
   private PenRequest getPenRequestEntityFromJsonString() {

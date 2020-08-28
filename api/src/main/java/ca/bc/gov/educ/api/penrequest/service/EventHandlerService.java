@@ -175,9 +175,9 @@ public class EventHandlerService {
   private void handlePenReqEventOutboxProcessed(String penRequestEventID) {
     val penRequestEventOptional = getPenRequestEventRepository().findById(UUID.fromString(penRequestEventID));
     if (penRequestEventOptional.isPresent()) {
-      val digIdEvent = penRequestEventOptional.get();
-      digIdEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
-      getPenRequestEventRepository().save(digIdEvent);
+      val penReqEvent = penRequestEventOptional.get();
+      penReqEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
+      getPenRequestEventRepository().save(penReqEvent);
     }
   }
 
