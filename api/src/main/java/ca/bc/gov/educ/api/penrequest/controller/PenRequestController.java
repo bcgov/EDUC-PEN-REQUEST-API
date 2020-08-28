@@ -161,7 +161,7 @@ public class PenRequestController extends BaseController implements PenRequestEn
           }
           i++;
         } else {
-          throw new InvalidParameterException("Search Criteria can not contain null values for", criteria.getKey(), criteria.getOperation().toString(), criteria.getValueType().toString());
+          throw new InvalidParameterException("Search Criteria can not contain null values for key, value and operation type");
         }
       }
     }

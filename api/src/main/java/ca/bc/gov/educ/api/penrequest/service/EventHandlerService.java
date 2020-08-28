@@ -122,7 +122,7 @@ public class EventHandlerService {
   private void handleGetPenRequest(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
-    if (!penRequestEventOptional.isPresent()) {
+    if (penRequestEventOptional.isEmpty()) {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       val optionalPenRequestEntity = getPenRequestRepository().findById(UUID.fromString(event.getEventPayload())); // expect the payload contains the pen request id.
@@ -146,7 +146,7 @@ public class EventHandlerService {
   private void handleUpdatePenRequest(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
-    if (!penRequestEventOptional.isPresent()) {
+    if (penRequestEventOptional.isEmpty()) {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       PenRequestEntity entity = mapper.toModel(JsonUtil.getJsonObjectFromString(PenRequest.class, event.getEventPayload()));
@@ -172,12 +172,12 @@ public class EventHandlerService {
     getPenRequestEventRepository().save(penRequestEvent);
   }
 
-  private void handlePenReqEventOutboxProcessed(String digitalIdEventId) {
-    val digitalIdEvent = getPenRequestEventRepository().findById(UUID.fromString(digitalIdEventId));
-    if (digitalIdEvent.isPresent()) {
-      val digIdEvent = digitalIdEvent.get();
-      digIdEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
-      getPenRequestEventRepository().save(digIdEvent);
+  private void handlePenReqEventOutboxProcessed(String penRequestEventID) {
+    val penRequestEventOptional = getPenRequestEventRepository().findById(UUID.fromString(penRequestEventID));
+    if (penRequestEventOptional.isPresent()) {
+      val penReqEvent = penRequestEventOptional.get();
+      penReqEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
+      getPenRequestEventRepository().save(penReqEvent);
     }
   }
 
