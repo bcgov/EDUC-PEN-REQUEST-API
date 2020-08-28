@@ -29,9 +29,6 @@ public class PenRequestMacroService {
     this.penRequestMacroTypeCodeRepository = penRequestMacroTypeCodeRepository;
   }
 
-  public List<PenRequestMacroTypeCodeEntity> findAllMacroTypeCodes() {
-    return getPenRequestMacroTypeCodeRepository().findAll();
-  }
 
   public Optional<PenRequestMacroTypeCodeEntity> getMacroTypeCode(String code) {
     return getPenRequestMacroTypeCodeRepository().findById(code);
