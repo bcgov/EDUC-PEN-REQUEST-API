@@ -11,7 +11,7 @@
   <properties>
     <!-- Enable language to disable other language analysis -->
     <sonar.language>java</sonar.language>
-    <sonar.exclusions>src/main/resources/**,src/main/java/ca/bc/gov/educ/api/penrequest/endpoint,
+    <sonar.exclusions>src/main/resources/**,src/main/java/ca/bc/gov/educ/api/penrequest/endpoint/**,
       src/main/java/ca/bc/gov/educ/api/penrequest/mappers/**,src/main/java/ca/bc/gov/educ/api/penrequest/exception/**,src/main/java/ca/bc/gov/educ/api/penrequest/model/**,src/main/java/ca/bc/gov/educ/api/penrequest/struct/**
     </sonar.exclusions>
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
