@@ -29,9 +29,6 @@ public class PenRequestMacroService {
     this.penRequestMacroTypeCodeRepository = penRequestMacroTypeCodeRepository;
   }
 
-  public List<PenRequestMacroTypeCodeEntity> findAllMacroTypeCodes() {
-    return getPenRequestMacroTypeCodeRepository().findAll();
-  }
 
   public Optional<PenRequestMacroTypeCodeEntity> getMacroTypeCode(String code) {
     return getPenRequestMacroTypeCodeRepository().findById(code);
@@ -58,7 +55,7 @@ public class PenRequestMacroService {
     if (result.isPresent()) {
       return getPenRequestMacroRepository().save(entity);
     } else {
-      throw new EntityNotFoundException(entity.getClass(), macroId.toString());
+      throw new EntityNotFoundException(entity.getClass(),"macroId", macroId.toString());
     }
   }
 }
