@@ -59,7 +59,7 @@ public class EventTaskScheduler {
     }
   }
 
-  private byte[] penRequestEventProcessed(PenRequestEvent penRequestEvent) throws JsonProcessingException {
+  protected byte[] penRequestEventProcessed(PenRequestEvent penRequestEvent) throws JsonProcessingException {
     Event event = Event.builder()
             .sagaId(penRequestEvent.getSagaId())
             .eventType(EventType.valueOf(penRequestEvent.getEventType()))
@@ -68,7 +68,7 @@ public class EventTaskScheduler {
     return JsonUtil.getJsonStringFromObject(event).getBytes();
   }
 
-  private byte[] createOutboxEvent(PenRequestEvent penRequestEvent) throws JsonProcessingException {
+  protected byte[] createOutboxEvent(PenRequestEvent penRequestEvent) throws JsonProcessingException {
     Event event = Event.builder().eventType(PEN_REQUEST_EVENT_OUTBOX_PROCESSED).eventPayload(penRequestEvent.getEventId().toString()).build();
     return JsonUtil.getJsonStringFromObject(event).getBytes();
   }
