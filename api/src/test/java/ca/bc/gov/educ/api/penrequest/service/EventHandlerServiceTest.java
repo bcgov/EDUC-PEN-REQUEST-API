@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.service;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEvent;
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestEventRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
@@ -42,6 +43,8 @@ public class EventHandlerServiceTest {
   private PenRequestEventRepository penRequestEventRepository;
   @Autowired
   private PenRequestCommentRepository penRequestCommentRepository;
+  @Autowired
+  private DocumentRepository documentRepository;
 
   @Autowired
   private EventHandlerService eventHandlerServiceUnderTest;
@@ -52,6 +55,7 @@ public class EventHandlerServiceTest {
   }
   @After
   public void tearDown(){
+    documentRepository.deleteAll();
     penRequestCommentRepository.deleteAll();
     penRequestRepository.deleteAll();
     penRequestEventRepository.deleteAll();
