@@ -55,7 +55,7 @@ public class PenRequestMacroController extends BaseController implements PenRequ
     if (result.isPresent()) {
       return mapper.toStructure(result.get());
     }
-    throw new EntityNotFoundException(PenRequestMacro.class, macroId.toString());
+    throw new EntityNotFoundException(PenRequestMacro.class, "macroId", macroId.toString());
   }
 
   @Override
