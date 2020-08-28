@@ -54,7 +54,7 @@ public class PenRequestPayloadValidator {
 
   protected void validateGenderCode(PenRequest penRequest, List<FieldError> apiValidationErrors) {
     if (penRequest.getGenderCode() != null) {
-      Optional<GenderCodeEntity> genderCodeEntity = penRequestService.findGenderCode(penRequest.getGenderCode());
+      Optional<GenderCodeEntity> genderCodeEntity = getPenRequestService().findGenderCode(penRequest.getGenderCode());
       if (genderCodeEntity.isEmpty()) {
         apiValidationErrors.add(createFieldError(GENDER_CODE, penRequest.getGenderCode(), "Invalid Gender Code."));
       } else if (genderCodeEntity.get().getEffectiveDate() != null && genderCodeEntity.get().getEffectiveDate().isAfter(LocalDateTime.now())) {
