@@ -17,6 +17,6 @@ public class PenRequestMVCConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(penRequestRequestInterceptor).addPathPatterns("/**/**/");
+        registry.addInterceptor(penRequestRequestInterceptor).addPathPatterns("/**");
     }
 }
