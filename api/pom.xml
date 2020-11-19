@@ -162,11 +162,6 @@
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.nats</groupId>
-      <artifactId>java-nats-streaming</artifactId>
-      <version>2.2.3</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.sonarsource.scanner.maven/sonar-maven-plugin -->
     <dependency>
       <groupId>org.sonarsource.scanner.maven</groupId>
@@ -179,6 +174,11 @@
       <artifactId>jacoco-maven-plugin</artifactId>
       <version>0.8.4</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.nats</groupId>
+      <artifactId>nats-spring-boot-starter</artifactId>
+      <version>0.4.0</version>
     </dependency>
   </dependencies>
 
