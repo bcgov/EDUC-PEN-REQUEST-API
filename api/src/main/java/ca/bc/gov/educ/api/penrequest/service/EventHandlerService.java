@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,7 @@ public class EventHandlerService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Async("subscriberExecutor")
   public void handleEvent(Event event) {
     try {
       switch (event.getEventType()) {

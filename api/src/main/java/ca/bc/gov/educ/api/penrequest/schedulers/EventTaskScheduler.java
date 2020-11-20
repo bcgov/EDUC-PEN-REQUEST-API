@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.penrequest.constants.EventStatus.DB_COMMITTED;
 import static ca.bc.gov.educ.api.penrequest.constants.EventType.PEN_REQUEST_EVENT_OUTBOX_PROCESSED;
@@ -42,7 +41,7 @@ public class EventTaskScheduler {
   @Scheduled(cron = "0/1 * * * * *")
   @SchedulerLock(name = "EventTablePoller",
           lockAtLeastFor = "900ms", lockAtMostFor = "950ms")
-  public void pollEventTableAndPublish() throws InterruptedException, IOException, TimeoutException {
+  public void pollEventTableAndPublish() throws IOException {
     List<PenRequestEvent> events = getPenRequestEventRepository().findByEventStatus(DB_COMMITTED.toString());
     if (!events.isEmpty()) {
       for (PenRequestEvent event : events) {
@@ -51,7 +50,7 @@ public class EventTaskScheduler {
             getMessagePubSub().dispatchMessage(event.getReplyChannel(), penRequestEventProcessed(event));
           }
           getMessagePubSub().dispatchMessage(PEN_REQUEST_API_TOPIC.toString(), createOutboxEvent(event));
-        } catch (InterruptedException | TimeoutException | IOException e) {
+        } catch (IOException e) {
           log.error("exception occurred", e);
           throw e;
         }
