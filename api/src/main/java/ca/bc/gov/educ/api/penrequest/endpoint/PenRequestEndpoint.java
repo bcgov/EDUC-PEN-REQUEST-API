@@ -123,6 +123,7 @@ public interface PenRequestEndpoint {
   @GetMapping("/paginated")
   @Async
   @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+  @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   CompletableFuture<Page<PenRequest>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
