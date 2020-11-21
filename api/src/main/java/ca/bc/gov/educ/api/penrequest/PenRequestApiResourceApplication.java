@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -25,7 +24,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "1s")
 @EnableRetry
-@EnableAsync
 public class PenRequestApiResourceApplication {
 
   public static void main(String[] args) {
