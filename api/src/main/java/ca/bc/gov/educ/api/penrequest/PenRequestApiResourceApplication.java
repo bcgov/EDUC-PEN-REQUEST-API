@@ -24,6 +24,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "1s")
 @EnableRetry
+@EnableAsync
 public class PenRequestApiResourceApplication {
 
   public static void main(String[] args) {
