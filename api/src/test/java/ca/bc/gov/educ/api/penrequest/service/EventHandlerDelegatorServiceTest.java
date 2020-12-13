@@ -49,6 +49,8 @@ public class EventHandlerDelegatorServiceTest {
   private PenRequestCommentRepository penRequestCommentRepository;
 
   @Autowired
+  private DocumentRepository documentRepository;
+  @Autowired
   MessagePublisher messagePublisher;
 
   @Autowired
@@ -67,6 +69,7 @@ public class EventHandlerDelegatorServiceTest {
 
   @After
   public void tearDown() {
+    documentRepository.deleteAll();
     penRequestCommentRepository.deleteAll();
     penRequestEventRepository.deleteAll();
     penRequestRepository.deleteAll();
