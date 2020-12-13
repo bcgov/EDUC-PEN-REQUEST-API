@@ -13,4 +13,8 @@ public class JsonUtil {
   public static <T> T getJsonObjectFromString(Class<T> clazz,  String payload) throws JsonProcessingException {
     return new ObjectMapper().readValue(payload,clazz);
   }
+
+  public static byte[] getJsonSBytesFromObject(Object payload) throws JsonProcessingException {
+    return new ObjectMapper().writeValueAsBytes(payload);
+  }
 }

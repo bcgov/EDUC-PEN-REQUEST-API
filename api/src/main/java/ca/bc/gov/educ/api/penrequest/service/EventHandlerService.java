@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.constants.EventOutcome;
+import ca.bc.gov.educ.api.penrequest.constants.EventType;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestCommentsMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
@@ -37,7 +38,6 @@ public class EventHandlerService {
   public static final String NO_RECORD_SAGA_ID_EVENT_TYPE = "no record found for the saga id and event type combination, processing";
   public static final String RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE = "record found for the saga id and event type combination, might be a duplicate or replay," +
           " just updating the db status so that it will be polled and sent back again.";
-  public static final String PAYLOAD_LOG = "payload is :: {}";
   public static final String EVENT_PAYLOAD = "event is :: {}";
   @Getter(PRIVATE)
   private final PenRequestRepository penRequestRepository;
@@ -55,41 +55,9 @@ public class EventHandlerService {
     this.penRequestCommentRepository = penRequestCommentRepository;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  @Async("subscriberExecutor")
-  public void handleEvent(Event event) {
-    try {
-      switch (event.getEventType()) {
-        case PEN_REQUEST_EVENT_OUTBOX_PROCESSED:
-          log.info("received outbox processed event :: ");
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
-          handlePenReqEventOutboxProcessed(event.getEventPayload());
-          break;
-        case UPDATE_PEN_REQUEST:
-          log.info("received UPDATE_PEN_REQUEST event :: ");
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
-          handleUpdatePenRequest(event);
-          break;
-        case GET_PEN_REQUEST:
-          log.info("received GET_PEN_REQUEST event :: ");
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
-          handleGetPenRequest(event);
-          break;
-        case ADD_PEN_REQUEST_COMMENT:
-          log.info("received ADD_PEN_REQUEST_COMMENT event :: ");
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
-          handleAddPenRequestComment(event);
-          break;
-        default:
-          log.info("silently ignoring other events.");
-          break;
-      }
-    } catch (final Exception e) {
-      log.error("Exception", e);
-    }
-  }
 
-  private void handleAddPenRequestComment(Event event) throws JsonProcessingException {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public byte[] handleAddPenRequestComment(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (penRequestEventOptional.isEmpty()) {
@@ -116,12 +84,14 @@ public class EventHandlerService {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
-      penRequestEvent.setEventStatus(DB_COMMITTED.toString());
+      penRequestEvent.setUpdateDate(LocalDateTime.now());
     }
     getPenRequestEventRepository().save(penRequestEvent);
+    return createResponseEvent(penRequestEvent);
   }
 
-  private void handleGetPenRequest(Event event) throws JsonProcessingException {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public byte[] handleGetPenRequest(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (penRequestEventOptional.isEmpty()) {
@@ -140,12 +110,14 @@ public class EventHandlerService {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
-      penRequestEvent.setEventStatus(DB_COMMITTED.toString());
+      penRequestEvent.setUpdateDate(LocalDateTime.now());
     }
     getPenRequestEventRepository().save(penRequestEvent);
+    return createResponseEvent(penRequestEvent);
   }
 
-  private void handleUpdatePenRequest(Event event) throws JsonProcessingException {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public byte[] handleUpdatePenRequest(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
     PenRequestEvent penRequestEvent;
     if (penRequestEventOptional.isEmpty()) {
@@ -169,19 +141,21 @@ public class EventHandlerService {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       penRequestEvent = penRequestEventOptional.get();
-      penRequestEvent.setEventStatus(DB_COMMITTED.toString());
+      penRequestEvent.setUpdateDate(LocalDateTime.now());
     }
     getPenRequestEventRepository().save(penRequestEvent);
+    return createResponseEvent(penRequestEvent);
   }
 
-  private void handlePenReqEventOutboxProcessed(String penRequestEventID) {
-    val penRequestEventOptional = getPenRequestEventRepository().findById(UUID.fromString(penRequestEventID));
-    if (penRequestEventOptional.isPresent()) {
-      val penReqEvent = penRequestEventOptional.get();
-      penReqEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
-      getPenRequestEventRepository().save(penReqEvent);
-    }
+  private byte[] createResponseEvent(PenRequestEvent penRequestEvent) throws JsonProcessingException {
+    Event responseEvent = Event.builder()
+      .sagaId(penRequestEvent.getSagaId())
+      .eventType(EventType.valueOf(penRequestEvent.getEventType()))
+      .eventOutcome(EventOutcome.valueOf(penRequestEvent.getEventOutcome()))
+      .eventPayload(penRequestEvent.getEventPayload()).build();
+    return JsonUtil.getJsonSBytesFromObject(responseEvent);
   }
+
 
 
   private PenRequestEvent createPenRequestEvent(Event event) {
@@ -193,7 +167,7 @@ public class EventHandlerService {
             .eventPayload(event.getEventPayload())
             .eventType(event.getEventType().toString())
             .sagaId(event.getSagaId())
-            .eventStatus(DB_COMMITTED.toString())
+            .eventStatus(MESSAGE_PUBLISHED.toString())
             .eventOutcome(event.getEventOutcome().toString())
             .replyChannel(event.getReplyTo())
             .build();
