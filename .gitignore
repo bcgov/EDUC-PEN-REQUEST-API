@@ -24,7 +24,7 @@ application-dev.properties
 *.tar.gz
 *.rar
 
-.iml
+*.iml
 bin/*
 target/*
 .sts4-cache
