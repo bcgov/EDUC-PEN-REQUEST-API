@@ -96,7 +96,9 @@ public class EventHandlerServiceTest {
     PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
 
     var sagaId = UUID.randomUUID();
-    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(GET_PEN_REQUEST.toString()).eventOutcome(PEN_REQUEST_FOUND.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(GET_PEN_REQUEST.toString())
+      .eventPayload(entity.getPenRequestID().toString()).eventOutcome(PEN_REQUEST_FOUND.toString()).eventStatus(MESSAGE_PUBLISHED.toString())
+      .createDate(LocalDateTime.now()).createUser("TEST").build();
     penRequestEventRepository.save(penRequestEvent);
 
     final Event event = Event.builder().eventType(GET_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(entity.getPenRequestID().toString()).build();
@@ -138,7 +140,9 @@ public class EventHandlerServiceTest {
     PenRequestEntity entity = penRequestRepository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
 
     var sagaId = UUID.randomUUID();
-    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(UPDATE_PEN_REQUEST.toString()).eventOutcome(PEN_REQUEST_UPDATED.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(UPDATE_PEN_REQUEST.toString())
+      .eventPayload(entity.getPenRequestID().toString()).eventOutcome(PEN_REQUEST_UPDATED.toString()).eventStatus(MESSAGE_PUBLISHED.toString())
+      .createDate(LocalDateTime.now()).createUser("TEST").build();
     penRequestEventRepository.save(penRequestEvent);
 
     final Event event = Event.builder().eventType(UPDATE_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(entity.getPenRequestID().toString()).build();
@@ -199,11 +203,14 @@ public class EventHandlerServiceTest {
     penRequestCommentsEntity.setUpdateUser("API");
 
     var sagaId = UUID.randomUUID();
+    var payload = JsonUtil.getJsonStringFromObject(prcMapper.toStructure(penRequestCommentsEntity));
 
-    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(ADD_PEN_REQUEST_COMMENT.toString()).eventOutcome(PEN_REQUEST_COMMENT_ADDED.toString()).eventStatus(MESSAGE_PUBLISHED.toString()).createDate(LocalDateTime.now()).createUser("TEST").build();
+    var penRequestEvent = PenRequestEvent.builder().sagaId(sagaId).replyChannel(STUDENT_PROFILE_SAGA_API_TOPIC).eventType(ADD_PEN_REQUEST_COMMENT.toString())
+      .eventPayload(payload).eventOutcome(PEN_REQUEST_COMMENT_ADDED.toString()).eventStatus(MESSAGE_PUBLISHED.toString())
+      .createDate(LocalDateTime.now()).createUser("TEST").build();
     penRequestEventRepository.save(penRequestEvent);
 
-    final Event event = Event.builder().eventType(ADD_PEN_REQUEST_COMMENT).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(prcMapper.toStructure(penRequestCommentsEntity))).build();
+    final Event event = Event.builder().eventType(ADD_PEN_REQUEST_COMMENT).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(payload).build();
     eventHandlerServiceUnderTest.handleAddPenRequestComment(event);
     var penReqEventUpdated = penRequestEventRepository.findBySagaIdAndEventType(sagaId, ADD_PEN_REQUEST_COMMENT.toString());
     assertThat(penReqEventUpdated).isPresent();
