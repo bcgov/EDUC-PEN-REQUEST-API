@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class EventHandlerDelegatorService {
+  public static final String RESPONDING_BACK_TO_NATS_ON_CHANNEL = "responding back to NATS on {} channel ";
   private final MessagePublisher messagePublisher;
   private final EventHandlerService eventHandlerService;
   public static final String PAYLOAD_LOG = "payload is :: {}";
@@ -29,18 +30,21 @@ public class EventHandlerDelegatorService {
           log.info("received UPDATE_PEN_REQUEST event :: ");
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleUpdatePenRequest(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
         case GET_PEN_REQUEST:
           log.info("received GET_PEN_REQUEST event :: ");
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleGetPenRequest(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
         case ADD_PEN_REQUEST_COMMENT:
           log.info("received ADD_PEN_REQUEST_COMMENT event :: ");
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleAddPenRequestComment(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
         default:
