@@ -27,21 +27,21 @@ public class EventHandlerDelegatorService {
     try {
       switch (event.getEventType()) {
         case UPDATE_PEN_REQUEST:
-          log.info("received UPDATE_PEN_REQUEST event :: ");
+          log.info("received UPDATE_PEN_REQUEST event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleUpdatePenRequest(event);
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
         case GET_PEN_REQUEST:
-          log.info("received GET_PEN_REQUEST event :: ");
+          log.info("received GET_PEN_REQUEST event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleGetPenRequest(event);
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
         case ADD_PEN_REQUEST_COMMENT:
-          log.info("received ADD_PEN_REQUEST_COMMENT event :: ");
+          log.info("received ADD_PEN_REQUEST_COMMENT event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleAddPenRequestComment(event);
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
