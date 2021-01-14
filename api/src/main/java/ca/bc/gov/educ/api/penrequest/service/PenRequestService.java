@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestStatusCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.*;
+import ca.bc.gov.educ.api.penrequest.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -73,6 +74,7 @@ public class PenRequestService {
   public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.DRAFT.toString());
     penRequest.setStatusUpdateDate(LocalDateTime.now());
+    TransformUtil.uppercaseFields(penRequest);
     return getPenRequestRepository().save(penRequest);
   }
 
@@ -116,6 +118,7 @@ public class PenRequestService {
       PenRequestEntity newPenRequest = curPenRequest.get();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
+      TransformUtil.uppercaseFields(penRequest);
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
