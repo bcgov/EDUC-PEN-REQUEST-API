@@ -118,7 +118,7 @@ public class PenRequestService {
       PenRequestEntity newPenRequest = curPenRequest.get();
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
-      TransformUtil.uppercaseFields(penRequest);
+      TransformUtil.uppercaseFields(newPenRequest);
       newPenRequest = penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
