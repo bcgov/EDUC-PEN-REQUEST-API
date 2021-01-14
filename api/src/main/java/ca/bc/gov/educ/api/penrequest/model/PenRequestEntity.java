@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
+import ca.bc.gov.educ.api.penrequest.utils.UpperCase;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
@@ -35,12 +36,15 @@ public class PenRequestEntity {
   @Column(name = "pen_retrieval_request_status_code")
   String penRequestStatusCode;
 
+  @UpperCase
   @Column(name = "legal_first_name")
   String legalFirstName;
 
+  @UpperCase
   @Column(name = "legal_middle_names")
   String legalMiddleNames;
 
+  @UpperCase
   @NotNull(message = "legalLastName cannot be null")
   @Column(name = "legal_last_name")
   String legalLastName;
@@ -48,39 +52,51 @@ public class PenRequestEntity {
   @Column(name = "dob")
   LocalDate dob;
 
+  @UpperCase
   @Column(name = "gender_code")
   String genderCode;
 
+  @UpperCase
   @Column(name = "usual_first_name")
   String usualFirstName;
 
+  @UpperCase
   @Column(name = "usual_middle_names")
   String usualMiddleName;
 
+  @UpperCase
   @Column(name = "usual_last_name")
   String usualLastName;
 
+  @UpperCase
   @Column(name = "email")
   String email;
 
+  @UpperCase
   @Column(name = "email_verified")
   String emailVerified;
-  
+
+  @UpperCase
   @Column(name = "maiden_name")
   String maidenName;
 
+  @UpperCase
   @Column(name = "past_names")
   String pastNames;
 
+  @UpperCase
   @Column(name = "last_bc_school")
   String lastBCSchool;
 
+  @UpperCase
   @Column(name = "last_bc_school_student_number")
   String lastBCSchoolStudentNumber;
 
+  @UpperCase
   @Column(name = "current_school")
   String currentSchool;
 
+  @UpperCase
   @Column(name = "reviewer")
   String reviewer;
 
@@ -118,6 +134,7 @@ public class PenRequestEntity {
   @Column(name = "PEN")
   String pen;
 
+  @UpperCase
   @Column(name = "demog_changed")
   String demogChanged;
 
