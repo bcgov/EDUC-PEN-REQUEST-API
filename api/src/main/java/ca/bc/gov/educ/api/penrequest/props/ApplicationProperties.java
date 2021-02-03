@@ -7,20 +7,26 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Getter
 public class ApplicationProperties {
   public static final String CLIENT_ID = "PEN-REQUEST-API";
   public static final String YES = "Y";
   public static final String TRUE = "TRUE";
 
-  @Getter
   @Value("${file.maxsize}")
   private int maxFileSize;
   @Value("${file.extensions}")
-  @Getter
   private List<String> fileExtensions;
 
   @Value("${bcsc.auto.match.outcomes}")
-  @Getter
   private List<String> bcscAutoMatchOutcomes;
 
+  @Value("${nats.server}")
+  private String server;
+
+  @Value("${nats.maxReconnect}")
+  private int maxReconnect;
+
+  @Value("${nats.connectionName}")
+  private String connectionName;
 }
