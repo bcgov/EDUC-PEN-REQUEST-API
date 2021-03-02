@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@EnableResourceServer
 public class PenReqDocumentController extends BaseController implements PenReqDocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;

@@ -35,7 +35,7 @@ public interface PenRequestEndpoint {
    * @param id the id
    * @return the pen request
    */
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST')")
   @GetMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   PenRequest retrievePenRequest(@PathVariable String id);
@@ -48,7 +48,7 @@ public interface PenRequestEndpoint {
    * @param pen       the pen
    * @return the iterable
    */
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST')")
   @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Tag(name = "findPenRequests", description = "This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.")
@@ -60,7 +60,7 @@ public interface PenRequestEndpoint {
    * @param penRequest the pen request
    * @return the pen request
    */
-  @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_PEN_REQUEST')")
   @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
@@ -73,7 +73,7 @@ public interface PenRequestEndpoint {
    * @param penRequest the pen request
    * @return the pen request
    */
-  @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_PEN_REQUEST')")
   @PutMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional
@@ -84,7 +84,7 @@ public interface PenRequestEndpoint {
    *
    * @return the pen request status codes
    */
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST_STATUSES')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST_STATUSES')")
   @GetMapping("/statuses")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<PenRequestStatusCode> getPenRequestStatusCodes();
@@ -94,7 +94,7 @@ public interface PenRequestEndpoint {
    *
    * @return the gender codes
    */
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST_CODES')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST_CODES')")
   @GetMapping("/gender-codes")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<GenderCode> getGenderCodes();
@@ -106,7 +106,7 @@ public interface PenRequestEndpoint {
    * @return the response entity
    */
   @DeleteMapping("/{id}")
-  @PreAuthorize("#oauth2.hasScope('DELETE_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_PEN_REQUEST')")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   ResponseEntity<Void> deleteById(@PathVariable UUID id);
 
@@ -120,7 +120,7 @@ public interface PenRequestEndpoint {
    * @return the completable future
    */
   @GetMapping("/paginated")
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST')")
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   CompletableFuture<Page<PenRequest>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,

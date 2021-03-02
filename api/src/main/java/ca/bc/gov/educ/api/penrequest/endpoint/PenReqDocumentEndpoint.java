@@ -20,37 +20,37 @@ import static org.springframework.http.HttpStatus.CREATED;
 public interface PenReqDocumentEndpoint {
 
   @GetMapping("/{penRequestID}/documents/{documentID}")
-  @PreAuthorize("#oauth2.hasScope('READ_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   PenReqDocument readDocument(@PathVariable String penRequestID, @PathVariable String documentID, @RequestParam(value = "includeDocData", defaultValue = "Y") String includeDocData);
 
   @PostMapping("/{penRequestID}/documents")
-  @PreAuthorize("#oauth2.hasAnyScope('WRITE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
   PenReqDocMetadata createDocument(@PathVariable String penRequestID, @Validated @RequestBody PenReqDocument penReqDocument);
 
   @PutMapping("/{penRequestID}/documents/{documentID}")
-  @PreAuthorize("#oauth2.hasScope('WRITE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   PenReqDocMetadata updateDocument(@PathVariable UUID penRequestID, @PathVariable UUID documentID, @Validated @RequestBody PenReqDocument penReqDocument);
 
   @DeleteMapping("/{penRequestID}/documents/{documentID}")
-  @PreAuthorize("#oauth2.hasScope('DELETE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   PenReqDocMetadata deleteDocument(@PathVariable String penRequestID, @PathVariable String documentID);
 
   @GetMapping("/{penRequestID}/documents")
-  @PreAuthorize("#oauth2.hasScope('READ_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<PenReqDocMetadata> readAllDocumentMetadata(@PathVariable String penRequestID);
 
   @GetMapping("/file-requirements")
-  @PreAuthorize("#oauth2.hasScope('READ_DOCUMENT_REQUIREMENTS')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_REQUIREMENTS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   PenReqDocRequirement getDocumentRequirements();
 
-  @PreAuthorize("#oauth2.hasScope('READ_DOCUMENT_TYPES')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_TYPES')")
   @GetMapping("/document-types")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<PenReqDocTypeCode> getDocumentTypeCodes();
