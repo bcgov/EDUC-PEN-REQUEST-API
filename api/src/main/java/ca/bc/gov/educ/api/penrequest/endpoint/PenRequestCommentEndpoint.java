@@ -16,13 +16,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/")
 public interface PenRequestCommentEndpoint {
 
-  @PreAuthorize("#oauth2.hasScope('READ_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST')")
   @GetMapping("/{penRequestId}/comments")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional
   List<PenRequestComments> retrieveComments(@PathVariable String penRequestId);
 
-  @PreAuthorize("#oauth2.hasScope('WRITE_PEN_REQUEST')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_PEN_REQUEST')")
   @PostMapping("/{penRequestId}/comments")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)

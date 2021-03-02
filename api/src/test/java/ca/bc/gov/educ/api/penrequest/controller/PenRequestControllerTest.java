@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import ca.bc.gov.educ.api.penrequest.exception.RestExceptionHandler;
 import ca.bc.gov.educ.api.penrequest.filter.FilterOperation;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.*;
@@ -12,7 +11,6 @@ import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.SearchCriteria;
 import ca.bc.gov.educ.api.penrequest.struct.ValueType;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
-import ca.bc.gov.educ.api.penrequest.support.WithMockOAuth2Scope;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
@@ -21,13 +19,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -36,17 +34,19 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest
+@AutoConfigureMockMvc
 public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   private static final PenRequestEntityMapper mapper = PenRequestEntityMapper.mapper;
+  @Autowired
   private MockMvc mockMvc;
   @Autowired
   PenRequestController controller;
@@ -66,8 +66,6 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setControllerAdvice(new RestExceptionHandler()).build();
     genderRepo.save(createGenderCodeData());
   }
 
@@ -86,102 +84,114 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenRandomID_ShouldThrowEntityNotFoundException() throws Exception {
-    this.mockMvc.perform(get("/" + UUID.randomUUID())).andDo(print()).andExpect(status().isNotFound());
+    this.mockMvc.perform(get("/" + UUID.randomUUID())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+            .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenValidID_ShouldReturnOkStatus() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
-    this.mockMvc.perform(get("/" + entity.getPenRequestID())).andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.penRequestID").value(entity.getPenRequestID().toString()));
+    this.mockMvc.perform(get("/" + entity.getPenRequestID())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+            .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.penRequestID").value(entity.getPenRequestID().toString()));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testFindPenRequest_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
-    this.mockMvc.perform(get("/?pen" + entity.getPen())).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getPen()));
+    this.mockMvc.perform(get("/?pen" + entity.getPen())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getPen()));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testRetrievePenRequest_GivenRandomDigitalIdAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get("/?digitalID=" + UUID.randomUUID() + "&status=" + "INT")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
+    this.mockMvc.perform(get("/?digitalID=" + UUID.randomUUID() + "&status=" + "INT")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequest_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    this.mockMvc.perform(post("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(post("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJson())).andDo(print()).andExpect(status().isCreated());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequest_GivenInitialSubmitDateInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(post("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithInitialSubmitDate())).andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequest_GivenPenReqIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(post("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testCreatePenRequest_LowercaseEmailVerifiedFlag_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(post("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidEmailVerifiedFlag())).andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testUpdatePenRequest_GivenInvalidPenReqIDInPayload_ShouldReturnStatusNotFound() throws Exception {
-    this.mockMvc.perform(put("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(put("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testUpdatePenRequest_GivenValidPenReqIDInPayload_ShouldReturnStatusOk() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
-    this.mockMvc.perform(put("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(put("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "WRITE_PEN_REQUEST")
   public void testUpdatePenRequest_GivenInvalidDemogChangedInPayload_ShouldReturnBadRequest() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
-    this.mockMvc.perform(put("/").contentType(APPLICATION_JSON)
+    this.mockMvc.perform(put("/")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(dummyPenRequestJsonWithInvalidDemogChanged(penReqId))).andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
   public void testDeletePenRequest_GivenInvalidId_ShouldReturn404() throws Exception {
-    this.mockMvc.perform(delete("/" + UUID.randomUUID().toString()).contentType(APPLICATION_JSON)
+    this.mockMvc.perform(delete("/" + UUID.randomUUID().toString())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
   public void testDeletePenRequest_GivenValidId_ShouldReturn204() throws Exception {
     PenRequestEntity entity = repository.save(mapper.toModel(getPenRequestEntityFromJsonString()));
     String penReqId = entity.getPenRequestID().toString();
-    this.mockMvc.perform(delete("/" + penReqId).contentType(APPLICATION_JSON)
+    this.mockMvc.perform(delete("/" + penReqId)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "DELETE_PEN_REQUEST")
   public void testDeletePenRequest_GivenValidIdWithAssociations_ShouldReturn204() throws Exception {
     PenRequestEntity penRequestEntity = mapper.toModel(getPenRequestEntityFromJsonString());
     penRequestEntity.setPenRequestComments(createPenRequestComments(penRequestEntity));
@@ -194,7 +204,9 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
             .build();
     this.documentRepository.save(document);
     String penReqId = entity.getPenRequestID().toString();
-    this.mockMvc.perform(delete("/" + penReqId).contentType(APPLICATION_JSON)
+    this.mockMvc.perform(delete("/" + penReqId)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_PEN_REQUEST")))
+            .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
   }
 
@@ -209,14 +221,14 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST_STATUSES")
   public void testReadPenRequestStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
     penRequestStatusCodeTableRepo.save(createPenReqStatus());
-    this.mockMvc.perform(get("/statuses")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
+    this.mockMvc.perform(get("/statuses")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATUSES"))))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_Always_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -226,22 +238,22 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
             .perform(get("/paginated?pageSize=2")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_whenNoDataInDB_ShouldReturnStatusOk() throws Exception {
     MvcResult result = mockMvc
             .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(0)));
   }
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginatedWithSorting_Always_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -254,14 +266,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     sortMap.put("legalFirstName", "DESC");
     String sort = new ObjectMapper().writeValueAsString(sortMap);
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("pageNumber","1").param("pageSize", "5").param("sort", sort)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("pageNumber","1").param("pageSize", "5").param("sort", sort)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(5)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -276,14 +289,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     System.out.println(criteriaJSON);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_GivenLastNameFilter_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -298,14 +312,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     System.out.println(criteriaJSON);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_GivenSubmitDateBetween_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -322,14 +337,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     System.out.println(criteriaJSON);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_GivenFirstAndLast_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -350,14 +366,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     System.out.println(criteriaJSON);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_LegalLastNameFilterIgnoreCase_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
             Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -372,13 +389,14 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     System.out.println(criteriaJSON);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-            .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+            .perform(get("/paginated")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                    .param("searchCriteriaList", criteriaJSON)
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_digitalID_ShouldReturnStatusOk() throws Exception {
     var file = new File(
         Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -392,14 +410,15 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     MvcResult result = mockMvc
-        .perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+        .perform(get("/paginated")
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+                .param("searchCriteriaList", criteriaJSON)
             .contentType(APPLICATION_JSON))
         .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
   @Test
-  @WithMockOAuth2Scope(scope = "READ_PEN_REQUEST")
   public void testReadPenRequestPaginated_givenOperationTypeNull_ShouldReturnStatusOk() throws Exception {
     var file = new File(
         Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
@@ -412,7 +431,9 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     var objectMapper = new ObjectMapper();
     String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
     repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    this.mockMvc.perform(get("/paginated").param("searchCriteriaList", criteriaJSON)
+    this.mockMvc.perform(get("/paginated")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST")))
+            .param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
