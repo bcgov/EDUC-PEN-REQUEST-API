@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -27,7 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableRetry
 public class PenRequestApiResourceApplication {
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     SpringApplication.run(PenRequestApiResourceApplication.class, args);
   }
 
@@ -48,7 +49,7 @@ public class PenRequestApiResourceApplication {
     }
 
     @Override
-    public void configure(WebSecurity web) {
+    public void configure(final WebSecurity web) {
       web.ignoring().antMatchers("/v3/api-docs/**",
               "/actuator/health", "/actuator/prometheus",
               "/swagger-ui/**", "/health");
@@ -56,13 +57,26 @@ public class PenRequestApiResourceApplication {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
       http
-              .authorizeRequests()
-              .anyRequest().authenticated().and()
-              .oauth2ResourceServer().jwt();
+          .authorizeRequests()
+          .anyRequest().authenticated().and()
+          .oauth2ResourceServer().jwt();
     }
   }
+
   @Bean
-  public LockProvider lockProvider(@Autowired JdbcTemplate jdbcTemplate, @Autowired PlatformTransactionManager transactionManager) {
+  public LockProvider lockProvider(@Autowired final JdbcTemplate jdbcTemplate, @Autowired final PlatformTransactionManager transactionManager) {
     return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "PEN_RETRIEVAL_REQUEST_SHEDLOCK");
+  }
+
+  /**
+   * Thread pool task scheduler thread pool task scheduler.
+   *
+   * @return the thread pool task scheduler
+   */
+  @Bean
+  public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+    final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+    threadPoolTaskScheduler.setPoolSize(2);
+    return threadPoolTaskScheduler;
   }
 }

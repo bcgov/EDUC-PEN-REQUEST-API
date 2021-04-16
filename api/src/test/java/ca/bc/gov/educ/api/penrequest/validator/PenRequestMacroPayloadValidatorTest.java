@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
+import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestMacroTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroTypeCodeRepository;
@@ -9,23 +10,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-public class PenRequestMacroPayloadValidatorTest {
+public class PenRequestMacroPayloadValidatorTest extends BasePenRequestAPITest {
 
   @Autowired
   PenRequestMacroTypeCodeRepository penRequestMacroTypeCodeRepository;
@@ -40,44 +34,44 @@ public class PenRequestMacroPayloadValidatorTest {
 
   @Before
   public void before() {
-    penRequestMacroTypeCodeRepository.deleteAll();
-    penRequestMacroService = new PenRequestMacroService(penRequestMacroRepository, penRequestMacroTypeCodeRepository);
-    penRequestMacroPayloadValidator = new PenRequestMacroPayloadValidator(penRequestMacroService);
+    this.penRequestMacroTypeCodeRepository.deleteAll();
+    this.penRequestMacroService = new PenRequestMacroService(this.penRequestMacroRepository, this.penRequestMacroTypeCodeRepository);
+    this.penRequestMacroPayloadValidator = new PenRequestMacroPayloadValidator(this.penRequestMacroService);
   }
 
   @Test
   public void testValidatePayload_WhenMacroIdGivenForPost_ShouldAddAnErrorTOTheReturnedList() {
-    val errorList = penRequestMacroPayloadValidator.validatePayload(getPenRequestMacroEntityFromJsonString(), true);
+    val errorList = this.penRequestMacroPayloadValidator.validatePayload(this.getPenRequestMacroEntityFromJsonString(), true);
     assertEquals(2, errorList.size());
     assertEquals("macroId should be null for post operation.", errorList.get(0).getDefaultMessage());
   }
   @Test
   public void testValidatePayload_WhenMacroTypeCodeIsInvalid_ShouldAddAnErrorTOTheReturnedList() {
-    val entity = getPenRequestMacroEntityFromJsonString();
+    val entity = this.getPenRequestMacroEntityFromJsonString();
     entity.setMacroId(null);
-    val errorList = penRequestMacroPayloadValidator.validatePayload(entity, true);
+    val errorList = this.penRequestMacroPayloadValidator.validatePayload(entity, true);
     assertEquals(1, errorList.size());
     assertEquals("macroTypeCode Invalid.", errorList.get(0).getDefaultMessage());
   }
 
   @Test
   public void testValidatePayload_WhenMacroTypeCodeIsNotEffective_ShouldAddAnErrorTOTheReturnedList() {
-    val macroTypeCode = createPenReqMacroTypeCode();
+    val macroTypeCode = this.createPenReqMacroTypeCode();
     macroTypeCode.setEffectiveDate(LocalDate.MAX);
-    penRequestMacroTypeCodeRepository.save(macroTypeCode);
-    val entity = getPenRequestMacroEntityFromJsonString();
-    val errorList = penRequestMacroPayloadValidator.validatePayload(entity, false);
+    this.penRequestMacroTypeCodeRepository.save(macroTypeCode);
+    val entity = this.getPenRequestMacroEntityFromJsonString();
+    val errorList = this.penRequestMacroPayloadValidator.validatePayload(entity, false);
     assertEquals(1, errorList.size());
     assertEquals("macroTypeCode is not yet effective.", errorList.get(0).getDefaultMessage());
   }
   @Test
   public void testValidatePayload_WhenMacroTypeCodeIsExpired_ShouldAddAnErrorTOTheReturnedList() {
-    PenRequestMacroTypeCodeEntity macroTypeCode = createPenReqMacroTypeCode();
+    final PenRequestMacroTypeCodeEntity macroTypeCode = this.createPenReqMacroTypeCode();
     macroTypeCode.setEffectiveDate(LocalDate.now());
     macroTypeCode.setExpiryDate(LocalDate.now().minusDays(1));
-    penRequestMacroTypeCodeRepository.save(macroTypeCode);
-    val entity = getPenRequestMacroEntityFromJsonString();
-    val errorList = penRequestMacroPayloadValidator.validatePayload(entity, false);
+    this.penRequestMacroTypeCodeRepository.save(macroTypeCode);
+    val entity = this.getPenRequestMacroEntityFromJsonString();
+    val errorList = this.penRequestMacroPayloadValidator.validatePayload(entity, false);
     assertEquals(1, errorList.size());
     assertEquals("macroTypeCode is expired.", errorList.get(0).getDefaultMessage());
   }
@@ -109,8 +103,8 @@ public class PenRequestMacroPayloadValidatorTest {
 
   protected PenRequestMacro getPenRequestMacroEntityFromJsonString() {
     try {
-      return new ObjectMapper().readValue(dummyPenRequestMacroJson(), PenRequestMacro.class);
-    } catch (Exception e) {
+      return new ObjectMapper().readValue(this.dummyPenRequestMacroJson(), PenRequestMacro.class);
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }

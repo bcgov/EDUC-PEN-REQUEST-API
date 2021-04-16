@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.repository;
 
 import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -9,6 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface PenRequestCommentRepository extends CrudRepository<PenRequestCommentsEntity, UUID> {
+public interface PenRequestCommentRepository extends JpaRepository<PenRequestCommentsEntity, UUID> {
   Optional<PenRequestCommentsEntity> findByCommentContentAndCommentTimestamp(String commentContent, LocalDateTime commentTimestamp);
 }
