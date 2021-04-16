@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
+import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
@@ -11,11 +12,7 @@ import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,11 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //import javax.transaction.Transactional;
 
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-//@Transactional
-public class PenReqDocumentServiceTests {
+public class PenReqDocumentServiceTests extends BasePenRequestAPITest {
 
   @Autowired
   DocumentService service;
@@ -52,7 +45,7 @@ public class PenReqDocumentServiceTests {
 
   @Before
   public void setUp() {
-    DocumentTypeCodeBuilder.setUpDocumentTypeCodes(documentTypeCodeRepository);
+    DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
     this.penRequest = new PenRequestBuilder()
             .withoutPenRequestID().build();
     this.bcscPhoto = new DocumentBuilder()
@@ -70,16 +63,16 @@ public class PenReqDocumentServiceTests {
             .withoutDocumentID()
             .withoutCreateAndUpdateUser()
             .build();
-    document = service.createDocument(this.penRequestID, document);
+    document = this.service.createDocument(this.penRequestID, document);
 
     assertThat(document).isNotNull();
     assertThat(document.getDocumentID()).isNotNull();
-    assertThat(document.getPenRequest().getPenRequestID()).isEqualTo(penRequestID);
+    assertThat(document.getPenRequest().getPenRequestID()).isEqualTo(this.penRequestID);
   }
 
   @Test
   public void retrieveDocumentMetadataTest() {
-    DocumentEntity retrievedDocument = service.retrieveDocumentMetadata(this.penRequestID, bcscPhoto.getDocumentID());
+    final DocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.penRequestID, this.bcscPhoto.getDocumentID());
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
@@ -88,41 +81,41 @@ public class PenReqDocumentServiceTests {
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidDocumentIdGivenTest() {
-    UUID randomGuid =  UUID.randomUUID();
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, randomGuid))
+    final UUID randomGuid =  UUID.randomUUID();
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.penRequestID, randomGuid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidPenRequestIdGivenTest() {
-    UUID randomGuid = UUID.randomUUID();
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(randomGuid, randomGuid))
+    final UUID randomGuid = UUID.randomUUID();
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(randomGuid, randomGuid))
         .isInstanceOf(EntityNotFoundException.class)
         .hasMessageContaining("DocumentEntity");
   }
 
   @Test
   public void retrieveDocumentDataTest() {
-    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"Y");
+    final DocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getDocumentID(),"Y");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
-    assertThat(retrievedDocument.getDocumentData()).isEqualTo(bcscPhoto.getDocumentData());
+    assertThat(retrievedDocument.getDocumentData()).isEqualTo(this.bcscPhoto.getDocumentData());
   }
 
   @Test
   public void retrieveDocumentDataTest1() {
-    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"TRUE");
+    final DocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getDocumentID(),"TRUE");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
-    assertThat(retrievedDocument.getDocumentData()).isEqualTo(bcscPhoto.getDocumentData());
+    assertThat(retrievedDocument.getDocumentData()).isEqualTo(this.bcscPhoto.getDocumentData());
   }
 
   @Test
   public void retrieveDocumentDataTest2() {
-    DocumentEntity retrievedDocument = service.retrieveDocument(this.penRequestID, bcscPhoto.getDocumentID(),"N");
+    final DocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getDocumentID(),"N");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
@@ -131,31 +124,31 @@ public class PenReqDocumentServiceTests {
 
   @Test
   public void retrieveAllDocumentMetadataTest() {
-    DocumentEntity document = new DocumentBuilder()
+    final DocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .withoutCreateAndUpdateUser()
             .withPenRequest(this.penRequest)
             .build();
     this.repository.save(document);
 
-    List<DocumentEntity> documents = service.retrieveAllDocumentMetadata(this.penRequestID);
+    final List<DocumentEntity> documents = this.service.retrieveAllDocumentMetadata(this.penRequestID);
     assertThat(documents.size()).isEqualTo(2);
   }
 
 
   @Test
   public void deleteDocumentTest() {
-    DocumentEntity deletedDocument = service.deleteDocument(this.penRequestID, this.bcscPhoto.getDocumentID());
+    final DocumentEntity deletedDocument = this.service.deleteDocument(this.penRequestID, this.bcscPhoto.getDocumentID());
     assertThat(deletedDocument).isNotNull();
-    UUID guid =  this.bcscPhoto.getDocumentID();
-    assertThatThrownBy(() -> service.retrieveDocumentMetadata(this.penRequestID, guid))
+    final UUID guid =  this.bcscPhoto.getDocumentID();
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.penRequestID, guid))
             .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
   public void deleteDocumentThrowsExceptionWhenInvalidIdGivenTest() {
-    UUID guid =  UUID.randomUUID();
-    assertThatThrownBy(() -> service.deleteDocument(this.penRequestID, guid))
+    final UUID guid =  UUID.randomUUID();
+    assertThatThrownBy(() -> this.service.deleteDocument(this.penRequestID, guid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }

@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
 
+import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
 import ca.bc.gov.educ.api.penrequest.constants.EventType;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.messaging.MessagePublisher;
@@ -17,14 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.UUID;
 
@@ -35,10 +32,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest
-public class EventHandlerDelegatorServiceTest {
+
+public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
   @Autowired
   PenRequestRepository penRequestRepository;
 
@@ -62,116 +57,116 @@ public class EventHandlerDelegatorServiceTest {
   @Before
   public void setUp() {
     openMocks(this);
-    PenRequestEntity penRequestEntity = mapper.toModel(getPenRequestEntityFromJsonString());
-    penRequestRepository.save(penRequestEntity);
-    penRequestID = penRequestEntity.getPenRequestID();
+    final PenRequestEntity penRequestEntity = this.mapper.toModel(this.getPenRequestEntityFromJsonString());
+    this.penRequestRepository.save(penRequestEntity);
+    this.penRequestID = penRequestEntity.getPenRequestID();
   }
 
   @After
   public void tearDown() {
-    documentRepository.deleteAll();
-    penRequestCommentRepository.deleteAll();
-    penRequestEventRepository.deleteAll();
-    penRequestRepository.deleteAll();
-    Mockito.clearInvocations(messagePublisher);
+    this.documentRepository.deleteAll();
+    this.penRequestCommentRepository.deleteAll();
+    this.penRequestEventRepository.deleteAll();
+    this.penRequestRepository.deleteAll();
+    Mockito.clearInvocations(this.messagePublisher);
   }
 
   @Test
   public void handleEventUpdatePenRequest_givenDBOperationFailed_shouldNotSendResponseMessageToNATS() throws JsonProcessingException {
-    var penReq = getPenRequestEntityFromJsonString();
-    penReq.setPenRequestID(penRequestID.toString());
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
     penReq.setLegalLastName(null);
-    Event event = Event.builder()
+    final Event event = Event.builder()
       .eventType(EventType.UPDATE_PEN_REQUEST)
       .eventPayload(JsonUtil.getJsonStringFromObject(penReq))
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, never()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, never()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
   }
 
   @Test
   public void handleEventUpdatePenRequest_givenDBOperationSuccess_shouldSendResponseMessageToNATS() throws JsonProcessingException {
-    var penReq = getPenRequestEntityFromJsonString();
-    penReq.setPenRequestID(penRequestID.toString());
-    Event event = Event.builder()
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
+    final Event event = Event.builder()
       .eventType(EventType.UPDATE_PEN_REQUEST)
       .eventPayload(JsonUtil.getJsonStringFromObject(penReq))
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
-    var natsResponse = new String(eventCaptor.getValue());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
     assertThat(natsResponse.contains(PEN_REQUEST_UPDATED.toString())).isTrue();
   }
 
   @Test
   public void handleEventUpdatePenRequest_givenReplayAndDBOperationSuccess_shouldSendResponseMessageToNATS() throws JsonProcessingException {
-    var penReq = getPenRequestEntityFromJsonString();
-    penReq.setPenRequestID(penRequestID.toString());
-    Event event = Event.builder()
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
+    final Event event = Event.builder()
       .eventType(EventType.UPDATE_PEN_REQUEST)
       .eventPayload(JsonUtil.getJsonStringFromObject(penReq))
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
-    var natsResponse = new String(eventCaptor.getValue());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
     assertThat(natsResponse.contains(PEN_REQUEST_UPDATED.toString())).isTrue();
   }
 
 
   @Test
   public void handleEventGetPenRequest_givenDBOperationFailed_shouldNotSendResponseMessageToNATS() {
-    Event event = Event.builder()
+    final Event event = Event.builder()
       .eventType(EventType.GET_PEN_REQUEST)
       .eventPayload("invalid pen request id")
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, never()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, never()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
   }
 
   @Test
   public void handleEventGetPenRequest_givenDBOperationSuccess_shouldSendResponseMessageToNATS() {
-    Event event = Event.builder()
+    final Event event = Event.builder()
       .eventType(EventType.GET_PEN_REQUEST)
-      .eventPayload(penRequestID.toString())
+      .eventPayload(this.penRequestID.toString())
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
-    var natsResponse = new String(eventCaptor.getValue());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
     assertThat(natsResponse.contains(PEN_REQUEST_FOUND.toString())).isTrue();
   }
 
   @Test
   public void handleEventGetPenRequest_givenReplayAndDBOperationSuccess_shouldSendResponseMessageToNATS() {
-    var penReq = getPenRequestEntityFromJsonString();
-    penReq.setPenRequestID(penRequestID.toString());
-    Event event = Event.builder()
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
+    final Event event = Event.builder()
       .eventType(EventType.GET_PEN_REQUEST)
-      .eventPayload(penRequestID.toString())
+      .eventPayload(this.penRequestID.toString())
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
-    eventHandlerDelegatorService.handleEvent(event);
-    eventHandlerDelegatorService.handleEvent(event);
-    verify(messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), eventCaptor.capture());
-    var natsResponse = new String(eventCaptor.getValue());
+    this.eventHandlerDelegatorService.handleEvent(event);
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
     assertThat(natsResponse.contains(PEN_REQUEST_FOUND.toString())).isTrue();
   }
 
   private PenRequest getPenRequestEntityFromJsonString() {
     try {
-      return new ObjectMapper().readValue(placeHolderPenReqJSON(), PenRequest.class);
-    } catch (Exception e) {
+      return new ObjectMapper().readValue(this.placeHolderPenReqJSON(), PenRequest.class);
+    } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }
