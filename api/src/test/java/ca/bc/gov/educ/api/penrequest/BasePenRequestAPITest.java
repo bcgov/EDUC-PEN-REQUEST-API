@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public abstract class BasePenRequestAPITest {
 
   @Autowired
-  PenRequestAPITestUtils penRequestAPITestUtils;
+  protected PenRequestAPITestUtils penRequestAPITestUtils;
 
   @Before
   public void before() {

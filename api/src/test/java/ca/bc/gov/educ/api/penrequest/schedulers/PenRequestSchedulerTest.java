@@ -64,8 +64,9 @@ public class PenRequestSchedulerTest extends BasePenRequestAPITest {
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
     assertThat(results.get(0)).isNotNull();
-    assertThat(results.get(0).getDocumentData()).isNotNull();
-    assertThat(results.get(0).getDocumentData().length).isZero();
     assertThat(results.get(0).getDocumentTypeCode()).isNotBlank();
+    val doc = this.penRequestAPITestUtils.getDocumentBlobByDocumentID(results.get(0).getDocumentID());
+    assertThat(doc).isNotNull();
+    assertThat(doc.length).isZero();
   }
 }
