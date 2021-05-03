@@ -37,8 +37,8 @@ public class PenRequestScheduler {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void removeBlobContentsFromUploadedDocuments() {
     LockAssert.assertLocked();
-    final LocalDateTime createDateToCompare = this.calculateCreateDateBasedOnRemoveDocumentBlobInDays();
-    val records = this.documentRepository.findAllByCreateDateBefore(createDateToCompare);
+    val createDateToCompare = this.calculateCreateDateBasedOnRemoveDocumentBlobInDays();
+    val records = this.documentRepository.findTop10000ByCreateDateBefore(createDateToCompare);
     if (!records.isEmpty()) {
       for (val document : records) {
         document.setDocumentData(new byte[0]); // empty the document data.
@@ -49,7 +49,7 @@ public class PenRequestScheduler {
   }
 
   private LocalDateTime calculateCreateDateBasedOnRemoveDocumentBlobInDays() {
-    final LocalDateTime currentTime = LocalDateTime.now();
+    val currentTime = LocalDateTime.now();
     return currentTime.minusDays(this.getRemoveDocumentBlobContentsAfterDays());
   }
 }

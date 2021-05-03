@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface DocumentRepository extends JpaRepository<DocumentEntity, UUID> {
   List<DocumentEntity> findByPenRequestPenRequestID(UUID penRequestId);
 
-  List<DocumentEntity> findAllByCreateDateBefore(LocalDateTime createDate);
+  List<DocumentEntity> findTop10000ByCreateDateBefore(LocalDateTime createDate);
 }
