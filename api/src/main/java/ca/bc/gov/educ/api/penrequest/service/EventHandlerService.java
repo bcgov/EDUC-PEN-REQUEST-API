@@ -2,11 +2,13 @@ package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.constants.EventOutcome;
 import ca.bc.gov.educ.api.penrequest.constants.EventType;
+import ca.bc.gov.educ.api.penrequest.mappers.DocumentMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestCommentsMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEvent;
+import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestEventRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.penrequest.constants.EventStatus.MESSAGE_PUBLISHED;
 import static lombok.AccessLevel.PRIVATE;
@@ -45,12 +48,15 @@ public class EventHandlerService {
   private final PenRequestEventRepository penRequestEventRepository;
   @Getter(PRIVATE)
   private final PenRequestCommentRepository penRequestCommentRepository;
+  @Getter(PRIVATE)
+  private final DocumentRepository documentRepository;
 
   @Autowired
-  public EventHandlerService(final PenRequestRepository penRequestRepository, final PenRequestEventRepository penRequestEventRepository, PenRequestCommentRepository penRequestCommentRepository) {
+  public EventHandlerService(final PenRequestRepository penRequestRepository, final PenRequestEventRepository penRequestEventRepository, PenRequestCommentRepository penRequestCommentRepository, DocumentRepository documentRepository) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestEventRepository = penRequestEventRepository;
     this.penRequestCommentRepository = penRequestCommentRepository;
+    this.documentRepository = documentRepository;
   }
 
 
@@ -114,6 +120,19 @@ public class EventHandlerService {
     return createResponseEvent(penRequestEvent);
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+  public byte[] handleGetPenRequestDocumentsMetadata(final Event event) throws JsonProcessingException {
+      val documentList = this.getDocumentRepository().findByPenRequestPenRequestID(UUID.fromString(event.getEventPayload())); // expect the payload contains the pen request id, which is a valid guid..
+      if (documentList.isEmpty()) {
+        event.setEventPayload("[]");
+        event.setEventOutcome(EventOutcome.PEN_REQUEST_DOCUMENTS_NOT_FOUND);
+      } else {
+        event.setEventPayload(JsonUtil.getJsonStringFromObject(documentList.stream().map(DocumentMapper.mapper::toMetadataStructure).collect(Collectors.toList())));// need to convert to structure MANDATORY otherwise jackson will break.
+        event.setEventOutcome(EventOutcome.PEN_REQUEST_DOCUMENTS_FOUND);
+      }
+    return createResponseEvent(createPenRequestEvent(event));
+  }
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public byte[] handleUpdatePenRequest(Event event) throws JsonProcessingException {
     val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
@@ -146,7 +165,7 @@ public class EventHandlerService {
   }
 
   private byte[] createResponseEvent(PenRequestEvent penRequestEvent) throws JsonProcessingException {
-    Event responseEvent = Event.builder()
+    val responseEvent = Event.builder()
       .sagaId(penRequestEvent.getSagaId())
       .eventType(EventType.valueOf(penRequestEvent.getEventType()))
       .eventOutcome(EventOutcome.valueOf(penRequestEvent.getEventOutcome()))

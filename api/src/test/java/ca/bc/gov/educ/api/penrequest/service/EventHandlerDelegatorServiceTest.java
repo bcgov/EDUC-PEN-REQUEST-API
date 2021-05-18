@@ -5,16 +5,18 @@ import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
 import ca.bc.gov.educ.api.penrequest.constants.EventType;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
 import ca.bc.gov.educ.api.penrequest.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
 import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestEventRepository;
-import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.repository.*;
 import ca.bc.gov.educ.api.penrequest.struct.Event;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
+import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
+import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,14 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.penrequest.constants.EventOutcome.PEN_REQUEST_FOUND;
-import static ca.bc.gov.educ.api.penrequest.constants.EventOutcome.PEN_REQUEST_UPDATED;
+import static ca.bc.gov.educ.api.penrequest.constants.EventOutcome.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-
+@Slf4j
 public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
   @Autowired
   PenRequestRepository penRequestRepository;
@@ -47,6 +48,10 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
   private DocumentRepository documentRepository;
   @Autowired
   MessagePublisher messagePublisher;
+  @Autowired
+  private DocumentTypeCodeTableRepository documentTypeCodeRepository;
+  @Autowired
+  private DocumentRepository repository;
 
   @Autowired
   EventHandlerDelegatorService eventHandlerDelegatorService;
@@ -54,12 +59,23 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
   ArgumentCaptor<byte[]> eventCaptor;
 
   UUID penRequestID;
+  private UUID documentID;
+
   @Before
   public void setUp() {
     openMocks(this);
     final PenRequestEntity penRequestEntity = this.mapper.toModel(this.getPenRequestEntityFromJsonString());
     this.penRequestRepository.save(penRequestEntity);
     this.penRequestID = penRequestEntity.getPenRequestID();
+    DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
+    DocumentEntity document = new DocumentBuilder()
+      .withoutDocumentID()
+      //.withoutCreateAndUpdateUser()
+      .withPenRequest(penRequestEntity)
+      .withTypeCode("CAPASSPORT")
+      .build();
+    document = this.repository.save(document);
+    this.documentID = document.getDocumentID();
   }
 
   @After
@@ -99,7 +115,7 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
     this.eventHandlerDelegatorService.handleEvent(event);
     verify(this.messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
     final var natsResponse = new String(this.eventCaptor.getValue());
-    assertThat(natsResponse.contains(PEN_REQUEST_UPDATED.toString())).isTrue();
+    assertThat(natsResponse).contains(PEN_REQUEST_UPDATED.toString());
   }
 
   @Test
@@ -116,7 +132,7 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
     this.eventHandlerDelegatorService.handleEvent(event);
     verify(this.messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
     final var natsResponse = new String(this.eventCaptor.getValue());
-    assertThat(natsResponse.contains(PEN_REQUEST_UPDATED.toString())).isTrue();
+    assertThat(natsResponse).contains(PEN_REQUEST_UPDATED.toString());
   }
 
 
@@ -143,7 +159,7 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
     this.eventHandlerDelegatorService.handleEvent(event);
     verify(this.messagePublisher, atLeastOnce()).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
     final var natsResponse = new String(this.eventCaptor.getValue());
-    assertThat(natsResponse.contains(PEN_REQUEST_FOUND.toString())).isTrue();
+    assertThat(natsResponse).contains(PEN_REQUEST_FOUND.toString());
   }
 
   @Test
@@ -160,7 +176,41 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
     this.eventHandlerDelegatorService.handleEvent(event);
     verify(this.messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
     final var natsResponse = new String(this.eventCaptor.getValue());
-    assertThat(natsResponse.contains(PEN_REQUEST_FOUND.toString())).isTrue();
+    assertThat(natsResponse).contains(PEN_REQUEST_FOUND.toString());
+  }
+
+  @Test
+  public void handleEventGetPenRequestDocMetadata_givenValidPenRequestIDAndDocInDB_shouldSendResponseMessageToNATS() {
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
+    final Event event = Event.builder()
+      .eventType(EventType.GET_PEN_REQUEST_DOCUMENT_METADATA)
+      .eventPayload(this.penRequestID.toString())
+      .replyTo("PROFILE_REQUEST_COMPLETE_SAGA_TOPIC")
+      .sagaId(UUID.randomUUID())
+      .build();
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeast(1)).dispatchMessage(eq("PROFILE_REQUEST_COMPLETE_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
+    log.info(natsResponse);
+    assertThat(natsResponse).contains(PEN_REQUEST_DOCUMENTS_FOUND.toString());
+  }
+
+  @Test
+  public void handleEventGetPenRequestDocMetadata_givenInValidPenRequestIDAndDocNotInDB_shouldSendResponseMessageToNATS() {
+    final var penReq = this.getPenRequestEntityFromJsonString();
+    penReq.setPenRequestID(this.penRequestID.toString());
+    final Event event = Event.builder()
+      .eventType(EventType.GET_PEN_REQUEST_DOCUMENT_METADATA)
+      .eventPayload(UUID.randomUUID().toString())
+      .replyTo("PROFILE_REQUEST_COMPLETE_SAGA_TOPIC")
+      .sagaId(UUID.randomUUID())
+      .build();
+    this.eventHandlerDelegatorService.handleEvent(event);
+    verify(this.messagePublisher, atLeast(1)).dispatchMessage(eq("PROFILE_REQUEST_COMPLETE_SAGA_TOPIC"), this.eventCaptor.capture());
+    final var natsResponse = new String(this.eventCaptor.getValue());
+    log.info(natsResponse);
+    assertThat(natsResponse).contains(PEN_REQUEST_DOCUMENTS_NOT_FOUND.toString());
   }
 
   private PenRequest getPenRequestEntityFromJsonString() {
