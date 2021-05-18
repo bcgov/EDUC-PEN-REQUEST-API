@@ -40,6 +40,13 @@ public class EventHandlerDelegatorService {
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
           messagePublisher.dispatchMessage(event.getReplyTo(), response);
           break;
+        case GET_PEN_REQUEST_DOCUMENT_METADATA:
+          log.info("received GET_PEN_REQUEST_DOCUMENT_METADATA event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          response = eventHandlerService.handleGetPenRequestDocumentsMetadata(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, event.getReplyTo());
+          messagePublisher.dispatchMessage(event.getReplyTo(), response);
+          break;
         case ADD_PEN_REQUEST_COMMENT:
           log.info("received ADD_PEN_REQUEST_COMMENT event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
