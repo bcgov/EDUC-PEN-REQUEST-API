@@ -16,7 +16,6 @@ import ca.bc.gov.educ.api.penrequest.struct.Event;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequestComments;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
-import ca.bc.gov.educ.api.penrequest.validator.PenRequestDocumentsValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
