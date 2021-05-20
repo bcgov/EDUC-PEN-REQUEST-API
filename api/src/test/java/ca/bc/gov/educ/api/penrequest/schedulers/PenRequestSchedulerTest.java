@@ -39,7 +39,7 @@ public class PenRequestSchedulerTest extends BasePenRequestAPITest {
     LockAssert.TestHelper.makeAllAssertsPass(true);
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
 
-    final PenRequestEntity penRequest = new PenRequestBuilder()
+    final PenRequestEntity penRequest = new PenRequestBuilder().withPenRequestStatusCode("MANUAL")
         .withoutPenRequestID().build();
     final DocumentEntity document = new DocumentBuilder()
         .withoutDocumentID()
@@ -66,7 +66,6 @@ public class PenRequestSchedulerTest extends BasePenRequestAPITest {
     assertThat(results.get(0)).isNotNull();
     assertThat(results.get(0).getDocumentTypeCode()).isNotBlank();
     val doc = this.penRequestAPITestUtils.getDocumentBlobByDocumentID(results.get(0).getDocumentID());
-    assertThat(doc).isNotNull();
-    assertThat(doc.length).isZero();
+    assertThat(doc).isNull();
   }
 }

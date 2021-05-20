@@ -8,5 +8,6 @@ public enum PenRequestStatusCode {
   AUTO,
   MANUAL,
   REJECTED,
-  UNMATCHED
+  UNMATCHED,
+  ABANDONED
 }
