@@ -35,6 +35,7 @@ public class PenRequestScheduler {
     if (!records.isEmpty()) {
       for (val document : records) {
         document.setDocumentData(null); // empty the document data.
+        document.setFileSize(0);
       }
       this.documentRepository.saveAll(records);
     }
