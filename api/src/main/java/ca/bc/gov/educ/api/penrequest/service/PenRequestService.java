@@ -9,7 +9,9 @@ import ca.bc.gov.educ.api.penrequest.repository.*;
 import ca.bc.gov.educ.api.penrequest.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +34,7 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PenRequestService {
 
   @Getter(AccessLevel.PRIVATE)
@@ -48,7 +51,7 @@ public class PenRequestService {
   private final GenderCodeTableRepository genderCodeTableRepo;
 
   @Autowired
-  public PenRequestService(final PenRequestRepository penRequestRepository, PenRequestCommentRepository penRequestCommentRepository, DocumentRepository documentRepository, final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, final GenderCodeTableRepository genderCodeTableRepo) {
+  public PenRequestService(final PenRequestRepository penRequestRepository, final PenRequestCommentRepository penRequestCommentRepository, final DocumentRepository documentRepository, final PenRequestStatusCodeTableRepository penRequestStatusCodeTableRepo, final GenderCodeTableRepository genderCodeTableRepo) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestCommentRepository = penRequestCommentRepository;
     this.documentRepository = documentRepository;
@@ -56,8 +59,8 @@ public class PenRequestService {
     this.genderCodeTableRepo = genderCodeTableRepo;
   }
 
-  public PenRequestEntity retrievePenRequest(UUID id) {
-    Optional<PenRequestEntity> res = getPenRequestRepository().findById(id);
+  public PenRequestEntity retrievePenRequest(final UUID id) {
+    final Optional<PenRequestEntity> res = this.getPenRequestRepository().findById(id);
     if (res.isPresent()) {
       return res.get();
     } else {
@@ -71,20 +74,20 @@ public class PenRequestService {
    * @param penRequest the pen request object to be persisted in the DB.
    * @return the persisted entity.
    */
-  public PenRequestEntity createPenRequest(PenRequestEntity penRequest) {
+  public PenRequestEntity createPenRequest(final PenRequestEntity penRequest) {
     penRequest.setPenRequestStatusCode(PenRequestStatusCode.DRAFT.toString());
     penRequest.setStatusUpdateDate(LocalDateTime.now());
     TransformUtil.uppercaseFields(penRequest);
-    return getPenRequestRepository().save(penRequest);
+    return this.getPenRequestRepository().save(penRequest);
   }
 
 
   public Iterable<PenRequestStatusCodeEntity> getPenRequestStatusCodesList() {
-    return getPenRequestStatusCodeTableRepo().findAll();
+    return this.getPenRequestStatusCodeTableRepo().findAll();
   }
 
-  public List<PenRequestEntity> findPenRequests(UUID digitalID, String statusCode, String pen) {
-    return getPenRequestRepository().findPenRequests(digitalID, statusCode, pen);
+  public List<PenRequestEntity> findPenRequests(final UUID digitalID, final String statusCode, final String pen) {
+    return this.getPenRequestRepository().findPenRequests(digitalID, statusCode, pen);
   }
 
   /**
@@ -94,15 +97,15 @@ public class PenRequestService {
    */
   @Cacheable("genderCodes")
   public List<GenderCodeEntity> getGenderCodesList() {
-    return genderCodeTableRepo.findAll();
+    return this.genderCodeTableRepo.findAll();
   }
 
   private Map<String, GenderCodeEntity> loadGenderCodes() {
-    return getGenderCodesList().stream().collect(Collectors.toMap(GenderCodeEntity::getGenderCode, genderCodeEntity -> genderCodeEntity));
+    return this.getGenderCodesList().stream().collect(Collectors.toMap(GenderCodeEntity::getGenderCode, genderCodeEntity -> genderCodeEntity));
   }
 
-  public Optional<GenderCodeEntity> findGenderCode(String genderCode) {
-    return Optional.ofNullable(loadGenderCodes().get(genderCode));
+  public Optional<GenderCodeEntity> findGenderCode(final String genderCode) {
+    return Optional.ofNullable(this.loadGenderCodes().get(genderCode));
   }
 
   /**
@@ -111,56 +114,55 @@ public class PenRequestService {
    * @param penRequest the object which needs to be updated.
    * @return updated object.
    */
-  public PenRequestEntity updatePenRequest(PenRequestEntity penRequest) {
-    Optional<PenRequestEntity> curPenRequest = getPenRequestRepository().findById(penRequest.getPenRequestID());
-
+  public PenRequestEntity updatePenRequest(final PenRequestEntity penRequest) {
+    final Optional<PenRequestEntity> curPenRequest = this.getPenRequestRepository().findById(penRequest.getPenRequestID());
     if (curPenRequest.isPresent()) {
       PenRequestEntity newPenRequest = curPenRequest.get();
+      this.logUpdates(penRequest, newPenRequest);
       penRequest.setPenRequestComments(newPenRequest.getPenRequestComments());
       BeanUtils.copyProperties(penRequest, newPenRequest);
       TransformUtil.uppercaseFields(newPenRequest);
-      newPenRequest = penRequestRepository.save(newPenRequest);
+      newPenRequest = this.penRequestRepository.save(newPenRequest);
       return newPenRequest;
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequest", penRequest.getPenRequestID().toString());
     }
   }
 
-  @Transactional(propagation = Propagation.MANDATORY)
-  public void deleteAll() {
-    List<PenRequestEntity> penRequests = getPenRequestRepository().findAll();
-    for (val entity : penRequests) {
-      deleteAssociatedDocumentsAndComments(entity);
+  private void logUpdates(final PenRequestEntity penRequest, final PenRequestEntity newPenRequest) {
+    if (log.isDebugEnabled()) {
+      log.debug("Pen Request update, current :: {}, new :: {}", newPenRequest, penRequest);
+    } else if (!StringUtils.equalsIgnoreCase(penRequest.getPenRequestStatusCode(), newPenRequest.getPenRequestStatusCode())) {
+      log.info("Pen Request status change, current :: {}, new :: {}", newPenRequest.getPenRequestStatusCode(), penRequest.getPenRequestStatusCode());
     }
-    getPenRequestRepository().deleteAll();
   }
 
-  private void deleteAssociatedDocumentsAndComments(PenRequestEntity entity) {
-    val documents = getDocumentRepository().findByPenRequestPenRequestID(entity.getPenRequestID());
+  private void deleteAssociatedDocumentsAndComments(final PenRequestEntity entity) {
+    val documents = this.getDocumentRepository().findByPenRequestPenRequestID(entity.getPenRequestID());
     if (documents != null && !documents.isEmpty()) {
-      getDocumentRepository().deleteAll(documents);
+      this.getDocumentRepository().deleteAll(documents);
     }
     if (entity.getPenRequestComments() != null && !entity.getPenRequestComments().isEmpty()) {
-      getPenRequestCommentRepository().deleteAll(entity.getPenRequestComments());
+      this.getPenRequestCommentRepository().deleteAll(entity.getPenRequestComments());
     }
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  public void deleteById(UUID id) {
-    val entity = getPenRequestRepository().findById(id);
+  public void deleteById(final UUID id) {
+    val entity = this.getPenRequestRepository().findById(id);
     if (entity.isPresent()) {
-      deleteAssociatedDocumentsAndComments(entity.get());
-      getPenRequestRepository().delete(entity.get());
+      this.deleteAssociatedDocumentsAndComments(entity.get());
+      this.getPenRequestRepository().delete(entity.get());
     } else {
       throw new EntityNotFoundException(PenRequestEntity.class, "PenRequestID", id.toString());
     }
   }
 
   @Transactional(propagation = Propagation.SUPPORTS)
-  public CompletableFuture<Page<PenRequestEntity>> findAll(Specification<PenRequestEntity> penRequestSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
-    Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
+  public CompletableFuture<Page<PenRequestEntity>> findAll(final Specification<PenRequestEntity> penRequestSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
+    final Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
     try {
-      val result = getPenRequestRepository().findAll(penRequestSpecs, paging);
+      val result = this.getPenRequestRepository().findAll(penRequestSpecs, paging);
       return CompletableFuture.completedFuture(result);
     } catch (final Exception ex) {
       throw new CompletionException(ex);

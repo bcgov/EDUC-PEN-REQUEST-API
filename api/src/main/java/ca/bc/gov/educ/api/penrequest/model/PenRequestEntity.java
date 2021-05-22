@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
 import ca.bc.gov.educ.api.penrequest.utils.UpperCase;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -16,8 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "pen_retrieval_request")
 @DynamicUpdate
@@ -130,7 +128,7 @@ public class PenRequestEntity {
 
   @Column(name = "BCSC_AUTO_MATCH_DETAIL")
   String bcscAutoMatchDetails;
-  
+
   @Column(name = "PEN")
   String pen;
 
@@ -141,6 +139,8 @@ public class PenRequestEntity {
   @Column(name = "complete_comment")
   String completeComment;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "penRequestEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = PenRequestCommentsEntity.class)
   private Set<PenRequestCommentsEntity> penRequestComments;
 
