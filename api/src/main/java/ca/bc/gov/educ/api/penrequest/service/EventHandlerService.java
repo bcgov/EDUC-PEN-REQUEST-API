@@ -131,6 +131,7 @@ public class EventHandlerService {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       PenRequestEntity entity = mapper.toModel(JsonUtil.getJsonObjectFromString(PenRequest.class, event.getEventPayload()));
+      entity.setUpdateDate(LocalDateTime.now());
       try{
         val updatedEntity = getPenRequestService().updatePenRequest(entity);
         event.setEventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(updatedEntity)));// need to convert to structure MANDATORY otherwise jackson will break.
