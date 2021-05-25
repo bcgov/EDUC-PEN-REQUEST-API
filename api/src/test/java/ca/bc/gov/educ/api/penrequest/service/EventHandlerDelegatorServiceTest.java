@@ -12,17 +12,18 @@ import ca.bc.gov.educ.api.penrequest.struct.Event;
 import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
-import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
@@ -59,7 +60,6 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
   ArgumentCaptor<byte[]> eventCaptor;
 
   UUID penRequestID;
-  private UUID documentID;
 
   @Before
   public void setUp() {
@@ -68,14 +68,13 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
     this.penRequestRepository.save(penRequestEntity);
     this.penRequestID = penRequestEntity.getPenRequestID();
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
-    DocumentEntity document = new DocumentBuilder()
+    final DocumentEntity document = new DocumentBuilder()
       .withoutDocumentID()
       //.withoutCreateAndUpdateUser()
       .withPenRequest(penRequestEntity)
       .withTypeCode("CAPASSPORT")
       .build();
-    document = this.repository.save(document);
-    this.documentID = document.getDocumentID();
+    this.repository.save(document);
   }
 
   @After
@@ -172,8 +171,10 @@ public class EventHandlerDelegatorServiceTest extends BasePenRequestAPITest {
       .replyTo("PROFILE_REQUEST_SAGA_TOPIC")
       .sagaId(UUID.randomUUID())
       .build();
+    val newEvent = new Event();
+    BeanUtils.copyProperties(event, newEvent);
     this.eventHandlerDelegatorService.handleEvent(event);
-    this.eventHandlerDelegatorService.handleEvent(event);
+    this.eventHandlerDelegatorService.handleEvent(newEvent);
     verify(this.messagePublisher, atLeast(2)).dispatchMessage(eq("PROFILE_REQUEST_SAGA_TOPIC"), this.eventCaptor.capture());
     final var natsResponse = new String(this.eventCaptor.getValue());
     assertThat(natsResponse).contains(PEN_REQUEST_FOUND.toString());
