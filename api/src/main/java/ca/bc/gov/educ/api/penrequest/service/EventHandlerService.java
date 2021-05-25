@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.constants.EventOutcome;
 import ca.bc.gov.educ.api.penrequest.constants.EventType;
+import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.penrequest.mappers.DocumentMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestCommentsMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
@@ -20,7 +21,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -50,13 +50,15 @@ public class EventHandlerService {
   private final PenRequestCommentRepository penRequestCommentRepository;
   @Getter(PRIVATE)
   private final DocumentRepository documentRepository;
-
+  @Getter(PRIVATE)
+  private final PenRequestService penRequestService;
   @Autowired
-  public EventHandlerService(final PenRequestRepository penRequestRepository, final PenRequestEventRepository penRequestEventRepository, PenRequestCommentRepository penRequestCommentRepository, DocumentRepository documentRepository) {
+  public EventHandlerService(final PenRequestRepository penRequestRepository, final PenRequestEventRepository penRequestEventRepository, PenRequestCommentRepository penRequestCommentRepository, DocumentRepository documentRepository, PenRequestService penRequestService) {
     this.penRequestRepository = penRequestRepository;
     this.penRequestEventRepository = penRequestEventRepository;
     this.penRequestCommentRepository = penRequestCommentRepository;
     this.documentRepository = documentRepository;
+    this.penRequestService = penRequestService;
   }
 
 
@@ -96,28 +98,16 @@ public class EventHandlerService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public byte[] handleGetPenRequest(Event event) throws JsonProcessingException {
-    val penRequestEventOptional = getPenRequestEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
-    PenRequestEvent penRequestEvent;
-    if (penRequestEventOptional.isEmpty()) {
-      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
-      log.trace(EVENT_PAYLOAD, event);
-      val optionalPenRequestEntity = getPenRequestRepository().findById(UUID.fromString(event.getEventPayload())); // expect the payload contains the pen request id.
-      if (optionalPenRequestEntity.isPresent()) {
-        val attachedEntity = optionalPenRequestEntity.get();
-        event.setEventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(attachedEntity)));// need to convert to structure MANDATORY otherwise jackson will break.
-        event.setEventOutcome(EventOutcome.PEN_REQUEST_FOUND);
-      } else {
-        event.setEventOutcome(EventOutcome.PEN_REQUEST_NOT_FOUND);
-      }
-      penRequestEvent = createPenRequestEvent(event);
+    log.trace(EVENT_PAYLOAD, event);
+    val optionalPenRequestEntity = getPenRequestRepository().findById(UUID.fromString(event.getEventPayload())); // expect the payload contains the pen request id.
+    if (optionalPenRequestEntity.isPresent()) {
+      val attachedEntity = optionalPenRequestEntity.get();
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(attachedEntity)));// need to convert to structure MANDATORY otherwise jackson will break.
+      event.setEventOutcome(EventOutcome.PEN_REQUEST_FOUND);
     } else {
-      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
-      log.trace(EVENT_PAYLOAD, event);
-      penRequestEvent = penRequestEventOptional.get();
-      penRequestEvent.setUpdateDate(LocalDateTime.now());
+      event.setEventOutcome(EventOutcome.PEN_REQUEST_NOT_FOUND);
     }
-    getPenRequestEventRepository().save(penRequestEvent);
-    return createResponseEvent(penRequestEvent);
+    return createResponseEvent(createPenRequestEvent(event));
   }
 
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -141,16 +131,11 @@ public class EventHandlerService {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       PenRequestEntity entity = mapper.toModel(JsonUtil.getJsonObjectFromString(PenRequest.class, event.getEventPayload()));
-      val optionalPenRequestEntity = getPenRequestRepository().findById(entity.getPenRequestID());
-      if (optionalPenRequestEntity.isPresent()) {
-        val attachedEntity = optionalPenRequestEntity.get();
-        entity.setPenRequestComments(attachedEntity.getPenRequestComments()); // need to add this , otherwise child entities will be out of reference.
-        BeanUtils.copyProperties(entity, attachedEntity);
-        attachedEntity.setUpdateDate(LocalDateTime.now());
-        getPenRequestRepository().save(attachedEntity);
-        event.setEventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(attachedEntity)));// need to convert to structure MANDATORY otherwise jackson will break.
+      try{
+        val updatedEntity = getPenRequestService().updatePenRequest(entity);
+        event.setEventPayload(JsonUtil.getJsonStringFromObject(mapper.toStructure(updatedEntity)));// need to convert to structure MANDATORY otherwise jackson will break.
         event.setEventOutcome(EventOutcome.PEN_REQUEST_UPDATED);
-      } else {
+      }catch (final EntityNotFoundException entityNotFoundException){
         event.setEventOutcome(EventOutcome.PEN_REQUEST_NOT_FOUND);
       }
       penRequestEvent = createPenRequestEvent(event);
