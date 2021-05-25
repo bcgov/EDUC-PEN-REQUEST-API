@@ -15,11 +15,13 @@ import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -61,26 +63,25 @@ public class EventHandlerServiceTest extends BasePenRequestAPITest {
 
 
   @Test
-  public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenNoPenRequestExist_shouldHaveEventOutcomePEN__REQUEST__NOT__FOUND() throws JsonProcessingException {
+  public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenNoPenRequestExist_shouldHaveEventOutcomePEN__REQUEST__NOT__FOUND() throws IOException {
     final var sagaId = UUID.randomUUID();
     final Event event = Event.builder().eventType(GET_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(UUID.randomUUID().toString()).build();
-    this.eventHandlerServiceUnderTest.handleGetPenRequest(event);
-    final var penReqEventUpdated = this.penRequestEventRepository.findBySagaIdAndEventType(sagaId, GET_PEN_REQUEST.toString());
-    assertThat(penReqEventUpdated).isPresent();
-    assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
-    assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_NOT_FOUND.toString());
+    val resBytes = this.eventHandlerServiceUnderTest.handleGetPenRequest(event);
+    final var penReqEventUpdated = JsonUtil.getJsonObjectFromBytes(Event.class, resBytes);
+    assertThat(penReqEventUpdated.getEventPayload()).isNotBlank();
+    assertThat(penReqEventUpdated.getEventOutcome()).isEqualTo(PEN_REQUEST_NOT_FOUND);
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenPenRequestExist_shouldHaveEventOutcomePEN__REQUEST__FOUND() throws JsonProcessingException {
+  public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenPenRequestExist_shouldHaveEventOutcomePEN__REQUEST__FOUND() throws IOException {
     final PenRequestEntity entity = this.penRequestRepository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
     final var sagaId = UUID.randomUUID();
     final Event event = Event.builder().eventType(GET_PEN_REQUEST).sagaId(sagaId).replyTo(STUDENT_PROFILE_SAGA_API_TOPIC).eventPayload(entity.getPenRequestID().toString()).build();
-    this.eventHandlerServiceUnderTest.handleGetPenRequest(event);
-    final var penReqEventUpdated = this.penRequestEventRepository.findBySagaIdAndEventType(sagaId, GET_PEN_REQUEST.toString());
-    assertThat(penReqEventUpdated).isPresent();
-    assertThat(penReqEventUpdated.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
-    assertThat(penReqEventUpdated.get().getEventOutcome()).isEqualTo(PEN_REQUEST_FOUND.toString());
+    val resBytes = this.eventHandlerServiceUnderTest.handleGetPenRequest(event);
+    final var penReqEventUpdated = JsonUtil.getJsonObjectFromBytes(Event.class, resBytes);
+    assertThat(penReqEventUpdated.getEventPayload()).isNotBlank();
+    assertThat(penReqEventUpdated.getEventPayload()).contains("penRequestStatusCode");
+    assertThat(penReqEventUpdated.getEventOutcome()).isEqualTo(PEN_REQUEST_FOUND);
   }
   @Test
   public void testHandleEvent_givenEventTypeGET__PENREQUEST__whenPenRequestExistAndDuplicateSagaMessage_shouldHaveEventOutcomePEN__REQUEST__FOUND() throws JsonProcessingException {
