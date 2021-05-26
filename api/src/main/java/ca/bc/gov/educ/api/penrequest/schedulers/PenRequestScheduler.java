@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Component
@@ -30,12 +31,15 @@ public class PenRequestScheduler {
     lockAtLeastFor = "PT4H", lockAtMostFor = "PT4H") //midnight job so lock for 4 hours
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void removeBlobContentsFromUploadedDocuments() {
+    val dateTimeToCompare = LocalDateTime.now().minusHours(24);
     LockAssert.assertLocked();
-    val records = this.documentRepository.findAllByPenRequestPenRequestStatusCodeIn(Arrays.asList(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.ABANDONED.toString()));
+    val records = this.documentRepository.findAllByPenRequestPenRequestStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.ABANDONED.toString()), 0);
     if (!records.isEmpty()) {
       for (val document : records) {
-        document.setDocumentData(null); // empty the document data.
-        document.setFileSize(0);
+        if(document.getPenRequest().getStatusUpdateDate().isBefore(dateTimeToCompare)){
+          document.setDocumentData(null); // empty the document data.
+          document.setFileSize(0);
+        }
       }
       this.documentRepository.saveAll(records);
     }

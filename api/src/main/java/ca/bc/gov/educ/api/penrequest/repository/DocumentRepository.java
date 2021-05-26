@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface DocumentRepository extends JpaRepository<DocumentEntity, UUID> {
   List<DocumentEntity> findByPenRequestPenRequestID(UUID penRequestId);
 
-  List<DocumentEntity> findAllByPenRequestPenRequestStatusCodeIn(List<String> penRequestStatusCodes);
+  // this query will only filter where document data is not null and file size greater than zero, so that system is not pulling a lot of records from db.
+  List<DocumentEntity> findAllByPenRequestPenRequestStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(List<String> penRequestStatusCodes, int fileSize);
 }

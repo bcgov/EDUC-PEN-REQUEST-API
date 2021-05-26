@@ -41,6 +41,7 @@ public class PenRequestSchedulerTest extends BasePenRequestAPITest {
 
     final PenRequestEntity penRequest = new PenRequestBuilder().withPenRequestStatusCode("MANUAL")
         .withoutPenRequestID().build();
+    penRequest.setStatusUpdateDate(LocalDateTime.now().minusHours(25));
     final DocumentEntity document = new DocumentBuilder()
         .withoutDocumentID()
         .withData(Files.readAllBytes(new ClassPathResource(
