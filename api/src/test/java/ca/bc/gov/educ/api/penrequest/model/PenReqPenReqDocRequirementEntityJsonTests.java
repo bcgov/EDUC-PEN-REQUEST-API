@@ -14,7 +14,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.penrequest.struct.PenReqDocRequirement;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocRequirement;
 
 
 
@@ -34,7 +34,7 @@ public class PenReqPenReqDocRequirementEntityJsonTests {
 
         assertThat(json).extractingJsonPathNumberValue("@.maxSize")
             .isEqualTo(maxSize);
-        
+
         assertThat(json).extractingJsonPathNumberValue("@.extensions.length()")
             .isEqualTo(extensions.size());
         assertThat(json).extractingJsonPathStringValue("@.extensions[0]")

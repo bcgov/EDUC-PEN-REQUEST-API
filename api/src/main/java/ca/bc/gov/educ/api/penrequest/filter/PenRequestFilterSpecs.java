@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.filter;
 
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

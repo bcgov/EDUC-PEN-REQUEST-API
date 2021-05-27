@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.messaging;
 
-import ca.bc.gov.educ.api.penrequest.service.EventHandlerDelegatorService;
-import ca.bc.gov.educ.api.penrequest.struct.Event;
+import ca.bc.gov.educ.api.penrequest.service.v1.EventHandlerDelegatorService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.Event;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import io.nats.client.Connection;
 import io.nats.client.Message;

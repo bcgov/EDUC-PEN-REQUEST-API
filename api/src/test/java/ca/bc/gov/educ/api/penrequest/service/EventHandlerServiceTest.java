@@ -1,17 +1,18 @@
 package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestCommentsMapper;
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestCommentsEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEvent;
+import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestCommentsMapper;
+import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestEntityMapper;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestCommentsEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEvent;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestEventRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.struct.Event;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.service.v1.EventHandlerService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.Event;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

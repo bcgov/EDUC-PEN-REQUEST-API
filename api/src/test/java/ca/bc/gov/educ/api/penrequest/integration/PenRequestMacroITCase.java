@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.bc.gov.educ.api.penrequest.props.IntegrationTestProperties;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequestMacro;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestMacro;
 
 import static io.restassured.RestAssured.*;
 
@@ -39,7 +39,7 @@ public class PenRequestMacroITCase {
 
     var response = given().auth().oauth2(token).param("macroTypeCode", "MOREINFO")
         .when().get(properties.getApiUrl()+ "/pen-request-macro");
-        
+
     response.then().assertThat().statusCode(200).and()
         .body("size()", is(not(lessThan(1))));
 

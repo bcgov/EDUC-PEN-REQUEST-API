@@ -2,11 +2,12 @@ package ca.bc.gov.educ.api.penrequest.service;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
 import ca.bc.gov.educ.api.penrequest.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.penrequest.service.v1.DocumentService;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;

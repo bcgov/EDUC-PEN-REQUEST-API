@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestEntityMapper;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
+import ca.bc.gov.educ.api.penrequest.controller.v1.PenRequestCommentsController;
+import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestEntityMapper;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestCommentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import org.junit.After;
@@ -49,7 +51,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
 
     @Test
     public void testRetrievePenRequestComments_GivenInvalidPenReqID_ShouldReturnStatusNotFound() throws Exception {
-        this.mockMvc.perform(get("/" + UUID.randomUUID().toString() + "/comments")
+        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,UUID.randomUUID())
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
                 .andDo(print()).andExpect(status().isNotFound());
     }
@@ -58,7 +60,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
     public void testRetrievePenRequestComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
         final PenRequestEntity entity = this.penRequestRepository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
         final String penReqId = entity.getPenRequestID().toString();
-        this.mockMvc.perform(get("/" + penReqId + "/comments")
+        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS, penReqId )
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
                 .andDo(print()).andExpect(status().isOk());
     }
@@ -67,7 +69,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
     public void testCreatePenRequestComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
         final PenRequestEntity entity = this.penRequestRepository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
         final String penReqId = entity.getPenRequestID().toString();
-        this.mockMvc.perform(post("/" + penReqId + "/comments")
+        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,penReqId )
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
@@ -76,7 +78,7 @@ public class PenRequestCommentsControllerTest extends BasePenReqControllerTest {
     @Test
     public void testCreatePenRequestComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
         final String penReqId = UUID.randomUUID().toString();
-        this.mockMvc.perform(post("/" + penReqId + "/comments")
+        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,penReqId)
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isNotFound());

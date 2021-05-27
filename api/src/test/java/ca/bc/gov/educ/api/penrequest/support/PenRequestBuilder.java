@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 
 public class PenRequestBuilder {
   DocumentEntity document;

@@ -14,9 +14,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import ca.bc.gov.educ.api.penrequest.filter.FilterOperation;
 import ca.bc.gov.educ.api.penrequest.props.IntegrationTestProperties;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
-import ca.bc.gov.educ.api.penrequest.struct.SearchCriteria;
-import ca.bc.gov.educ.api.penrequest.struct.ValueType;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
+import ca.bc.gov.educ.api.penrequest.struct.v1.SearchCriteria;
+import ca.bc.gov.educ.api.penrequest.struct.v1.ValueType;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.*;
@@ -96,7 +96,7 @@ public class PenRequestITCase {
         body(dummyPenRequestJson()).
         when().post(properties.getApiUrl()).
         then().assertThat().statusCode(201));
-    
+
     SearchCriteria criteria = SearchCriteria.builder().key("digitalID").operation(FilterOperation.EQUAL).value("b1e0788a-7dab-4b92-af86-c678e411f1e3").valueType(ValueType.UUID).build();
     List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);

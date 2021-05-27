@@ -2,8 +2,8 @@ package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidValueException;
-import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.model.DocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;

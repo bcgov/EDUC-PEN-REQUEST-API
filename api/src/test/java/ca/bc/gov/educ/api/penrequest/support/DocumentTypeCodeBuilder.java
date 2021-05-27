@@ -2,10 +2,9 @@ package ca.bc.gov.educ.api.penrequest.support;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
-import ca.bc.gov.educ.api.penrequest.model.DocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 
 public class DocumentTypeCodeBuilder {

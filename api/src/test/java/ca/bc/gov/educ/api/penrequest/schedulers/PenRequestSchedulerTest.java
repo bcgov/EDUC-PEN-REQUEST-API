@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.penrequest.schedulers;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;

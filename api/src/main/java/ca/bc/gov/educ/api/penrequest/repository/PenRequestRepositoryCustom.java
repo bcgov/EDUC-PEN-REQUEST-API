@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.repository;
 
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 
 import java.util.List;
 import java.util.UUID;

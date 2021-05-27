@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BasePenReqControllerTest extends BasePenRequestAPITest {

@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.model.GenderCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.GenderCodeEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.*;
-import ca.bc.gov.educ.api.penrequest.service.PenRequestService;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
-import ca.bc.gov.educ.api.penrequest.service.PenRequestMacroService;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequestMacro;
+import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestMacroService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestMacro;
 import lombok.Getter;
 import lombok.val;
 import org.springframework.stereotype.Component;

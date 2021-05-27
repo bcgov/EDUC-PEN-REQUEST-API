@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.penrequest.validator;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestMacroTypeCodeEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestMacroTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroTypeCodeRepository;
-import ca.bc.gov.educ.api.penrequest.service.PenRequestMacroService;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequestMacro;
+import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestMacroService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestMacro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;

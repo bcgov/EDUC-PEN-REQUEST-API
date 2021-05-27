@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.bc.gov.educ.api.penrequest.props.IntegrationTestProperties;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.*;
@@ -72,5 +72,5 @@ public class PenRequestCommentITCase {
             "  \"commentContent\": \"" + "comment1" + "\",\n" +
             "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
             "}";
-  }  
+  }
 }

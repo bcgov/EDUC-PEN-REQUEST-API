@@ -1,14 +1,16 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
 import ca.bc.gov.educ.api.penrequest.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.penrequest.model.DocumentEntity;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestEntity;
+import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
+import ca.bc.gov.educ.api.penrequest.controller.v1.PenReqDocumentController;
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
-import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
-import ca.bc.gov.educ.api.penrequest.struct.PenReqDocument;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocument;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;
@@ -77,7 +79,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void readDocumentTest() throws Exception {
-    this.mvc.perform(get("/" + this.penReqID.toString() + "/documents/" + this.documentID.toString())
+    this.mvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -89,7 +91,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void createDocumentTest() throws Exception {
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -105,7 +107,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void updateDocumentTest() throws Exception {
-    final var result = this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    final var result = this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(Files.readAllBytes(new ClassPathResource(
@@ -123,7 +125,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
     final PenReqDocMetadata penReqDocMetadata = JsonUtil.getJsonObjectFromString(PenReqDocMetadata.class,result.getResponse().getContentAsString());
     penReqDocMetadata.setCreateDate(null);
     penReqDocMetadata.setFileExtension("pdf");
-    this.mvc.perform(put("/" + this.penReqID.toString() + "/documents/"+penReqDocMetadata.getDocumentID())
+    this.mvc.perform(put(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, penReqDocMetadata.getDocumentID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(JsonUtil.getJsonStringFromObject(penReqDocMetadata))
@@ -140,7 +142,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void testCreateDocument_GivenMandatoryFieldsNullValues_ShouldReturnStatusBadRequest() throws Exception {
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.geNullDocumentJsonAsString())
@@ -153,7 +155,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   @Test
   public void testCreateDocument_GivenDocumentIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(UUID.randomUUID().toString());
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -167,7 +169,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   public void testCreateDocument_GivenInvalidFileExtension_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(null);
     penReqDocument.setFileExtension("exe");
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -181,7 +183,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   public void testCreateDocument_GivenInvalidDocumentTypeCode_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(null);
     penReqDocument.setDocumentTypeCode("doc");
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -195,7 +197,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   public void testCreateDocument_GivenFileSizeIsMore_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(null);
     penReqDocument.setFileSize(99999999);
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -209,7 +211,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   public void testCreateDocument_GivenDocTypeNotEffective_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(null);
     penReqDocument.setDocumentTypeCode("BCeIdPHOTO");
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -223,7 +225,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   public void testCreateDocument_GivenDocTypeExpired_ShouldReturnStatusBadRequest() throws Exception {
     final PenReqDocument penReqDocument = this.getDummyDocument(null);
     penReqDocument.setDocumentTypeCode("dl");
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(penReqDocument))
@@ -235,7 +237,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void createDocumentWithInvalidFileSizeTest() throws Exception {
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -248,7 +250,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void createDocumentWithoutDocumentDataTest() throws Exception {
-    this.mvc.perform(post("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -260,7 +262,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void deleteDocumentTest() throws Exception {
-    this.mvc.perform(delete("/" + this.penReqID.toString() + "/documents/" + this.documentID.toString())
+    this.mvc.perform(delete(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -275,7 +277,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void readAllDocumentMetadataTest() throws Exception {
-    this.mvc.perform(get("/" + this.penReqID.toString() + "/documents")
+    this.mvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_ID_DOCUMENTS,this.penReqID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -288,7 +290,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void getDocumentRequirementsTest() throws Exception {
-    this.mvc.perform(get("/file-requirements")
+    this.mvc.perform(get(URL.BASE_URL+URL.FILE_REQUIREMENTS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT_REQUIREMENTS")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -300,7 +302,7 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
 
   @Test
   public void getDocumentTypesTest() throws Exception {
-    this.mvc.perform(get("/document-types")
+    this.mvc.perform(get(URL.BASE_URL+URL.DOCUMENT_TYPES)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT_TYPES")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())

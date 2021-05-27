@@ -13,8 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.bc.gov.educ.api.penrequest.props.IntegrationTestProperties;
-import ca.bc.gov.educ.api.penrequest.struct.PenReqDocMetadata;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequest;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocMetadata;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.*;
@@ -75,7 +75,7 @@ public class PenRequestDocumentITCase {
         .post(properties.getApiUrl() + "/" + penRequest.getPenRequestID() + "/documents")
         .then().assertThat().statusCode(201).and()
         .body("documentID", any(String.class));
-    
+
     given().auth().oauth2(token)
         .when().get(properties.getApiUrl()+ "/" + penRequest.getPenRequestID() + "/documents")
         .then().assertThat().statusCode(200).and()

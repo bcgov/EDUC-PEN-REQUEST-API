@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.model;
 
+import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.repository.DocumentRepository;
 import ca.bc.gov.educ.api.penrequest.support.DocumentBuilder;
 import ca.bc.gov.educ.api.penrequest.support.PenRequestBuilder;

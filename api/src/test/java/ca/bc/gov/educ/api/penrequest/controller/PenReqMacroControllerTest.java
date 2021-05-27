@@ -1,11 +1,13 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
-import ca.bc.gov.educ.api.penrequest.mappers.PenRequestMacroMapper;
-import ca.bc.gov.educ.api.penrequest.model.PenRequestMacroTypeCodeEntity;
+import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
+import ca.bc.gov.educ.api.penrequest.controller.v1.PenRequestMacroController;
+import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestMacroMapper;
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestMacroTypeCodeEntity;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroRepository;
 import ca.bc.gov.educ.api.penrequest.repository.PenRequestMacroTypeCodeRepository;
-import ca.bc.gov.educ.api.penrequest.service.PenRequestMacroService;
-import ca.bc.gov.educ.api.penrequest.struct.PenRequestMacro;
+import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestMacroService;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestMacro;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.After;
@@ -60,14 +62,14 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
 
   @Test
   public void testRetrievePenRequestMacros_ShouldReturnStatusOK() throws Exception {
-    this.mockMvc.perform(get("/pen-request-macro")
+    this.mockMvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_MACRO)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQ_MACRO"))))
             .andDo(print()).andExpect(status().isOk());
   }
 
   @Test
   public void testRetrievePenRequestMacros_GivenInvalidMacroID_ShouldReturnStatusNotFound() throws Exception {
-    this.mockMvc.perform(get("/pen-request-macro/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_MACRO+URL.MACRO_ID,UUID.randomUUID().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQ_MACRO"))))
             .andDo(print()).andExpect(status().isNotFound());
   }
@@ -79,14 +81,14 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateDate(LocalDateTime.now());
     val savedEntity = this.service.createMacro(entity);
-    final var result = this.mockMvc.perform(get("/pen-request-macro/" + savedEntity.getMacroId().toString())
+    final var result = this.mockMvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_MACRO+URL.MACRO_ID, savedEntity.getMacroId().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQ_MACRO"))))
             .andDo(print()).andExpect(MockMvcResultMatchers.jsonPath("$.macroId").value(entity.getMacroId().toString())).andExpect(status().isOk()).andReturn();
     assertThat(result).isNotNull();
   }
   @Test
   public void testRetrievePenRequestMacros_GivenInValidMacroID_ShouldReturnStatusNotFound() throws Exception {
-    final var result = this.mockMvc.perform(get("/pen-request-macro/" + UUID.randomUUID().toString())
+    final var result = this.mockMvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_MACRO+URL.MACRO_ID, UUID.randomUUID().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQ_MACRO"))))
             .andDo(print()).andExpect(status().isNotFound()).andReturn();
     assertThat(result).isNotNull();
@@ -99,7 +101,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateDate(LocalDateTime.now());
     val savedEntity = this.service.createMacro(entity);
-    final var result = this.mockMvc.perform(get("/pen-request-macro/?macroTypeCode=" + savedEntity.getMacroTypeCode())
+    final var result = this.mockMvc.perform(get(URL.BASE_URL+URL.PEN_REQUEST_MACRO+"?macroTypeCode=" + savedEntity.getMacroTypeCode())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQ_MACRO"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
     assertThat(result).isNotNull();
@@ -107,7 +109,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
 
   @Test
   public void testCreatePenRequestMacros_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    this.mockMvc.perform(post("/pen-request-macro")
+    this.mockMvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_MACRO)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQ_MACRO")))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestMacroJson())).andDo(print()).andExpect(status().isCreated());
@@ -115,7 +117,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
 
   @Test
   public void testCreatePenRequestMacros_GivenInValidPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post("/pen-request-macro")
+    this.mockMvc.perform(post(URL.BASE_URL+URL.PEN_REQUEST_MACRO)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQ_MACRO")))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestMacroJsonWithId())).andDo(print()).andExpect(status().isBadRequest());
@@ -132,7 +134,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
     savedEntity.setUpdateDate(null);
     savedEntity.setMacroText("updated text");
     final String jsonString = new ObjectMapper().writeValueAsString(mapper.toStructure(savedEntity));
-    final var result = this.mockMvc.perform(put("/pen-request-macro/" + savedEntity.getMacroId().toString())
+    final var result = this.mockMvc.perform(put(URL.BASE_URL+URL.PEN_REQUEST_MACRO+URL.MACRO_ID, savedEntity.getMacroId().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQ_MACRO")))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON).content(jsonString)).andDo(print()).andExpect(status().isOk());
@@ -150,7 +152,7 @@ public class PenReqMacroControllerTest extends BasePenReqControllerTest {
     savedEntity.setUpdateDate(null);
     savedEntity.setMacroText("updated text");
     final String jsonString = new ObjectMapper().writeValueAsString(mapper.toStructure(savedEntity));
-    final var result = this.mockMvc.perform(put("/pen-request-macro/" + UUID.randomUUID().toString())
+    final var result = this.mockMvc.perform(put(URL.BASE_URL+URL.PEN_REQUEST_MACRO+URL.MACRO_ID, UUID.randomUUID().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQ_MACRO")))
             .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON).content(jsonString)).andDo(print()).andExpect(status().isNotFound());

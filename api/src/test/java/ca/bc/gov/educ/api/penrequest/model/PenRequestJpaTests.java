@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.penrequest.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,5 +36,5 @@ public class PenRequestJpaTests {
 
         assertThat(this.repository.findById(savedPenRequest.getPenRequestID())).isPresent();
     }
-   
+
 }
