@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.messaging;
 
+import ca.bc.gov.educ.api.penrequest.helpers.LogHelper;
 import ca.bc.gov.educ.api.penrequest.service.v1.EventHandlerDelegatorService;
 import ca.bc.gov.educ.api.penrequest.struct.v1.Event;
 import ca.bc.gov.educ.api.penrequest.utils.JsonUtil;
@@ -49,6 +50,7 @@ public class MessageSubscriber {
       if (message != null) {
         try {
           var eventString = new String(message.getData());
+          LogHelper.logMessagingEventDetails(eventString);
           var event = JsonUtil.getJsonObjectFromString(Event.class, eventString);
           eventHandlerDelegatorService.handleEvent(event);
         } catch (final Exception e) {

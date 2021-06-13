@@ -18,6 +18,7 @@
       src/main/java/ca/bc/gov/educ/api/penrequest/endpoint/**,
       src/main/java/ca/bc/gov/educ/api/penrequest/messaging/**,
       src/main/java/ca/bc/gov/educ/api/penrequest/config/**,
+      src/main/java/ca/bc/gov/educ/api/penrequest/helpers/LogHelper.java,
     </sonar.exclusions>
     <java.version>11</java.version>
     <maven.compiler.version>3.8.0</maven.compiler.version>

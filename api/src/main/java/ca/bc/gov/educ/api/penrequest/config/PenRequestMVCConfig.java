@@ -8,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class PenRequestMVCConfig implements WebMvcConfigurer {
 
-    private final PenRequestRequestInterceptor penRequestRequestInterceptor;
+    private final RequestResponseInterceptor requestResponseInterceptor;
 
     @Autowired
-    public PenRequestMVCConfig(final PenRequestRequestInterceptor penRequestRequestInterceptor){
-        this.penRequestRequestInterceptor = penRequestRequestInterceptor;
+    public PenRequestMVCConfig(final RequestResponseInterceptor requestResponseInterceptor){
+        this.requestResponseInterceptor = requestResponseInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(penRequestRequestInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(requestResponseInterceptor).addPathPatterns("/**");
     }
 }
