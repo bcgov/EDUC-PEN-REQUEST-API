@@ -48,8 +48,8 @@ public class PenRequestDocumentsValidator {
       throw new InvalidValueException("fileExtension", document.getFileExtension());
     }
 
-    if (document.getFileSize() > properties.getMaxFileSize()) {
-      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max fileSize",
+    if (document.getFileSize() > properties.getMaxEncodedFileSize()) {
+      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max Encoded fileSize",
               String.valueOf(properties.getMaxFileSize()));
     }
 
