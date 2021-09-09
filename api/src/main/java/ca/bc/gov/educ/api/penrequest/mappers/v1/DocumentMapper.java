@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.penrequest.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.penrequest.model.v1.DocumentEntity;
 import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocMetadata;
 import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocument;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocumentMetadata;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -22,4 +23,8 @@ public interface DocumentMapper {
   DocumentEntity toModel(PenReqDocument struct);
 
   PenReqDocMetadata toMetadataStructure(DocumentEntity entity);
+
+  @Mapping(target = "digitalID", source = "penRequest.digitalID")
+  @Mapping(target = "penRequestID", source = "penRequest.penRequestID")
+  PenReqDocumentMetadata toMetaData(DocumentEntity entity);
 }

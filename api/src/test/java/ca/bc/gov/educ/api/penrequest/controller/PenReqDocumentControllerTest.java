@@ -289,6 +289,20 @@ public class PenReqDocumentControllerTest extends BasePenRequestAPITest {
   }
 
   @Test
+  public void readAllDocumentMetadataWithoutPenRequestIDTest() throws Exception {
+    this.mvc.perform(get(URL.BASE_URL+URL.ALL_DOCUMENTS)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+      .andDo(print())
+      .andExpect(jsonPath("$.length()", is(1)))
+      .andExpect(jsonPath("$.[0].documentID", is(this.documentID.toString())))
+      .andExpect(jsonPath("$.[0].penRequestID", is(notNullValue())))
+      .andExpect(jsonPath("$.[0].digitalID", is(notNullValue())))
+      .andExpect(jsonPath("$.[0].documentTypeCode", is("CAPASSPORT")))
+      .andExpect(jsonPath("$.[0].documentData").doesNotExist());
+  }
+  @Test
   public void getDocumentRequirementsTest() throws Exception {
     this.mvc.perform(get(URL.BASE_URL+URL.FILE_REQUIREMENTS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT_REQUIREMENTS")))
