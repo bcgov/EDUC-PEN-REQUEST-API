@@ -101,6 +101,9 @@ public class DocumentService {
     return this.documentRepository.findByPenRequestPenRequestID(penRequestId);
   }
 
+  public List<DocumentEntity> retrieveAllDocumentsMetadata(){
+    return this.documentRepository.findAll();
+  }
   /**
    * Creates a DocumentEntity
    *

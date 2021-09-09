@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.penrequest.endpoint.v1;
 
 import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocMetadata;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocRequirement;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocTypeCode;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocument;
+import ca.bc.gov.educ.api.penrequest.struct.v1.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -55,4 +53,9 @@ public interface PenReqDocumentEndpoint {
   @GetMapping(URL.DOCUMENT_TYPES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<PenReqDocTypeCode> getDocumentTypeCodes();
+
+  @GetMapping(URL.ALL_DOCUMENTS)
+  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<PenReqDocumentMetadata> readAllDocumentsMetadata();
 }

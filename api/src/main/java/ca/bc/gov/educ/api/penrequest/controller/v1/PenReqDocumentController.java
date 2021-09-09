@@ -5,10 +5,7 @@ import ca.bc.gov.educ.api.penrequest.endpoint.v1.PenReqDocumentEndpoint;
 import ca.bc.gov.educ.api.penrequest.mappers.v1.DocumentMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.v1.DocumentTypeCodeMapper;
 import ca.bc.gov.educ.api.penrequest.service.v1.DocumentService;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocMetadata;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocTypeCode;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocument;
-import ca.bc.gov.educ.api.penrequest.struct.v1.PenReqDocRequirement;
+import ca.bc.gov.educ.api.penrequest.struct.v1.*;
 import ca.bc.gov.educ.api.penrequest.validator.PenRequestDocumentsValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -75,6 +72,11 @@ public class PenReqDocumentController extends BaseController implements PenReqDo
   public List<PenReqDocTypeCode> getDocumentTypeCodes() {
     return getDocumentService().getDocumentTypeCodeList().stream()
             .map(documentTypeCodeMapper::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<PenReqDocumentMetadata> readAllDocumentsMetadata() {
+    return getDocumentService().retrieveAllDocumentsMetadata().stream().map(mapper::toMetaData).collect(Collectors.toList());
   }
 
 }
