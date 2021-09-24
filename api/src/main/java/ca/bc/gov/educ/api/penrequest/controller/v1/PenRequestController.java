@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.controller.v1;
 
+import ca.bc.gov.educ.api.penrequest.constants.StatsType;
 import ca.bc.gov.educ.api.penrequest.controller.BaseController;
 import ca.bc.gov.educ.api.penrequest.endpoint.v1.PenRequestEndpoint;
 import ca.bc.gov.educ.api.penrequest.exception.InvalidParameterException;
@@ -13,6 +14,7 @@ import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestGenderCodeMapper;
 import ca.bc.gov.educ.api.penrequest.mappers.v1.PenRequestStatusCodeMapper;
 import ca.bc.gov.educ.api.penrequest.model.v1.PenRequestEntity;
 import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestService;
+import ca.bc.gov.educ.api.penrequest.service.v1.PenRequestStatsService;
 import ca.bc.gov.educ.api.penrequest.struct.v1.*;
 import ca.bc.gov.educ.api.penrequest.utils.UUIDUtil;
 import ca.bc.gov.educ.api.penrequest.validator.PenRequestPayloadValidator;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,12 +58,13 @@ public class PenRequestController extends BaseController implements PenRequestEn
   private static final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
   private static final PenRequestGenderCodeMapper genderCodeMapper = PenRequestGenderCodeMapper.mapper;
   private final PenRequestFilterSpecs penRequestFilterSpecs;
-
+ private final PenRequestStatsService penRequestStatsService;
   @Autowired
-  PenRequestController(final PenRequestService penRequest, final PenRequestPayloadValidator payloadValidator, PenRequestFilterSpecs penRequestFilterSpecs) {
+  PenRequestController(final PenRequestService penRequest, final PenRequestPayloadValidator payloadValidator, PenRequestFilterSpecs penRequestFilterSpecs, PenRequestStatsService penRequestStatsService) {
     this.service = penRequest;
     this.payloadValidator = payloadValidator;
     this.penRequestFilterSpecs = penRequestFilterSpecs;
+    this.penRequestStatsService = penRequestStatsService;
   }
 
   public PenRequest retrievePenRequest(String id) {
@@ -128,6 +132,11 @@ public class PenRequestController extends BaseController implements PenRequestEn
       throw new PenRequestRuntimeException(e.getMessage());
     }
     return getService().findAll(penRequestSpecs, pageNumber, pageSize, sorts).thenApplyAsync(penRequestEntities -> penRequestEntities.map(mapper::toStructure));
+  }
+
+  @Override
+  public ResponseEntity<PenRequestStats> getStats(@NonNull final StatsType statsType) {
+    return ResponseEntity.ok(this.penRequestStatsService.getStats(statsType));
   }
 
 

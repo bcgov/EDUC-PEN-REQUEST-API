@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.penrequest.endpoint.v1;
 
+import ca.bc.gov.educ.api.penrequest.constants.StatsType;
 import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
 import ca.bc.gov.educ.api.penrequest.struct.v1.GenderCode;
 import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequest;
+import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestStats;
 import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestStatusCode;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -128,4 +130,11 @@ public interface PenRequestEndpoint {
                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                               @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
                                               @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+
+  @GetMapping(URL.STATS)
+  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST_STATS')")
+  @Transactional(readOnly = true)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  ResponseEntity<PenRequestStats> getStats(@RequestParam(name = "statsType") StatsType statsType);
+
 }
