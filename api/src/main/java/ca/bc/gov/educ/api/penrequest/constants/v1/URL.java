@@ -4,6 +4,7 @@ public final class URL {
   public static final String STATUSES = "/statuses";
   public static final String GENDER_CODES = "/gender-codes";
   public static final String PAGINATED = "/paginated";
+  public static final String STATS = "/stats";
   public static final String PEN_REQUEST_ID_COMMENTS = "/{penRequestId}/comments";
   public static final String PEN_REQUEST_ID_DOCUMENTS = "/{penRequestID}/documents";
   public static final String ALL_DOCUMENTS = "/documents";
