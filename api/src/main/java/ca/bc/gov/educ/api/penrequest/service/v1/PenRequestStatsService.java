@@ -38,11 +38,11 @@ public class PenRequestStatsService {
       case PERCENT_GMP_REJECTED_TO_LAST_MONTH:
         return PenRequestStats.builder().percentRejectedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.REJECTED.toString())).build();
       case PERCENT_GMP_ABANDONED_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentRejectedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.ABANDONED.toString())).build();
+        return PenRequestStats.builder().percentAbandonedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.ABANDONED.toString())).build();
       case PERCENT_GMP_COMPLETED_WITH_DOCUMENTS_TO_LAST_MONTH:
         return PenRequestStats.builder().percentGmpCompletedWithDocumentsToLastMonth(this.getMonthlyPercentGMPWithDocsBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString())).build();
       case PERCENT_GMP_COMPLETION_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentRejectedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString())).build();
+        return PenRequestStats.builder().percentCompletedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString())).build();
       case ALL_STATUSES_LAST_12_MONTH:
         return PenRequestStats.builder().allStatsLastTwelveMonth(this.getAllStatusesBetweenDates(baseDateTime.minusMonths(12), baseDateTime.minusDays(1))).build();
       case ALL_STATUSES_LAST_6_MONTH:
