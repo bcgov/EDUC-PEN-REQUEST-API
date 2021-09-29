@@ -6,6 +6,10 @@ import ca.bc.gov.educ.api.penrequest.repository.PenRequestRepository;
 import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestStats;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -24,7 +28,9 @@ public class PenRequestStatsService {
     this.penRequestRepository = penRequestRepository;
   }
 
+  @Cacheable(value = "gmpStats")
   public PenRequestStats getStats(final StatsType statsType) {
+    Pair<Long, Double> currentMonthResultAndPercentile;
     val baseDateTime = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
     val baseWeekStart = LocalDateTime.now().with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
     val baseWeekEnd = LocalDateTime.now().with(DayOfWeek.MONDAY).withHour(23).withMinute(59).withSecond(59).withNano(0);
@@ -36,13 +42,17 @@ public class PenRequestStatsService {
       case COMPLETIONS_LAST_12_MONTH:
         return this.getPenRequestsCompletedLastYear();
       case PERCENT_GMP_REJECTED_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentRejectedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.REJECTED.toString())).build();
+        currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.REJECTED.toString());
+        return PenRequestStats.builder().gmpRejectedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentRejectedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
       case PERCENT_GMP_ABANDONED_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentAbandonedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.ABANDONED.toString())).build();
+        currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.ABANDONED.toString());
+        return PenRequestStats.builder().gmpAbandonedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentAbandonedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
       case PERCENT_GMP_COMPLETED_WITH_DOCUMENTS_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentGmpCompletedWithDocumentsToLastMonth(this.getMonthlyPercentGMPWithDocsBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString())).build();
+        currentMonthResultAndPercentile = this.getMonthlyPercentGMPWithDocsBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString());
+        return PenRequestStats.builder().gmpCompletedWithDocsInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentGmpCompletedWithDocumentsToLastMonth(currentMonthResultAndPercentile.getRight()).build();
       case PERCENT_GMP_COMPLETION_TO_LAST_MONTH:
-        return PenRequestStats.builder().percentCompletedGmpToLastMonth(this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString())).build();
+        currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString());
+        return PenRequestStats.builder().gmpCompletedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentCompletedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
       case ALL_STATUSES_LAST_12_MONTH:
         return PenRequestStats.builder().allStatsLastTwelveMonth(this.getAllStatusesBetweenDates(baseDateTime.minusMonths(12), baseDateTime.minusDays(1))).build();
       case ALL_STATUSES_LAST_6_MONTH:
@@ -57,7 +67,7 @@ public class PenRequestStatsService {
     return new PenRequestStats();
   }
 
-  private double getMonthlyPercentGMPBasedOnStatus(final String... statusCode) {
+  private Pair<Long, Double> getMonthlyPercentGMPBasedOnStatus(final String... statusCode) {
     val dayOfMonth = LocalDateTime.now().getDayOfMonth();
 
     val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(1);
@@ -69,10 +79,10 @@ public class PenRequestStatsService {
     val previousMonthResult = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(List.of(statusCode), startDatePreviousMonth, endDatePreviousMonth);
 
     val currentMonthResult = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(List.of(statusCode), startDateCurrentMonth, endDateCurrentMonth);
-    return findPercentage(previousMonthResult, currentMonthResult);
+    return Pair.of(currentMonthResult, findPercentage(previousMonthResult, currentMonthResult));
   }
 
-  private double getMonthlyPercentGMPWithDocsBasedOnStatus(final String... statusCode) {
+  private Pair<Long, Double> getMonthlyPercentGMPWithDocsBasedOnStatus(final String... statusCode) {
     val dayOfMonth = LocalDateTime.now().getDayOfMonth();
 
     val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(1);
@@ -85,7 +95,7 @@ public class PenRequestStatsService {
 
     val currentMonthResult = this.penRequestRepository.findNumberOfPenRequestsWithDocumentsStatusCodeInAndStatusUpdateDateBetween(List.of(statusCode), startDateCurrentMonth, endDateCurrentMonth);
 
-    return findPercentage(previousMonthResult, currentMonthResult);
+    return Pair.of(currentMonthResult, findPercentage(previousMonthResult, currentMonthResult));
   }
 
   private double findPercentage(long previousMonthResult, long currentMonthResult) {
@@ -183,5 +193,10 @@ public class PenRequestStatsService {
     return PenRequestStats.builder().completionsInLastWeek(sortedMap).build();
   }
 
+  @Scheduled(cron = "0 0 0 * * *") // midnight
+  @CacheEvict(value = "gmpStats", allEntries = true)
+  public void clearCache() {
+    // Empty method, spring boot does the magic.
+  }
 
 }
