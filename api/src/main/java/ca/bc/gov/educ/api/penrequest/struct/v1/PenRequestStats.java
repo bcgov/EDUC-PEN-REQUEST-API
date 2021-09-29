@@ -91,4 +91,21 @@ public class PenRequestStats {
    * The Percent gmp completed with documents to last month.
    */
   Double percentGmpCompletedWithDocumentsToLastMonth;
+  /**
+   * The Gmp completed in current month.
+   */
+  Long gmpCompletedInCurrentMonth;
+  /**
+   * The Gmp abandoned in current month.
+   */
+  Long gmpAbandonedInCurrentMonth;
+  /**
+   * The Gmp rejected in current month.
+   */
+  Long gmpRejectedInCurrentMonth;
+
+  /**
+   * The Gmp completed with docs in current month.
+   */
+  Long gmpCompletedWithDocsInCurrentMonth;
 }
