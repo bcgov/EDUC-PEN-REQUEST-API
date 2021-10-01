@@ -7,9 +7,6 @@ import ca.bc.gov.educ.api.penrequest.struct.v1.PenRequestStats;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -28,12 +25,10 @@ public class PenRequestStatsService {
     this.penRequestRepository = penRequestRepository;
   }
 
-  @Cacheable(value = "gmpStats")
   public PenRequestStats getStats(final StatsType statsType) {
     Pair<Long, Double> currentMonthResultAndPercentile;
-    val baseDateTime = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-    val baseWeekStart = LocalDateTime.now().with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
-    val baseWeekEnd = LocalDateTime.now().with(DayOfWeek.MONDAY).withHour(23).withMinute(59).withSecond(59).withNano(0);
+    val currentDateTime = LocalDateTime.now();
+    val baseDateTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
     switch (statsType) {
       case COMPLETIONS_LAST_WEEK:
         return this.getPenRequestsCompletedLastWeek();
@@ -54,13 +49,13 @@ public class PenRequestStatsService {
         currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.AUTO.toString());
         return PenRequestStats.builder().gmpCompletedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentCompletedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
       case ALL_STATUSES_LAST_12_MONTH:
-        return PenRequestStats.builder().allStatsLastTwelveMonth(this.getAllStatusesBetweenDates(baseDateTime.minusMonths(12), baseDateTime.minusDays(1))).build();
+        return PenRequestStats.builder().allStatsLastTwelveMonth(this.getAllStatusesBetweenDates(baseDateTime.withDayOfMonth(1).minusMonths(11), currentDateTime)).build();
       case ALL_STATUSES_LAST_6_MONTH:
-        return PenRequestStats.builder().allStatsLastSixMonth(this.getAllStatusesBetweenDates(baseDateTime.minusMonths(6), baseDateTime.minusDays(1))).build();
+        return PenRequestStats.builder().allStatsLastSixMonth(this.getAllStatusesBetweenDates(baseDateTime.withDayOfMonth(1).minusMonths(5), currentDateTime)).build();
       case ALL_STATUSES_LAST_1_MONTH:
-        return PenRequestStats.builder().allStatsLastOneMonth(this.getAllStatusesBetweenDates(baseDateTime.minusMonths(1), baseDateTime.minusDays(1))).build();
+        return PenRequestStats.builder().allStatsLastOneMonth(this.getAllStatusesBetweenDates(baseDateTime.minusDays(1).minusMonths(1), currentDateTime)).build();
       case ALL_STATUSES_LAST_1_WEEK:
-        return PenRequestStats.builder().allStatsLastOneWeek(this.getAllStatusesBetweenDates(baseWeekStart.minusWeeks(1), baseWeekEnd.minusWeeks(1).plusDays(6))).build();
+        return PenRequestStats.builder().allStatsLastOneWeek(this.getAllStatusesBetweenDates(baseDateTime.minusDays(6), currentDateTime)).build();
       default:
         break;
     }
@@ -123,10 +118,9 @@ public class PenRequestStatsService {
   }
 
   private PenRequestStats getPenRequestsCompletedLastYear() {
-    LocalDate currentDate = LocalDate.now();
-    LocalDate fromDate = currentDate.minusMonths(13);
-    LocalDate toDate = currentDate.minusMonths(1);
-    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, toDate, Arrays.asList("MANUAL", "AUTO"));
+    LocalDateTime currentDate = LocalDateTime.now();
+    LocalDateTime fromDate = currentDate.withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(11);
+    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, currentDate, Arrays.asList("MANUAL", "AUTO"));
     Map<String, Integer> penReqCompletionsInLast12Months = new HashMap<>();
     for (val gmpStat : gmpStats) {
       val month = gmpStat.getStatusUpdateDate().getMonth().toString();
@@ -169,10 +163,9 @@ public class PenRequestStatsService {
   }
 
   private PenRequestStats getPenRequestsCompletedLastWeek() {
-    LocalDate currentDate = LocalDate.now();
-    LocalDate fromDate = currentDate.minusDays(8);
-    LocalDate toDate = currentDate.minusDays(1);
-    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, toDate, Arrays.asList("MANUAL", "AUTO"));
+    LocalDateTime currentDate = LocalDateTime.now();
+    LocalDateTime fromDate = currentDate.withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(6);
+    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, currentDate, Arrays.asList("MANUAL", "AUTO"));
     Map<String, Integer> penReqCompletionsInLastWeek = new HashMap<>();
     for (val gmpStat : gmpStats) {
       val day = gmpStat.getStatusUpdateDate().getDayOfWeek().toString();
@@ -191,12 +184,6 @@ public class PenRequestStatsService {
     val sortedKeys = new ArrayList<>(penReqCompletionsInLastWeek.keySet()).stream().sorted(this::dayComparator).collect(Collectors.toList());
     Map<String, Integer> sortedMap = createSortedMap(penReqCompletionsInLastWeek, sortedKeys);
     return PenRequestStats.builder().completionsInLastWeek(sortedMap).build();
-  }
-
-  @Scheduled(cron = "0 0 0 * * *") // midnight
-  @CacheEvict(value = "gmpStats", allEntries = true)
-  public void clearCache() {
-    // Empty method, spring boot does the magic.
   }
 
 }

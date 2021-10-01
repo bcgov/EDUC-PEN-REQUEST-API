@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.penrequest.controller;
 
+import ca.bc.gov.educ.api.penrequest.constants.PenRequestStatusCode;
 import ca.bc.gov.educ.api.penrequest.constants.v1.URL;
 import ca.bc.gov.educ.api.penrequest.controller.v1.PenRequestController;
 import ca.bc.gov.educ.api.penrequest.filter.FilterOperation;
@@ -29,7 +30,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -430,6 +432,255 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
             .param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
+
+
+  @Test
+  public void testGetStats_COMPLETIONS_LAST_WEEK_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    var updateDate = LocalDateTime.now().minusDays(6);
+    var dayName1 = updateDate.getDayOfWeek().name();
+    entities.get(0).setStatusUpdateDate(updateDate.toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.AUTO.toString());
+    updateDate = LocalDateTime.now();
+    var dayName2 = updateDate.getDayOfWeek().name();
+    entities.get(1).setStatusUpdateDate(updateDate.toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "COMPLETIONS_LAST_WEEK")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.completionsInLastWeek." + dayName1, is(1)))
+      .andExpect(jsonPath("$.completionsInLastWeek." + dayName2, is(1)));
+  }
+
+  @Test
+  public void testGetStats_COMPLETIONS_LAST_12_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    var updateDate = LocalDateTime.now();
+    var month1 = updateDate.getMonth().toString();
+    entities.get(0).setStatusUpdateDate(updateDate.toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.AUTO.toString());
+    updateDate = LocalDateTime.now().withDayOfMonth(1).minusMonths(11);
+    var month2 = updateDate.getMonth().toString();
+    entities.get(1).setStatusUpdateDate(updateDate.toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "COMPLETIONS_LAST_12_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.completionsInLastTwelveMonth." + month1, is(1)))
+      .andExpect(jsonPath("$.completionsInLastTwelveMonth." + month2, is(1)));
+  }
+
+  @Test
+  public void testGetStats_PERCENT_GMP_REJECTED_TO_LAST_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "PERCENT_GMP_REJECTED_TO_LAST_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.percentRejectedGmpToLastMonth", closeTo(100, 0.001)))
+      .andExpect(jsonPath("$.gmpRejectedInCurrentMonth", is(2)));
+  }
+
+  @Test
+  public void testGetStats_PERCENT_GMP_ABANDONED_TO_LAST_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "PERCENT_GMP_ABANDONED_TO_LAST_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.percentAbandonedGmpToLastMonth", closeTo(100, 0.001)))
+      .andExpect(jsonPath("$.gmpAbandonedInCurrentMonth", is(2)));
+  }
+
+  @Test
+  public void testGetStats_PERCENT_GMP_COMPLETION_TO_LAST_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "PERCENT_GMP_COMPLETION_TO_LAST_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.percentCompletedGmpToLastMonth", closeTo(100, 0.001)))
+      .andExpect(jsonPath("$.gmpCompletedInCurrentMonth", is(2)));
+  }
+
+  @Test
+  public void testGetStats_PERCENT_GMP_COMPLETED_WITH_DOCUMENTS_TO_LAST_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().toString());
+    var PenRequests = repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    DocumentEntity document = new DocumentBuilder()
+      .withoutDocumentID()
+      .withPenRequest(PenRequests.get(0))
+      .withTypeCode("CAPASSPORT")
+      .build();
+    this.documentRepository.save(document);
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "PERCENT_GMP_COMPLETED_WITH_DOCUMENTS_TO_LAST_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.percentGmpCompletedWithDocumentsToLastMonth", closeTo(1, 0.001)))
+      .andExpect(jsonPath("$.gmpCompletedWithDocsInCurrentMonth", is(1)));
+  }
+
+  @Test
+  public void testGetStats_ALL_STATUSES_LAST_12_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(11).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.RETURNED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().minusMonths(3).toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "ALL_STATUSES_LAST_12_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.allStatsLastTwelveMonth.MANUAL", is(2)))
+      .andExpect(jsonPath("$.allStatsLastTwelveMonth.RETURNED", is(1)));
+  }
+
+  @Test
+  public void testGetStats_ALL_STATUSES_LAST_6_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(5).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.RETURNED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().minusMonths(3).toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "ALL_STATUSES_LAST_6_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.allStatsLastSixMonth.MANUAL", is(2)))
+      .andExpect(jsonPath("$.allStatsLastSixMonth.RETURNED", is(1)));
+  }
+
+  @Test
+  public void testGetStats_ALL_STATUSES_LAST_1_MONTH_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusDays(1).minusMonths(1).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.RETURNED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "ALL_STATUSES_LAST_1_MONTH")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.allStatsLastOneMonth.MANUAL", is(2)))
+      .andExpect(jsonPath("$.allStatsLastOneMonth.RETURNED", is(1)));
+  }
+
+  @Test
+  public void testGetStats_ALL_STATUSES_LAST_1_WEEK_ShouldReturnStatusOk() throws Exception {
+    final File file = new File(
+      Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
+    );
+    List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusDays(6).toString());
+    entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
+    entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
+    entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.RETURNED.toString());
+    entities.get(2).setStatusUpdateDate(LocalDateTime.now().minusDays(2).toString());
+    repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+
+    this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
+      .param("statsType", "ALL_STATUSES_LAST_1_WEEK")
+      .contentType(APPLICATION_JSON))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.allStatsLastOneWeek.MANUAL", is(2)))
+      .andExpect(jsonPath("$.allStatsLastOneWeek.RETURNED", is(1)));
+  }
+
 
   private PenRequestStatusCodeEntity createPenReqStatus() {
     final PenRequestStatusCodeEntity entity = new PenRequestStatusCodeEntity();
