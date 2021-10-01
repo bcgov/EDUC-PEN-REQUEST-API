@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +15,7 @@ import java.util.UUID;
 public interface PenRequestRepository extends JpaRepository<PenRequestEntity, UUID>, PenRequestRepositoryCustom, JpaSpecificationExecutor<PenRequestEntity> {
 
   @Query(value = "select pen_retrieval_request_status_code as status, status_update_date as statusupdatedate from pen_retrieval_request where  pen_retrieval_request.status_update_date between :fromDate and :toDate and pen_retrieval_request_status_code in :statuses order by status_update_date", nativeQuery = true)
-  List<GmpStats> findStatusAndStatusUpdateDatesBetweenForStatuses(LocalDate fromDate, LocalDate toDate, List<String> statuses);
+  List<GmpStats> findStatusAndStatusUpdateDatesBetweenForStatuses(LocalDateTime fromDate, LocalDateTime toDate, List<String> statuses);
 
   @Query(value = "select avg(STATUS_UPDATE_DATE-INITIAL_SUBMIT_DATE) as averageCompletionTime from pen_retrieval_request WHERE PEN_RETRIEVAL_REQUEST_STATUS_CODE IN ('MANUAL','AUTO')", nativeQuery = true)
   GmpStats findCompletionProcessAverageTime();
