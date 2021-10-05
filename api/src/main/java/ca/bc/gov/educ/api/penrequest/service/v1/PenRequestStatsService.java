@@ -9,12 +9,11 @@ import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -35,7 +34,7 @@ public class PenRequestStatsService {
       case AVERAGE_COMPLETION_TIME:
         return this.getAverageGMPCompletionTime();
       case COMPLETIONS_LAST_12_MONTH:
-        return this.getPenRequestsCompletedLastYear();
+        return this.getPenRequestsCompletedLastTwelveMonths();
       case PERCENT_GMP_REJECTED_TO_LAST_MONTH:
         currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.REJECTED.toString());
         return PenRequestStats.builder().gmpRejectedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentRejectedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
@@ -63,13 +62,10 @@ public class PenRequestStatsService {
   }
 
   private Pair<Long, Double> getMonthlyPercentGMPBasedOnStatus(final String... statusCode) {
-    val dayOfMonth = LocalDateTime.now().getDayOfMonth();
-
-    val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(1);
-    val endDatePreviousMonthLength = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).minusMonths(1).getMonth().length(LocalDate.now().minusMonths(1).isLeapYear());
-    val endDatePreviousMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).withDayOfMonth(Math.min(dayOfMonth, endDatePreviousMonthLength)).minusMonths(1);
-    val startDateCurrentMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1);
-    val endDateCurrentMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).withDayOfMonth(dayOfMonth);
+    val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(59);
+    val endDatePreviousMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999).minusDays(30);
+    val startDateCurrentMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(29);
+    val endDateCurrentMonth = LocalDateTime.now();
 
     val previousMonthResult = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(List.of(statusCode), startDatePreviousMonth, endDatePreviousMonth);
 
@@ -78,13 +74,11 @@ public class PenRequestStatsService {
   }
 
   private Pair<Long, Double> getMonthlyPercentGMPWithDocsBasedOnStatus(final String... statusCode) {
-    val dayOfMonth = LocalDateTime.now().getDayOfMonth();
 
-    val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(1);
-    val endDatePreviousMonthLength = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).minusMonths(1).getMonth().length(LocalDate.now().minusMonths(1).isLeapYear());
-    val endDatePreviousMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).withDayOfMonth(Math.min(dayOfMonth, endDatePreviousMonthLength)).minusMonths(1);
-    val startDateCurrentMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1);
-    val endDateCurrentMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0).withDayOfMonth(dayOfMonth);
+    val startDatePreviousMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(59);
+    val endDatePreviousMonth = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999).minusDays(30);
+    val startDateCurrentMonth = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(29);
+    val endDateCurrentMonth = LocalDateTime.now();
     val previousMonthResult = this.penRequestRepository.findNumberOfPenRequestsWithDocumentsStatusCodeInAndStatusUpdateDateBetween(List.of(statusCode), startDatePreviousMonth, endDatePreviousMonth);
 
 
@@ -117,44 +111,16 @@ public class PenRequestStatsService {
     return allStatusMap;
   }
 
-  private PenRequestStats getPenRequestsCompletedLastYear() {
+  private PenRequestStats getPenRequestsCompletedLastTwelveMonths() {
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime fromDate = currentDate.withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1).minusMonths(11);
-    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, currentDate, Arrays.asList("MANUAL", "AUTO"));
-    Map<String, Integer> penReqCompletionsInLast12Months = new HashMap<>();
-    for (val gmpStat : gmpStats) {
-      val month = gmpStat.getStatusUpdateDate().getMonth().toString();
-      if (penReqCompletionsInLast12Months.containsKey(month)) {
-        val currentCount = penReqCompletionsInLast12Months.get(month);
-        penReqCompletionsInLast12Months.put(month, currentCount + 1);
-      } else {
-        penReqCompletionsInLast12Months.put(month, 1);
-      }
+    Map<String, Long> penReqCompletionsInLast12Months = new LinkedHashMap<>();
+    for (int i = 11; i >= 0; i--) {
+      LocalDateTime startDate = currentDate.minusMonths(i).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+      LocalDateTime endDate = currentDate.minusMonths(i).withDayOfMonth(currentDate.minusMonths(i).toLocalDate().lengthOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+      val gmpNumbers = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(Arrays.asList("MANUAL", "AUTO"), startDate, endDate);
+      penReqCompletionsInLast12Months.put(startDate.getMonth().toString(), gmpNumbers);
     }
-    Arrays.stream(Month.values()).forEach(el -> {
-      if (!penReqCompletionsInLast12Months.containsKey(el.toString())) {
-        penReqCompletionsInLast12Months.put(el.toString(), 0);
-      }
-    });
-    val sortedKeys = new ArrayList<>(penReqCompletionsInLast12Months.keySet()).stream().sorted(this::monthComparator).collect(Collectors.toList());
-    Map<String, Integer> sortedMap = createSortedMap(penReqCompletionsInLast12Months, sortedKeys);
-    return PenRequestStats.builder().completionsInLastTwelveMonth(sortedMap).build();
-  }
-
-  private Map<String, Integer> createSortedMap(Map<String, Integer> unsortedMap, List<String> sortedKeys) {
-    Map<String, Integer> sortedMap = new LinkedHashMap<>();
-    for (val key : sortedKeys) {
-      sortedMap.put(key, unsortedMap.get(key));
-    }
-    return sortedMap;
-  }
-
-  private int monthComparator(String month1, String month2) {
-    return Month.valueOf(month1).getValue() - Month.valueOf(month2).getValue();
-  }
-
-  private int dayComparator(String day1, String day2) {
-    return DayOfWeek.valueOf(day1).getValue() - DayOfWeek.valueOf(day2).getValue();
+    return PenRequestStats.builder().completionsInLastTwelveMonth(penReqCompletionsInLast12Months).build();
   }
 
   private PenRequestStats getAverageGMPCompletionTime() {
@@ -163,27 +129,15 @@ public class PenRequestStatsService {
   }
 
   private PenRequestStats getPenRequestsCompletedLastWeek() {
+    Map<String, Long> penReqCompletionsInLastWeek = new LinkedHashMap<>();
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime fromDate = currentDate.withHour(0).withMinute(0).withSecond(0).withNano(0).minusDays(6);
-    val gmpStats = this.penRequestRepository.findStatusAndStatusUpdateDatesBetweenForStatuses(fromDate, currentDate, Arrays.asList("MANUAL", "AUTO"));
-    Map<String, Integer> penReqCompletionsInLastWeek = new HashMap<>();
-    for (val gmpStat : gmpStats) {
-      val day = gmpStat.getStatusUpdateDate().getDayOfWeek().toString();
-      if (penReqCompletionsInLastWeek.containsKey(day)) {
-        val currentCount = penReqCompletionsInLastWeek.get(day);
-        penReqCompletionsInLastWeek.put(day, currentCount + 1);
-      } else {
-        penReqCompletionsInLastWeek.put(day, 1);
-      }
+    for (int i = 6; i >= 0; i--) {
+      LocalDateTime startDate = currentDate.minusDays(i).withHour(0).withMinute(0).withSecond(0).withNano(0);
+      LocalDateTime endDate = currentDate.minusDays(i).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+      val gmpNumbers = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(Arrays.asList("MANUAL", "AUTO"), startDate, endDate);
+      penReqCompletionsInLastWeek.put(startDate.getDayOfWeek().toString(), gmpNumbers);
     }
-    Arrays.stream(DayOfWeek.values()).forEach(el -> {
-      if (!penReqCompletionsInLastWeek.containsKey(el.toString())) {
-        penReqCompletionsInLastWeek.put(el.toString(), 0);
-      }
-    });
-    val sortedKeys = new ArrayList<>(penReqCompletionsInLastWeek.keySet()).stream().sorted(this::dayComparator).collect(Collectors.toList());
-    Map<String, Integer> sortedMap = createSortedMap(penReqCompletionsInLastWeek, sortedKeys);
-    return PenRequestStats.builder().completionsInLastWeek(sortedMap).build();
+    return PenRequestStats.builder().completionsInLastWeek(penReqCompletionsInLastWeek).build();
   }
 
 }
