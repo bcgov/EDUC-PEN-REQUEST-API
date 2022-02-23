@@ -30,7 +30,6 @@ public class PenRequest extends BaseRequest implements Serializable {
   private String legalLastName;
   @NotNull(message = "dob cannot be null")
   private String dob;
-  @NotNull(message = "genderCode cannot be null")
   @Size(max = 1)
   private String genderCode;
   @Size(max = 40)
