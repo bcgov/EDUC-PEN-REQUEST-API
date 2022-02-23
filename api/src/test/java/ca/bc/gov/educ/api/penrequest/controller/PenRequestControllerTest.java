@@ -118,6 +118,14 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
+  public void testCreatePenRequest_GivenValidPayloadWithoutGenderCode_ShouldReturnStatusCreated() throws Exception {
+    this.mockMvc.perform(post(URL.BASE_URL+"/")
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+      .contentType(APPLICATION_JSON)
+      .accept(APPLICATION_JSON).content(this.dummyPenRequestJsonWithoutGenderCode())).andDo(print()).andExpect(status().isCreated());
+  }
+
+  @Test
   public void testCreatePenRequest_GivenInitialSubmitDateInPayload_ShouldReturnStatusBadRequest() throws Exception {
     this.mockMvc.perform(post(URL.BASE_URL+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
