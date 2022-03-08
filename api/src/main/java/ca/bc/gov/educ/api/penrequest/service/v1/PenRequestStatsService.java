@@ -34,7 +34,7 @@ public class PenRequestStatsService {
       case AVERAGE_COMPLETION_TIME:
         return this.getAverageGMPCompletionTime();
       case COMPLETIONS_LAST_13_MONTH:
-        return this.getPenRequestsCompletedLastMonths(12);
+        return this.getPenRequestsCompletedLastMonths();
       case PERCENT_GMP_REJECTED_TO_LAST_MONTH:
         currentMonthResultAndPercentile = this.getMonthlyPercentGMPBasedOnStatus(PenRequestStatusCode.REJECTED.toString());
         return PenRequestStats.builder().gmpRejectedInCurrentMonth(currentMonthResultAndPercentile.getLeft()).percentRejectedGmpToLastMonth(currentMonthResultAndPercentile.getRight()).build();
@@ -111,16 +111,17 @@ public class PenRequestStatsService {
     return allStatusMap;
   }
 
-  private PenRequestStats getPenRequestsCompletedLastMonths(int months) {
+  private PenRequestStats getPenRequestsCompletedLastMonths() {
     LocalDateTime currentDate = LocalDateTime.now();
     Map<String, Long> penReqCompletionsInLastMonths = new LinkedHashMap<>();
-    for (int i = months; i >= 0; i--) {
+    for (int i = 12; i >= 0; i--) {
       LocalDateTime startDate = currentDate.minusMonths(i).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
       LocalDateTime endDate = currentDate.minusMonths(i).withDayOfMonth(currentDate.minusMonths(i).toLocalDate().lengthOfMonth()).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
       val gmpNumbers = this.penRequestRepository.countByPenRequestStatusCodeInAndStatusUpdateDateBetween(Arrays.asList("MANUAL", "AUTO"), startDate, endDate);
-      penReqCompletionsInLastMonths.put(startDate.getMonth().toString(), gmpNumbers);
+      val monthName = (i == 0) ? "CURRENT" : startDate.getMonth().toString();
+      penReqCompletionsInLastMonths.put(monthName, gmpNumbers);
     }
-    return PenRequestStats.builder().completionsInLastTwelveMonth(penReqCompletionsInLastMonths).build();
+    return PenRequestStats.builder().completionsInLastMonths(penReqCompletionsInLastMonths).build();
   }
 
   private PenRequestStats getAverageGMPCompletionTime() {

@@ -477,7 +477,6 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     });
     entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
     var updateDate = LocalDateTime.now();
-    var month1 = updateDate.getMonth().toString();
     entities.get(0).setStatusUpdateDate(updateDate.toString());
     entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.AUTO.toString());
     updateDate = LocalDateTime.now().withDayOfMonth(1).minusMonths(11);
@@ -490,8 +489,8 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
       .param("statsType", "COMPLETIONS_LAST_13_MONTH")
       .contentType(APPLICATION_JSON))
       .andDo(print()).andExpect(status().isOk())
-      .andExpect(jsonPath("$.completionsInLastTwelveMonth." + month1, is(1)))
-      .andExpect(jsonPath("$.completionsInLastTwelveMonth." + month2, is(1)));
+      .andExpect(jsonPath("$.completionsInLastMonths.CURRENT" , is(1)))
+      .andExpect(jsonPath("$.completionsInLastMonths." + month2, is(1)));
   }
 
   @Test
