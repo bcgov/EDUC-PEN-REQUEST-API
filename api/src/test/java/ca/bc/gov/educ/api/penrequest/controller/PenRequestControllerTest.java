@@ -469,7 +469,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
-  public void testGetStats_COMPLETIONS_LAST_12_MONTH_ShouldReturnStatusOk() throws Exception {
+  public void testGetStats_COMPLETIONS_LAST_13_MONTH_ShouldReturnStatusOk() throws Exception {
     final File file = new File(
       Objects.requireNonNull(getClass().getClassLoader().getResource("mock_pen_requests.json")).getFile()
     );
@@ -487,7 +487,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
     this.mockMvc.perform(get(URL.BASE_URL + URL.STATS)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST_STATS")))
-      .param("statsType", "COMPLETIONS_LAST_12_MONTH")
+      .param("statsType", "COMPLETIONS_LAST_13_MONTH")
       .contentType(APPLICATION_JSON))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.completionsInLastTwelveMonth." + month1, is(1)))
@@ -502,7 +502,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
-    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusDays(30).toString());
     entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
     entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
     entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.REJECTED.toString());
@@ -526,7 +526,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
-    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusDays(30).toString());
     entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
     entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
     entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.ABANDONED.toString());
@@ -550,7 +550,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     List<PenRequest> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     entities.get(0).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
-    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusMonths(1).toString());
+    entities.get(0).setStatusUpdateDate(LocalDateTime.now().minusDays(30).toString());
     entities.get(1).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
     entities.get(1).setStatusUpdateDate(LocalDateTime.now().toString());
     entities.get(2).setPenRequestStatusCode(PenRequestStatusCode.MANUAL.toString());
