@@ -21,7 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-//import javax.transaction.Transactional;
+//import jakarta.transaction.Transactional;
 
 
 public class PenReqDocumentServiceTests extends BasePenRequestAPITest {

@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.penrequest.props.ApplicationProperties;
 import ca.bc.gov.educ.api.penrequest.struct.BaseRequest;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public abstract class BaseController {
