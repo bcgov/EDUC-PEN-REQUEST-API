@@ -1,6 +1,11 @@
 # Compiled class file
 *.class
 
+# Direnv
+.envrc
+.direnv/
+shell.nix
+
 # Log file
 *.log
 
@@ -38,6 +43,9 @@ hs_err_pid*
 .project
 .factorypath
 .vscode
+
+# Vim
+Session.vim
 
 # Local Secrets
 application-local.properties
