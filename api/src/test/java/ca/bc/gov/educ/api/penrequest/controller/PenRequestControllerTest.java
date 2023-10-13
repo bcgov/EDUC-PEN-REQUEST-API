@@ -179,7 +179,7 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
 
   @Test
   public void testDeletePenRequest_GivenInvalidId_ShouldReturn404() throws Exception {
-    this.mockMvc.perform(delete(URL.BASE_URL+"/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(delete(URL.BASE_URL+"/" + UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_PEN_REQUEST")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNotFound());
@@ -702,14 +702,6 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
     entity.setUpdateDate(LocalDateTime.now());
     entity.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime()));
     return entity;
-  }
-
-  private String dummyPenRequestCommentsJsonWithValidPenReqID(final String penReqId) {
-    return "{\n" +
-            "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
-            "  \"commentContent\": \"" + "comment1" + "\",\n" +
-            "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
-            "}";
   }
 
 }
