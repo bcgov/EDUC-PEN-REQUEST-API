@@ -4,8 +4,8 @@ import ca.bc.gov.educ.api.penrequest.struct.BaseRequest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

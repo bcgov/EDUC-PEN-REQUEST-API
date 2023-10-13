@@ -3,8 +3,8 @@ package ca.bc.gov.educ.api.penrequest.struct.v1;
 import ca.bc.gov.educ.api.penrequest.struct.BaseRequest;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
