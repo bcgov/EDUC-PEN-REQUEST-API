@@ -95,6 +95,14 @@ public class PenRequestControllerTest extends BasePenReqControllerTest {
   }
 
   @Test
+  public void testRetrievePenRequest_WithWrongScope_ShouldReturnStatusForbidden() throws Exception {
+    final PenRequestEntity entity = this.repository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
+    this.mockMvc.perform(get(URL.BASE_URL+"/" + entity.getPenRequestID())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRONG_SCOPE"))))
+        .andDo(print()).andExpect(status().isForbidden());
+  }
+
+  @Test
   public void testFindPenRequest_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     final PenRequestEntity entity = this.repository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
     this.mockMvc.perform(get(URL.BASE_URL+"?pen=" + entity.getPen())
