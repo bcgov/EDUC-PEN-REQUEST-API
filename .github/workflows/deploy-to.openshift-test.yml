@@ -28,7 +28,7 @@ env:
 
   APP_NAME: 'pen-request-api'
   REPO_NAME: "educ-pen-request-api"
-  BRANCH: "master"
+  BRANCH: "${{ github.ref_name }}"
   APP_NAME_FULL: "pen-request-api-master"
   NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
@@ -138,7 +138,7 @@ jobs:
             ${{ env.MAX_MEM }} \
             k oc apply -f -
 
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh \
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-configmap.sh \
             | bash /dev/stdin test \
             ${{ env.APP_NAME }} \
             ${{ env.NAMESPACE }} \

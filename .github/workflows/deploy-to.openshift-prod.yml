@@ -24,7 +24,7 @@ env:
 
   APP_NAME: 'pen-request-api'
   REPO_NAME: "educ-pen-request-api"
-  BRANCH: "master"
+  BRANCH: ${{ github.ref_name }}
   NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
