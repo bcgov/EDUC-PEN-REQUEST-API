@@ -180,7 +180,7 @@ jobs:
             ${{ env.BRANCH }}
 
           # Start rollout (if necessary) and follow it
-          oc rollout latest deployment/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+          oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
             || true && echo "Rollout in progress"
 
           oc logs -f deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}

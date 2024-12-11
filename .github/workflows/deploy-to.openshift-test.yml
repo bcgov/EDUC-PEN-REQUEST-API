@@ -28,7 +28,7 @@ env:
 
   APP_NAME: 'pen-request-api'
   REPO_NAME: "educ-pen-request-api"
-  BRANCH: "${{ github.ref_name }}"
+  BRANCH: ${{ github.ref_name }}
   APP_NAME_FULL: "pen-request-api-master"
   NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
@@ -150,7 +150,7 @@ jobs:
             ${{ env.BRANCH }}
 
           # Start rollout (if necessary) and follow it
-          oc rollout latest deployment/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+          oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
             || true && echo "Rollout in progress"
 
           oc logs -f deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}
