@@ -12,6 +12,10 @@ target
 settings.xml
 application-dev.properties
 
+# Vim
+Session.vim
+.vim
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -38,3 +42,6 @@ hs_err_pid*
 .project
 .factorypath
 .vscode
+.direnv
+.envrc
+shell.nix
