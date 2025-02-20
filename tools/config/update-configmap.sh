@@ -1,4 +1,4 @@
-envValue=$1
+ENVIRONMENT=$1
 APP_NAME=$2
 OPENSHIFT_NAMESPACE=$3
 DB_JDBC_CONNECT_STRING=$5
@@ -9,12 +9,12 @@ SPLUNK_TOKEN=$8
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
 
-SOAM_KC_LOAD_USER_ADMIN=$(oc -n "$OPENSHIFT_NAMESPACE"-"$envValue" -o json get secret sso-admin-"${envValue}" | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
-SOAM_KC_LOAD_USER_PASS=$(oc -n "$OPENSHIFT_NAMESPACE"-"$envValue" -o json get secret sso-admin-"${envValue}" | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
+SOAM_KC_LOAD_USER_ADMIN=$(oc -n "$OPENSHIFT_NAMESPACE"-"$ENVIRONMENT" -o json get secret sso-admin-"${ENVIRONMENT}" | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
+SOAM_KC_LOAD_USER_PASS=$(oc -n "$OPENSHIFT_NAMESPACE"-"$ENVIRONMENT" -o json get secret sso-admin-"${ENVIRONMENT}" | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
 
-SOAM_KC=soam-$envValue.apps.silver.devops.gov.bc.ca
+SOAM_KC=soam-$ENVIRONMENT.apps.silver.devops.gov.bc.ca
 NATS_CLUSTER=educ_nats_cluster
-NATS_URL="nats://nats.${OPENSHIFT_NAMESPACE}-${envValue}.svc.cluster.local:4222"
+NATS_URL="nats://nats.${OPENSHIFT_NAMESPACE}-${ENVIRONMENT}.svc.cluster.local:4222"
 
 echo Fetching SOAM token
 TKN=$(curl -s \
@@ -152,7 +152,7 @@ PARSER_CONFIG="
 "
 echo
 echo Creating config map "$APP_NAME-config-map"
-oc create -n "$OPENSHIFT_NAMESPACE-$envValue" configmap \
+oc create -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" configmap \
   "$APP_NAME-config-map" \
   --from-literal=TZ=$TZVALUE \
   --from-literal=TOKEN_ISSUER_URL="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID" \
@@ -179,17 +179,17 @@ oc create -n "$OPENSHIFT_NAMESPACE-$envValue" configmap \
   --dry-run=client -o yaml | oc apply -f -
 echo
 
-echo Setting environment variables for "$APP_NAME-$envValue" application
-oc -n "$OPENSHIFT_NAMESPACE-$envValue" set env \
-  --from="configmap/$APP_NAME-config-map" "deployment/$APP_NAME-$envValue"
+echo Setting environment variables for "$APP_NAME-$ENVIRONMENT" application
+oc -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" set env \
+  --from="configmap/$APP_NAME-config-map" "deployment/$APP_NAME-$ENVIRONMENT"
 
 echo Creating config map "$APP_NAME-flb-sc-config-map"
-oc create -n "$OPENSHIFT_NAMESPACE-$envValue" configmap \
+oc create -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" configmap \
   "$APP_NAME-flb-sc-config-map" \
   --from-literal=fluent-bit.conf="$FLB_CONFIG" \
   --from-literal=parsers.conf="$PARSER_CONFIG" \
   --dry-run=client=client -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
-oc -n "$OPENSHIFT_NAMESPACE-$envValue" set env \
-  "deployment/$APP_NAME-$envValue" KEYCLOAK_PUBLIC_KEY-
+oc -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" set env \
+  "deployment/$APP_NAME-$ENVIRONMENT" KEYCLOAK_PUBLIC_KEY-
