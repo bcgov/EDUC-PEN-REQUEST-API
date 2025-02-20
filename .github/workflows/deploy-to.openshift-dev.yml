@@ -177,8 +177,7 @@ jobs:
             ${{ env.DB_JDBC_CONNECT_STRING }} \
             ${{ env.DB_PWD }} \
             ${{ env.DB_USER }} \
-            ${{ env.SPLUNK_TOKEN }} \
-            ${{ env.BRANCH }}
+            ${{ env.SPLUNK_TOKEN }}
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
