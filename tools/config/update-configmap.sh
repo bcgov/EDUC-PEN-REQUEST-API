@@ -188,7 +188,7 @@ oc create -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" configmap \
   "$APP_NAME-flb-sc-config-map" \
   --from-literal=fluent-bit.conf="$FLB_CONFIG" \
   --from-literal=parsers.conf="$PARSER_CONFIG" \
-  --dry-run=client=client -o yaml | oc apply -f -
+  --dry-run=client -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
 oc -n "$OPENSHIFT_NAMESPACE-$ENVIRONMENT" set env \
