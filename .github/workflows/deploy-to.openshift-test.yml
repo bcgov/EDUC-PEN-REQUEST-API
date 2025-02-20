@@ -34,8 +34,8 @@ env:
   NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: ${{ github.event.inputs.tag }}
-  MIN_REPLICAS_TEST: "2"
-  MAX_REPLICAS_TEST: "3"
+  MIN_REPLICAS: "2"
+  MAX_REPLICAS: "3"
   MIN_CPU: "15m"
   MAX_CPU: "150m"
   MIN_MEM: "650Mi"
@@ -131,10 +131,10 @@ jobs:
             -p APP_NAME=${{ env.APP_NAME }} \
             -p REPO_NAME=${{ env.REPO_NAME }} \
             -p BRANCH=${{ env.BRANCH }} \
-            -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_DEV }} \
+            -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} \
             -p TAG=${{ env.TAG }} \
-            -p MIN_REPLICAS=${{ env.MIN_REPLICAS_DEV }} \
-            -p MAX_REPLICAS=${{ env.MAX_REPLICAS_DEV }} \
+            -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} \
+            -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} \
             -p MIN_CPU=${{ env.MIN_CPU }} \
             -p MAX_CPU=${{ env.MAX_CPU }} \
             -p MIN_MEM=${{ env.MIN_MEM }} \

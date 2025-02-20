@@ -162,8 +162,8 @@ jobs:
             -p BRANCH=${{ env.BRANCH }} \
             -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_DEV }} \
             -p TAG=${{ env.TAG }} \
-            -p MIN_REPLICAS=${{ env.MIN_REPLICAS_DEV }} \
-            -p MAX_REPLICAS=${{ env.MAX_REPLICAS_DEV }} \
+            -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} \
+            -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} \
             -p MIN_CPU=${{ env.MIN_CPU }} \
             -p MAX_CPU=${{ env.MAX_CPU }} \
             -p MIN_MEM=${{ env.MIN_MEM }} \
