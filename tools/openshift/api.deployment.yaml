@@ -4,19 +4,19 @@ kind: Template
 labels:
   template: "${REPO_NAME}-template"
 metadata:
-  name: "${REPO_NAME}-${BRANCH}-deployment"
+  name: "${REPO_NAME}-${APP_ENVIRONMENT}-deployment"
 objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
       labels:
-        app: "${APP_NAME}-${BRANCH}"
-      name: "${APP_NAME}-${BRANCH}"
+        app: "${APP_NAME}-${APP_ENVIRONMENT}"
+      name: "${APP_NAME}-${APP_ENVIRONMENT}"
     spec:
       replicas: ${{MIN_REPLICAS}}
       selector:
         matchLabels:
-          app: "${APP_NAME}-${BRANCH}"
+          app: "${APP_NAME}-${APP_ENVIRONMENT}"
       strategy:
         type: RollingUpdate
         rollingUpdate:
@@ -30,8 +30,7 @@ objects:
             prometheus.io/port: '8080'
             prometheus.io/scrape: 'true'
           labels:
-            app: "${APP_NAME}-${BRANCH}"
-            deploymentConfig: "${APP_NAME}-${BRANCH}"
+            app: "${APP_NAME}-${APP_ENVIRONMENT}"
         spec:
           containers:
             - image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/${REPO_NAME}-${BRANCH}:${TAG}
@@ -124,7 +123,7 @@ objects:
       annotations:
         service.alpha.openshift.io/serving-cert-secret-name: "pen-request-api-cert"
       labels:
-        app: "${APP_NAME}-${BRANCH}"
+        app: "${APP_NAME}-${APP_ENVIRONMENT}"
       name: "${APP_NAME}-${BRANCH}"
     spec:
       ports:
@@ -132,7 +131,7 @@ objects:
           port: ${{CONTAINER_PORT}}
           protocol: TCP
       selector:
-        app: "${APP_NAME}-${BRANCH}"
+        app: "${APP_NAME}-${APP_ENVIRONMENT}"
   - apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
     metadata:
@@ -153,6 +152,9 @@ objects:
               type: Utilization
               averageUtilization: 200
 parameters:
+  - name: APP_ENVIRONMENT
+    description: The app environment being used
+    required: true
   - name: REPO_NAME
     description: Application repository name
     required: true
