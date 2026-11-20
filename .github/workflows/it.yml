@@ -4,6 +4,9 @@ on:
   repository_dispatch:
     types: [integration-test]
   workflow_dispatch:  
+permissions:
+  contents: read
+
 jobs:
   integration_test:
 
